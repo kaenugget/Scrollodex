@@ -58,6 +58,40 @@
     - A section displaying the contact's detailed contact information.
     - Must include: Email, Phone, Social Media (as a hyperlink), and Preferred Contact Method.
 
+### 3.4. Relationship Stats Definitions
+
+The four core relationship stats provide a comprehensive view of the relationship's health and dynamics:
+
+- **Connection (0-100):** Represents the depth of the emotional bond and mutual understanding. This is the core "health" of the friendship, indicating closeness and empathy.
+- **Reliability (0-100):** Measures the level of trust and dependability. A high Reliability score means this is a friend you can count on to be there for you and keep their promises.
+- **Communication (0-100):** Reflects the quality and consistency of interaction. It measures how well you both keep in touch and engage in meaningful conversation.
+- **Energy (0-100):** Indicates the overall vibe and dynamic of the friendship. A high Energy stat signifies a fun, positive, and uplifting presence.
+
+### 3.5. Stat Measurement Strategies
+
+The relationship stats can be measured through a combination of automated data analysis and manual user input:
+
+#### Automated Measurement (Data-Driven)
+
+- **Connection:** Analyze sentiment of notes/moments, length of relationship, shared experiences count, frequency of deep conversations
+- **Reliability:** Track response rate to messages, follow-through on actions/todos, consistency of check-ins, meeting attendance
+- **Communication:** Measure frequency of interactions, message length/depth, response time, variety of communication channels used
+- **Energy:** Analyze positive sentiment in interactions, shared activities, emoji usage, exclamation marks in messages, meeting duration vs. planned
+
+#### Manual Input Options
+
+- **Connection:** User can manually adjust based on gut feeling, significant life events shared, level of vulnerability in conversations
+- **Reliability:** User can rate after specific interactions (kept/missed commitments, was there in crisis, etc.)
+- **Communication:** User can note quality beyond quantity (meaningful vs. surface-level chats)
+- **Energy:** User can rate the "vibe" after interactions (energized, neutral, drained)
+
+#### Hybrid Approach (Recommended)
+
+- Start with baseline automated scores
+- Allow manual overrides/adjustments via simple UI controls (slider or +/- buttons)
+- AI-suggested adjustments based on notes/moments content analysis
+- Periodic "check-in" prompts asking user to confirm or adjust stats
+
 ## 4. Non-Functional Requirements
 
 - **Performance:** The page should render instantly. A loading indicator must be shown for the AI-generated summary, which may have a slight delay.
