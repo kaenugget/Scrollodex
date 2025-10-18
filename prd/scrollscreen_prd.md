@@ -55,8 +55,8 @@ MVP
 
 - **Framework:** React
 - **Styling:** Tailwind CSS
-- **Components:** `FriendexList.tsx`, which contains the `FriendCard` component.
-- **Data Source:** A static array of `Friend` objects located in `constants.ts`.
+- **Components:** `ContactList.tsx`, which contains the `ContactCard` component.
+- **Data Source:** A static array of `Contact` objects located in `constants.ts`.
 
 ## 6. Out of Scope for this Feature
 
