@@ -143,7 +143,7 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
               getContactType(contact.name) === 'Personal' 
-                ? 'bg-green-500 text-white' 
+                ? 'bg-emerald-500 text-white' 
                 : 'bg-blue-500 text-white'
             }`}>
               {getContactType(contact.name)}
