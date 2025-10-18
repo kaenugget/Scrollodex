@@ -42,6 +42,7 @@ export default defineSchema({
     notes: v.array(v.string()),
     lastInteractionAt: v.number(),
     pinned: v.boolean(),
+    profilePictureUrl: v.optional(v.string()), // Profile picture URL for demo data
     // Dynamic connection fields
     connectedUserId: v.optional(v.id("users")), // If this contact is a connected user
     isDynamicContact: v.optional(v.boolean()), // True if this is a live-connected contact

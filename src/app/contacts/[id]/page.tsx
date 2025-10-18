@@ -21,14 +21,20 @@ export default function ContactDetailPage() {
   const isUserAuthenticated = isAuthenticated;
   const currentUser = user;
   
-  // Only load data if we have a user
+  // Only use hooks when we have a valid Convex user ID (same logic as main page)
+  const hasValidConvexUserId = currentUser?._id && typeof currentUser._id === 'string' && currentUser._id !== 'demo';
+  
+  // Use a dummy ID when we don't have a valid user ID, but disable the queries
+  const dummyUserId = "demo" as Id<"users">;
+  
+  // Only load data if we have a valid user
   const { contacts, isLoading: contactsLoading } = useContacts(
-    currentUser?._id as Id<"users">, 
-    !!currentUser
+    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
+    !!(isUserAuthenticated && hasValidConvexUserId)
   );
   const { dexEntries, isLoading: dexLoading } = useDexEntries(
-    currentUser?._id as Id<"users">, 
-    !!currentUser
+    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
+    !!(isUserAuthenticated && hasValidConvexUserId)
   );
 
   const handleSignOut = () => {
@@ -40,7 +46,7 @@ export default function ContactDetailPage() {
     return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 
-  if (!isUserAuthenticated || !currentUser) {
+  if (!isUserAuthenticated || !hasValidConvexUserId) {
     return <LoadingSpinner fullScreen text="Redirecting to login..." />;
   }
 
@@ -63,6 +69,8 @@ export default function ContactDetailPage() {
         <ContactDetailView 
           contactId={contactId}
           userId={currentUser._id as Id<"users">}
+          contacts={contacts}
+          dexEntries={dexEntries}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />

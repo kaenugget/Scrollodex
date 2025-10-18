@@ -153,10 +153,15 @@ export default function ProfilePage() {
     return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
 
-  if (!isUserAuthenticated || !currentUser) {
+  // Only redirect if explicitly not authenticated, not if user is still loading
+  if (!isUserAuthenticated) {
     return <LoadingSpinner fullScreen text="Redirecting to login..." />;
   }
 
+  // Show loading while user data is being fetched
+  if (!currentUser) {
+    return <LoadingSpinner fullScreen text="Loading profile..." />;
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-red-800 flex flex-col items-center justify-center p-4">
       <AnimatedBackground />

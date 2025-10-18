@@ -22,7 +22,7 @@ export function SeedDataButton({ userId }: SeedDataButtonProps) {
       
       alert("Contacts imported successfully! Your contacts are now loaded.");
     } catch (error) {
-      console.error("Error importing contacts:", error);
+      console.error("Error seeding data:", error);
       alert("Error importing contacts. Check console for details.");
     } finally {
       setIsSeeding(false);

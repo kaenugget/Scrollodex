@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from 'framer-motion';
-import { LoginForm, SignUpForm } from "@/components/AuthForms";
+import { MultiStepSignupForm } from "@/components/MultiStepSignupForm";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 // Static asset paths for emoji images in public directory
@@ -140,10 +140,11 @@ function MobileGridSection() {
 export function SignupLandingPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
 
-  const handleAuthSuccess = () => {
-    router.push("/profile");
+  const handleSignupSuccess = () => {
+    // Use window.location.href to force a full page reload
+    // This ensures the authentication state is properly synchronized
+    window.location.href = "/";
   };
 
   return (
@@ -195,7 +196,7 @@ export function SignupLandingPage() {
           </motion.div>
         </div>
 
-        {/* Right Side - Auth Form */}
+        {/* Right Side - Signup Form */}
         <motion.div 
           className="w-full lg:w-auto lg:min-w-[480px] z-50"
           initial={{ opacity: 0, y: 20 }}
@@ -208,45 +209,18 @@ export function SignupLandingPage() {
                 <span className="text-white text-2xl">✨</span>
               </div>
               <h2 className="text-2xl font-bold scrollodex-text-dark mb-2">
-                {authMode === "signup" ? "Join Scrollodex" : "Welcome Back"}
+                Join Scrollodex
               </h2>
               <p className="scrollodex-text-gray">
-                {authMode === "signup" 
-                  ? "Create your account and start building meaningful connections"
-                  : "Sign in to continue your journey"
-                }
+                Create your account and start building meaningful connections
               </p>
             </div>
             
-            {/* Auth Mode Toggle */}
-            <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setAuthMode("signup")}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                  authMode === "signup"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Sign Up
-              </button>
-              <button
-                onClick={() => setAuthMode("login")}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                  authMode === "login"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Sign In
-              </button>
-            </div>
-            
-            {authMode === "signup" ? (
-              <SignUpForm onSuccess={handleAuthSuccess} />
-            ) : (
-              <LoginForm onSuccess={handleAuthSuccess} />
-            )}
+            <MultiStepSignupForm 
+              onSuccess={handleSignupSuccess}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+            />
           </div>
         </motion.div>
       </div>
