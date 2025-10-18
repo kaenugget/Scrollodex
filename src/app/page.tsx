@@ -26,6 +26,7 @@ export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
+  const router = useRouter();
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
@@ -58,27 +59,8 @@ export default function Home() {
   );
 
   const handleContactView = (contactId: string) => {
-    console.log('handleContactView called with contactId:', contactId);
-    console.log('Current URL before navigation:', window.location.href);
-    
-    // Test direct navigation first
-    console.log('Attempting to navigate to:', `/contacts/${contactId}`);
-    
-    try {
-      router.push(`/contacts/${contactId}`);
-      console.log('Router.push called successfully');
-      
-      // Check if navigation actually happened
-      setTimeout(() => {
-        console.log('URL after navigation attempt:', window.location.href);
-      }, 100);
-      
-    } catch (error) {
-      console.error('Router navigation failed:', error);
-      // Only use window.location as absolute fallback
-      console.log('Falling back to window.location');
-      window.location.href = `/contacts/${contactId}`;
-    }
+    // Use Next.js router for client-side navigation
+    router.push(`/contacts/${contactId}`);
   };
 
   const handleAuthSuccess = () => {

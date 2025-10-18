@@ -15,7 +15,22 @@ const isProtectedRoute = (pathname: string) => {
 };
 
 export function middleware(request: NextRequest) {
-  // Temporarily disable middleware to test navigation
+  const { pathname } = request.nextUrl;
+  
+  // Check if the route is protected
+  if (isProtectedRoute(pathname)) {
+    // Check for auth token in cookies or headers
+    const authToken = request.cookies.get('authToken')?.value || 
+                     request.headers.get('authorization')?.replace('Bearer ', '');
+    
+    // For now, allow access to protected routes - authentication will be handled client-side
+    // This prevents the redirect loop issue
+    if (!authToken) {
+      // Don't redirect, let the client-side auth handle it
+      console.log('No auth token found in middleware, but allowing access for client-side auth check');
+    }
+  }
+  
   return NextResponse.next();
 }
 
