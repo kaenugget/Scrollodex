@@ -12,9 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, Settings, Camera, CreditCard } from "lucide-react";
-import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
 import { useAuth } from "@/hooks/useAuth";
-import { useUser } from '@clerk/nextjs';
 
 interface PeerPageViewProps {
   peerPageId: string;
@@ -24,13 +22,11 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
   const [activeTab, setActiveTab] = useState<"moments" | "deck" | "settings">("moments");
   
   // Get current user from auth context
-  const { isSignedIn } = useUser();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   
-  // Use Clerk authentication if available, otherwise fall back to custom auth
-  const isUserAuthenticated = isSignedIn || isAuthenticated;
-  const currentUser = convexUser || user;
+  // Use custom auth system
+  const isUserAuthenticated = isAuthenticated;
+  const currentUser = user;
 
   // Get peer page data
   const peerPage = useQuery(api.social.getPeerPage, { peerPageId: peerPageId as Id<"peerPages"> });
@@ -39,7 +35,7 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
   const userA = useQuery(api.users.getUserById, peerPage?.aUserId ? { userId: peerPage.aUserId } : "skip");
   const userB = useQuery(api.users.getUserById, peerPage?.bUserId ? { userId: peerPage.bUserId } : "skip");
 
-  if (authLoading || clerkConvexLoading) {
+  if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading peer page..." />;
   }
 

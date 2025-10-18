@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,7 @@ export function SharedCardView({ shareToken }: SharedCardViewProps) {
   const card = useQuery(api.social.getCardByShareToken, { shareToken });
   
   // Get current user
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
 
   // Mutations
   const claimCard = useMutation(api.social.claimCard);

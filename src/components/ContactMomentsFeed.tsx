@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   // Get current user
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
   
   // Get contact to check if it's a connected user
   const contact = useQuery(api.contacts.get, { contactId });

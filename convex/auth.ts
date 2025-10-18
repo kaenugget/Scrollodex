@@ -1,6 +1,5 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@clerk/nextjs/server";
 
 // Simple password hashing (in production, use bcrypt or similar)
 function simpleHash(password: string): string {

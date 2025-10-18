@@ -7,30 +7,22 @@ import { DexDetailView } from '@/components/DexDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
-import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
-import { useUser } from '@clerk/nextjs';
 import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function DexDetailPage() {
   const params = useParams();
   const contactId = params.id as string;
   
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
-  const { isSignedIn } = useUser();
+  const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   
-  const isUserAuthenticated = isSignedIn || isAuthenticated;
-  const currentUser = convexUser || user;
+  const isUserAuthenticated = isAuthenticated;
+  const currentUser = user;
 
   const handleSignOut = () => {
-    if (isSignedIn) {
-      window.location.href = '/';
-    } else {
-      // Handle custom auth sign out
-    }
+    signOut();
   };
 
-  if (authLoading || clerkConvexLoading) {
+  if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading dex entry..." />;
   }
 

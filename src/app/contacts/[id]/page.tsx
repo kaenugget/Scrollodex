@@ -7,8 +7,6 @@ import { ContactDetailView } from '@/components/ContactDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
-import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
-import { useUser } from '@clerk/nextjs';
 import { useContacts } from '@/hooks/useContacts';
 import { useDexEntries } from '@/hooks/useDex';
 import { Id } from "../../../../convex/_generated/dataModel";
@@ -18,12 +16,10 @@ export default function ContactDetailPage() {
   const contactId = params.id as string;
   const [activeTab, setActiveTab] = useState<"overview" | "notes" | "actions" | "preferences" | "moments">("overview");
   
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
-  const { isSignedIn } = useUser();
+  const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   
-  const isUserAuthenticated = isSignedIn || isAuthenticated;
-  const currentUser = convexUser || user;
+  const isUserAuthenticated = isAuthenticated;
+  const currentUser = user;
   
   // Only load data if we have a user
   const { contacts, isLoading: contactsLoading } = useContacts(
@@ -36,15 +32,11 @@ export default function ContactDetailPage() {
   );
 
   const handleSignOut = () => {
-    if (isSignedIn) {
-      window.location.href = '/';
-    } else {
-      // Handle custom auth sign out
-    }
+    signOut();
   };
 
-  if (authLoading || clerkConvexLoading || contactsLoading || dexLoading) {
-    console.log('Loading states:', { authLoading, clerkConvexLoading, contactsLoading, dexLoading });
+  if (authLoading || contactsLoading || dexLoading) {
+    console.log('Loading states:', { authLoading, contactsLoading, dexLoading });
     return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 

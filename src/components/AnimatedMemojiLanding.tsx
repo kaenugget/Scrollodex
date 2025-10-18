@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { LoginForm, SignUpForm } from "@/components/AuthForms";
-import { ClerkAuth, ClerkSignUp } from "@/components/ClerkAuth";
 import { MultiStepSignupForm } from "@/components/MultiStepSignupForm";
 
 // Memoji components with different animations
@@ -49,7 +48,7 @@ function TakePhotoButton({ onTakePhoto }: { onTakePhoto: () => void }) {
         onClick={onTakePhoto}
       >
         <p className="font-bold text-[24px] text-[#1f0f26] sm:text-[20px]">
-          📸 Take a Photo
+          📸 Create Account with Selfie & AI Avatar
         </p>
       </motion.button>
     </div>
@@ -62,8 +61,8 @@ function AuthOverlay({
   setShowAuth, 
   onAuthSuccess 
 }: { 
-  showAuth: "login" | "signup" | "clerk-login" | "clerk-signup" | "multi-step-signup" | null;
-  setShowAuth: (auth: "login" | "signup" | "clerk-login" | "clerk-signup" | "multi-step-signup" | null) => void;
+  showAuth: "login" | "signup" | "multi-step-signup" | null;
+  setShowAuth: (auth: "login" | "signup" | "multi-step-signup" | null) => void;
   onAuthSuccess: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,18 +71,14 @@ function AuthOverlay({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md">
+      <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         {showAuth === "login" ? (
           <LoginForm onSuccess={onAuthSuccess} />
         ) : showAuth === "signup" ? (
           <SignUpForm onSuccess={onAuthSuccess} />
-        ) : showAuth === "clerk-login" ? (
-          <ClerkAuth onSuccess={onAuthSuccess} />
-        ) : showAuth === "clerk-signup" ? (
-          <ClerkSignUp onSuccess={onAuthSuccess} />
         ) : showAuth === "multi-step-signup" ? (
           <MultiStepSignupForm 
-            onSuccess={onAuthSuccess} 
+            onSuccess={onAuthSuccess}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
           />
@@ -106,10 +101,10 @@ function AuthOverlay({
 }
 
 export default function AnimatedMemojiLanding() {
-  const [showAuth, setShowAuth] = useState<"login" | "signup" | "clerk-login" | "clerk-signup" | "multi-step-signup" | null>(null);
+  const [showAuth, setShowAuth] = useState<"login" | "signup" | "multi-step-signup" | null>(null);
 
   const handleTakePhoto = () => {
-    // Open the multi-step signup with selfie capture
+    // Open the multi-step signup form with memoji generation
     setShowAuth("multi-step-signup");
   };
 
@@ -219,7 +214,7 @@ export default function AnimatedMemojiLanding() {
           </motion.button>
           
           <motion.button
-            onClick={() => setShowAuth("clerk-signup")}
+            onClick={() => setShowAuth("signup")}
             className="w-full px-6 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -227,11 +222,11 @@ export default function AnimatedMemojiLanding() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4, duration: 0.8 }}
           >
-            🚀 Quick Signup (Google, GitHub, etc.)
+            🚀 Quick Signup
           </motion.button>
           
           <motion.button
-            onClick={() => setShowAuth("clerk-login")}
+            onClick={() => setShowAuth("login")}
             className="w-full px-6 py-4 border-2 border-blue-400 text-blue-400 font-semibold rounded-xl hover:bg-blue-400 hover:text-white transition-all duration-200"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -239,7 +234,7 @@ export default function AnimatedMemojiLanding() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6, duration: 0.8 }}
           >
-            🔑 Sign In (Google, GitHub, etc.)
+            🔑 Sign In
           </motion.button>
           
           <motion.div

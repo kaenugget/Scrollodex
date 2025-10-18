@@ -4,13 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:server": "nodemon --watch src --exec \"ts-node --project tsconfig.server.json\" src/server.ts",
-    "dev:mastra": "nodemon --watch src --exec \"ts-node --project tsconfig.server.json\" src/mastra/server.ts",
     "build": "next build",
-    "build:server": "tsc --project tsconfig.server.json",
     "start": "next start",
-    "start:server": "node dist/server.js",
-    "start:mastra": "node dist/mastra/server.js",
     "seed": "ts-node scripts/seed.ts",
     "migrate": "ts-node src/db/migrate.ts",
     "test-db": "ts-node scripts/test-db.ts",
@@ -19,7 +14,6 @@
   },
   "dependencies": {
     "@auth/core": "^0.41.0",
-    "@clerk/nextjs": "^6.33.7",
     "@convex-dev/auth": "^0.0.90",
     "@google-cloud/local-auth": "^3.0.1",
     "@mastra/core": "^0.21.1",

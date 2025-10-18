@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Upload, MapPin, Calendar, Tag, Smile, Eye, Cloud, Activity } from "lucide-react";
@@ -65,7 +65,7 @@ export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
   const addMoment = useMutation(api.social.addMoment);
   
   // Get current user
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

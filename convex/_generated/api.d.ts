@@ -9,6 +9,7 @@
  */
 
 import type * as actions from "../actions.js";
+import type * as agents from "../agents.js";
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as clerk from "../clerk.js";
@@ -43,6 +44,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   actions: typeof actions;
+  agents: typeof agents;
   ai: typeof ai;
   auth: typeof auth;
   clerk: typeof clerk;

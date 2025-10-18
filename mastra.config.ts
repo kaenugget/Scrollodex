@@ -6,17 +6,10 @@ import { curator } from "./src/agents/curator";
 import { planner } from "./src/agents/planner";
 import { writer } from "./src/agents/writer";
 
-// Import your existing workflows
-import { dailyDigestWorkflow } from "./src/workflows/dailyDigest";
-import { sendApprovedWorkflow } from "./src/workflows/sendApproved";
-
-// Import MCP configuration
-import { userMcp } from "./src/mcp/userMcp";
-
 export const mastra = new Mastra({
   name: "scrollodex-crm",
   version: "1.0.0",
-  description: "Agentic CRM system for Scrollodex",
+  description: "Agentic CRM system for Scrollodex - AI agents for contact management",
   
   // Configure model providers
   modelProviders: {
@@ -25,21 +18,13 @@ export const mastra = new Mastra({
     }),
   },
   
-  // Register your agents
+  // Register your agents (these will be deployed to Mastra Cloud)
   agents: {
     curator,
     planner,
     writer,
   },
   
-  // Register your workflows
-  workflows: {
-    dailyDigest: dailyDigestWorkflow,
-    sendApproved: sendApprovedWorkflow,
-  },
-  
-  // Configure MCP servers
-  mcpServers: {
-    // We'll add MCP servers here once we have them configured
-  },
+  // Note: Workflows are now handled by Convex actions
+  // MCP servers are now handled by Convex actions
 });

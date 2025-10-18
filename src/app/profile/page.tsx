@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
-import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
-import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { QRCodeDisplay } from '@/components/QRCodeDisplay';
@@ -34,23 +32,25 @@ export default function ProfilePage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
-  const { isSignedIn } = useUser();
-  const { signOut: clerkSignOut } = useClerk();
+  // Profile form state
+  const [profileForm, setProfileForm] = useState({
+    displayName: '',
+    bio: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
-  const isUserAuthenticated = isSignedIn || isAuthenticated;
-  const currentUser = convexUser || user;
+  const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
+  
+  const isUserAuthenticated = isAuthenticated;
+  const currentUser = user;
 
   // Mutations
   const createUserShare = useMutation(api.social.createUserShare);
+  const updateProfile = useMutation(api.users.updateProfile);
 
   const handleSignOut = async () => {
-    if (isSignedIn) {
-      await clerkSignOut();
-    } else {
-      // Handle custom auth sign out
-    }
+    await signOut();
   };
 
   const generateProfileShareLink = async () => {
@@ -85,7 +85,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (authLoading || clerkConvexLoading) {
+  if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
 

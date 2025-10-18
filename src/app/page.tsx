@@ -2,17 +2,13 @@
 
 import { ContactCard } from "@/components/ContactCard";
 import { SeedDataButton } from "@/components/SeedDataButton";
-import { LoginForm, SignUpForm } from "@/components/AuthForms";
-import { ClerkAuth, ClerkSignUp } from "@/components/ClerkAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { SignupLandingPage } from "@/components/SignupLandingPage";
+import AnimatedMemojiLanding from "@/components/AnimatedMemojiLanding";
 import { useContacts } from "@/hooks/useContacts";
 import { useAuth } from "@/hooks/useAuth";
-// import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
 import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
-// import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
@@ -26,9 +22,8 @@ export default function Home() {
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
-  // const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   
-  // Use custom auth only for now due to React 19 compatibility issues with Clerk
+  // Use custom auth system
   const isUserAuthenticated = isAuthenticated;
   const currentUser = user;
 
@@ -57,7 +52,6 @@ export default function Home() {
     setShowAuth(null);
   };
 
-
   // Show loading while checking authentication
   if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading Scrollodex..." />;
@@ -66,7 +60,7 @@ export default function Home() {
   // Show auth forms if not authenticated
   if (!isUserAuthenticated) {
     console.log('User not authenticated, showing landing page');
-    return <SignupLandingPage />;
+    return <AnimatedMemojiLanding />;
   }
 
   const handleSignOut = async () => {

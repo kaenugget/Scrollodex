@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +32,7 @@ export function CardComposer({ peerPageId, onClose }: CardComposerProps) {
   const createDeck = useMutation(api.social.createDeck);
   
   // Get current user and contacts
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
   const getDecks = useQuery(api.social.getDecks, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
   const contacts = useQuery(api.contacts.list, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
 

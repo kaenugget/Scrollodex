@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
+import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ export function MomentsFeed({ peerPageId }: MomentsFeedProps) {
   const moments = useQuery(api.social.getMoments, { peerPageId });
   
   // Get current user
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
 
   if (!moments) {
     return (
@@ -126,7 +126,7 @@ interface MomentCardProps {
 function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
   const photoUrl = useQuery(api.files.getFileUrl, { fileId: moment.photoFileId });
   const author = useQuery(api.users.getUser, { userId: moment.authorId });
-  const { convexUser: currentUser } = useClerkConvexUser();
+  const { user: currentUser } = useAuth();
   
   const likeMoment = useMutation(api.social.likeMoment);
   const unlikeMoment = useMutation(api.social.unlikeMoment);

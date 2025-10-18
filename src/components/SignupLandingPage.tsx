@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from 'framer-motion';
-import { ClerkProvider } from '@clerk/nextjs';
-import { MultiStepSignupForm } from "@/components/MultiStepSignupForm";
+import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 // Static asset paths for emoji images in public directory
@@ -141,92 +140,116 @@ function MobileGridSection() {
 export function SignupLandingPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
 
-  const handleSignupSuccess = () => {
+  const handleAuthSuccess = () => {
     router.push("/");
   };
 
   return (
-    <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-    >
-      <div className="scrollodex-bg min-h-screen flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 lg:p-8">
-        <AnimatedBackground />
-        
-        {/* Desktop Hero Section */}
-        <DesktopHeroSection />
-        
-        {/* Mobile Grid Section */}
-        <MobileGridSection />
+    <div className="scrollodex-bg min-h-screen flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 lg:p-8">
+      <AnimatedBackground />
+      
+      {/* Desktop Hero Section */}
+      <DesktopHeroSection />
+      
+      {/* Mobile Grid Section */}
+      <MobileGridSection />
 
-        {/* Content Section */}
-        <div className="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-16 z-50">
-          {/* Left Side - Hero Content */}
-          <div className="flex-1 text-center lg:text-left lg:max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold scrollodex-text-white-bold scrollodex-text-animate mb-6">
-                Scrollodex
-              </h1>
-              <p className="text-xl sm:text-2xl lg:text-3xl scrollodex-text-white mb-8 lg:mb-12">
-                Explore Your Circle Like Never Before.
-              </p>
-              <div className="hidden lg:block">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1.0, duration: 0.8 }}
-                  className="space-y-4 text-left"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="scrollodex-text-white">AI-powered contact management</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    <span className="scrollodex-text-white">Personalized relationship insights</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                    <span className="scrollodex-text-white">Smart networking made simple</span>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Right Side - Signup Form */}
-          <motion.div 
-            className="w-full lg:w-auto lg:min-w-[480px] z-50"
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-16 z-50">
+        {/* Left Side - Hero Content */}
+        <div className="flex-1 text-center lg:text-left lg:max-w-2xl">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.8 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
           >
-            <div className="scrollodex-card scrollodex-card-large">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white text-2xl">✨</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold scrollodex-text-white-bold scrollodex-text-animate mb-6">
+              Scrollodex
+            </h1>
+            <p className="text-xl sm:text-2xl lg:text-3xl scrollodex-text-white mb-8 lg:mb-12">
+              Explore Your Circle Like Never Before.
+            </p>
+            <div className="hidden lg:block">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.0, duration: 0.8 }}
+                className="space-y-4 text-left"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="scrollodex-text-white">AI-powered contact management</span>
                 </div>
-                <h2 className="text-2xl font-bold scrollodex-text-dark mb-2">
-                  Join Scrollodex
-                </h2>
-                <p className="scrollodex-text-gray">
-                  Create your account and start building meaningful connections
-                </p>
-              </div>
-              
-              <MultiStepSignupForm 
-                onSuccess={handleSignupSuccess}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-              />
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                  <span className="scrollodex-text-white">Personalized relationship insights</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                  <span className="scrollodex-text-white">Smart networking made simple</span>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
+
+        {/* Right Side - Auth Form */}
+        <motion.div 
+          className="w-full lg:w-auto lg:min-w-[480px] z-50"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.8 }}
+        >
+          <div className="scrollodex-card scrollodex-card-large">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white text-2xl">✨</span>
+              </div>
+              <h2 className="text-2xl font-bold scrollodex-text-dark mb-2">
+                {authMode === "signup" ? "Join Scrollodex" : "Welcome Back"}
+              </h2>
+              <p className="scrollodex-text-gray">
+                {authMode === "signup" 
+                  ? "Create your account and start building meaningful connections"
+                  : "Sign in to continue your journey"
+                }
+              </p>
+            </div>
+            
+            {/* Auth Mode Toggle */}
+            <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setAuthMode("signup")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                  authMode === "signup"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Sign Up
+              </button>
+              <button
+                onClick={() => setAuthMode("login")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                  authMode === "login"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Sign In
+              </button>
+            </div>
+            
+            {authMode === "signup" ? (
+              <SignUpForm onSuccess={handleAuthSuccess} />
+            ) : (
+              <LoginForm onSuccess={handleAuthSuccess} />
+            )}
+          </div>
+        </motion.div>
       </div>
-    </ClerkProvider>
+    </div>
   );
 }
