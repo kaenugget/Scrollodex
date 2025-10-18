@@ -102,7 +102,8 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
   const hasExistingPet = !!(petModel && petModel.petType && petModel.level && petModel.happiness !== undefined);
   
   // Check if we're still loading pet data (petData is undefined but we expect it)
-  const isLoadingPetData = petData === undefined;
+  // Only show loading if we're actively generating a pet, not if pet data simply doesn't exist
+  const isLoadingPetData = isGenerating;
   
   console.log('🐣 PetModel: State check:', {
     petData,
