@@ -28,6 +28,22 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
   const contact = contacts.find(c => c._id === contactId);
   const dexEntry = dexEntries.find(d => d.contactId === contactId);
 
+  // Helper functions for consistent type and role display
+  const getContactType = (name: string) => {
+    const index = name.charCodeAt(0) % 2;
+    return index === 0 ? 'Personal' : 'Professional';
+  };
+
+  const getRole = (name: string) => {
+    const roles = [
+      'Mentor', 'Investor', 'Childhood Friend', 'Golf Buddy', 'Colleague', 
+      'Client', 'Partner', 'Advisor', 'Friend', 'Acquaintance', 
+      'Family', 'Neighbor', 'Classmate', 'Teammate', 'Business Contact'
+    ];
+    const index = name.charCodeAt(0) % roles.length;
+    return roles[index];
+  };
+
   // List of available memoji images
   const memojiImages = [
     '08356205059d24549593d0b9a19cb1762abc8900.png',
@@ -89,7 +105,7 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
     return `${Math.floor(days / 7)} weeks ago`;
   };
 
-  // Calculate relationship stats based on actual contact data
+  // Calculate relationship stats with randomization for variety
   const getRelationshipStats = () => {
     if (!contact) {
       return {
@@ -110,58 +126,67 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
     const hasPhones = contact.phones?.length > 0;
     const hasTags = contact.tags?.length > 0;
 
-    // Base score from dex entry if available
-    let baseScore = 50;
-    if (dexEntry) {
-      baseScore = Math.min(95, 50 + (dexEntry.level * 5) + Math.floor(dexEntry.xp / 100));
-    }
+    // Create a deterministic but varied seed based on contact name
+    const nameHash = contact.name.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
 
-    // Connection: Based on interaction frequency, notes, and contact completeness
-    const connectionScore = Math.min(100, Math.max(20, 
-      baseScore + 
-      (notesCount * 3) + // More notes = stronger connection
-      (isPinned ? 10 : 0) + // Pinned contacts have stronger connection
-      (lastInteractionDays < 7 ? 15 : lastInteractionDays < 30 ? 10 : lastInteractionDays < 90 ? 5 : -10) + // Recent interaction bonus
-      (hasCompany ? 5 : 0) + // Complete profile
-      (hasLocation ? 5 : 0) +
-      (hasEmails ? 5 : 0) +
+    // Generate consistent but varied base scores for each stat
+    const connectionSeed = (nameHash + 1) % 100;
+    const reliabilitySeed = (nameHash + 2) % 100;
+    const communicationSeed = (nameHash + 3) % 100;
+    const energySeed = (nameHash + 4) % 100;
+
+    // Base scores with more variation (30-70 range)
+    let baseConnection = 30 + (connectionSeed * 0.4);
+    let baseReliability = 30 + (reliabilitySeed * 0.4);
+    let baseCommunication = 30 + (communicationSeed * 0.4);
+    let baseEnergy = 30 + (energySeed * 0.4);
+
+    // Apply modifiers but keep them more conservative
+    const connectionScore = Math.min(100, Math.max(15, 
+      baseConnection + 
+      (notesCount * 2) + // Reduced from 3
+      (isPinned ? 8 : 0) + // Reduced from 10
+      (lastInteractionDays < 7 ? 12 : lastInteractionDays < 30 ? 8 : lastInteractionDays < 90 ? 4 : -8) + // Reduced bonuses
+      (hasCompany ? 3 : 0) + // Reduced from 5
+      (hasLocation ? 3 : 0) +
+      (hasEmails ? 3 : 0) +
+      (hasPhones ? 3 : 0) +
+      (hasTags ? 3 : 0)
+    ));
+
+    const reliabilityScore = Math.min(100, Math.max(15,
+      baseReliability +
+      (lastInteractionDays < 30 ? 10 : lastInteractionDays < 90 ? 6 : lastInteractionDays < 180 ? 3 : -12) + // Reduced bonuses
+      (notesCount > 3 ? 6 : notesCount > 1 ? 3 : 0) + // Reduced from 10/5
+      (hasCompany ? 5 : 0) + // Reduced from 8
+      (hasLocation ? 3 : 0) +
+      (hasEmails ? 5 : 0) + // Reduced from 8
       (hasPhones ? 5 : 0) +
-      (hasTags ? 5 : 0)
+      (isPinned ? 4 : 0) // Reduced from 5
     ));
 
-    // Reliability: Based on consistency of interaction and profile completeness
-    const reliabilityScore = Math.min(100, Math.max(20,
-      baseScore +
-      (lastInteractionDays < 30 ? 15 : lastInteractionDays < 90 ? 10 : lastInteractionDays < 180 ? 5 : -15) + // Consistent interaction
-      (notesCount > 3 ? 10 : notesCount > 1 ? 5 : 0) + // Multiple notes show reliability
-      (hasCompany ? 8 : 0) + // Professional reliability
-      (hasLocation ? 5 : 0) +
-      (hasEmails ? 8 : 0) + // Contact info shows reliability
-      (hasPhones ? 8 : 0) +
-      (isPinned ? 5 : 0) // Pinned = reliable contact
+    const communicationScore = Math.min(100, Math.max(15,
+      baseCommunication +
+      (notesCount * 3) + // Reduced from 4
+      (lastInteractionDays < 14 ? 15 : lastInteractionDays < 30 ? 10 : lastInteractionDays < 60 ? 6 : lastInteractionDays < 180 ? 3 : -8) + // Reduced bonuses
+      (hasEmails ? 6 : 0) + // Reduced from 10
+      (hasPhones ? 6 : 0) + // Reduced from 10
+      (hasTags ? 3 : 0) + // Reduced from 5
+      (isPinned ? 5 : 0) // Reduced from 8
     ));
 
-    // Communication: Based on notes, contact methods, and interaction recency
-    const communicationScore = Math.min(100, Math.max(20,
-      baseScore +
-      (notesCount * 4) + // Notes indicate communication
-      (lastInteractionDays < 14 ? 20 : lastInteractionDays < 30 ? 15 : lastInteractionDays < 60 ? 10 : lastInteractionDays < 180 ? 5 : -10) + // Recent communication
-      (hasEmails ? 10 : 0) + // Email = communication channel
-      (hasPhones ? 10 : 0) + // Phone = communication channel
-      (hasTags ? 5 : 0) + // Tags show understanding
-      (isPinned ? 8 : 0) // Pinned = important communication
-    ));
-
-    // Energy: Based on interaction frequency, profile activity, and engagement
-    const energyScore = Math.min(100, Math.max(20,
-      baseScore +
-      (lastInteractionDays < 7 ? 25 : lastInteractionDays < 14 ? 20 : lastInteractionDays < 30 ? 15 : lastInteractionDays < 60 ? 10 : lastInteractionDays < 180 ? 5 : -15) + // Recent activity
-      (notesCount > 2 ? 15 : notesCount > 0 ? 8 : 0) + // Active note-taking
-      (hasCompany ? 5 : 0) + // Professional energy
-      (hasLocation ? 5 : 0) +
-      (hasTags ? 8 : 0) + // Tagging shows engagement
-      (isPinned ? 10 : 0) + // Pinned = high energy relationship
-      (dexEntry ? Math.min(10, dexEntry.level) : 0) // Dex level shows engagement
+    const energyScore = Math.min(100, Math.max(15,
+      baseEnergy +
+      (lastInteractionDays < 7 ? 18 : lastInteractionDays < 14 ? 12 : lastInteractionDays < 30 ? 8 : lastInteractionDays < 60 ? 5 : lastInteractionDays < 180 ? 3 : -12) + // Reduced bonuses
+      (notesCount > 2 ? 8 : notesCount > 0 ? 4 : 0) + // Reduced from 15/8
+      (hasCompany ? 3 : 0) + // Reduced from 5
+      (hasLocation ? 3 : 0) +
+      (hasTags ? 5 : 0) + // Reduced from 8
+      (isPinned ? 6 : 0) + // Reduced from 10
+      (dexEntry ? Math.min(6, dexEntry.level * 2) : 0) // Reduced from 10
     ));
 
     return {
@@ -210,14 +235,6 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
               <div className="text-4xl font-bold scrollodex-text-dark">{overallScore}</div>
             </div>
           </div>
-
-          {/* Pet Model */}
-          <PetModel 
-            contactId={contactId as Id<"contacts">} 
-            userId={userId}
-            relationshipStats={relationshipStats}
-            petData={contact.petData}
-          />
 
           {/* Relationship Stats */}
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -281,24 +298,14 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
             </div>
           </div>
 
-          {/* Dex Info Card */}
-          {dexEntry && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Dex Info</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500 font-mono">Dex #{dexEntry.dexNumber.toString().padStart(3, '0')}</span>
-                  <span className="text-sm font-semibold text-gray-900">Lv. {dexEntry.level}</span>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {dexEntry.types.map(type => (
-                    <TypeChip key={type} type={type as "FIRE" | "WATER" | "GRASS" | "ELEC" | "PSY" | "STEEL" | "DARK" | "ART" | "NORM"} size="sm"/>
-                  ))}
-                </div>
-                <XpProgress level={dexEntry.level} xp={dexEntry.xp} />
-              </div>
-            </div>
-          )}
+          {/* Pet Model */}
+          <PetModel 
+            contactId={contactId as Id<"contacts">} 
+            userId={userId}
+            relationshipStats={relationshipStats}
+            petData={contact.petData}
+          />
+
         </div>
 
         {/* Right Panel - Contact Information */}
@@ -368,14 +375,17 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
             {/* Type */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Type</h3>
-              <div className="flex gap-2">
-                {dexEntry && dexEntry.types.length > 0 ? (
-                  dexEntry.types.map(type => (
-                    <TypeChip key={type} type={type as "FIRE" | "WATER" | "GRASS" | "ELEC" | "PSY" | "STEEL" | "DARK" | "ART" | "NORM"} size="md"/>
-                  ))
-                ) : (
-                  <span className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg">Professional</span>
-                )}
+              <div className="flex gap-2 flex-wrap">
+                <span className={`px-4 py-2 text-white font-medium rounded-lg ${
+                  getContactType(contact.name) === 'Personal' 
+                    ? 'bg-emerald-500' 
+                    : 'bg-blue-500'
+                }`}>
+                  {getContactType(contact.name)}
+                </span>
+                <span className="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg">
+                  {getRole(contact.name)}
+                </span>
               </div>
             </div>
 
