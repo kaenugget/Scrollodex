@@ -259,7 +259,7 @@ export default defineSchema({
     kind: v.string(), // "card" | "user"
     cardId: v.optional(v.id("cards")),
     userId: v.optional(v.id("users")), // For user profile sharing
-    shareToken: v.optional(v.string()),
+    shareToken: v.string(),
     shareType: v.optional(v.string()),
     createdAt: v.number(),
     expiresAt: v.number(),

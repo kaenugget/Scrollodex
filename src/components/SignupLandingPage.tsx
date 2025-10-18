@@ -143,7 +143,7 @@ export function SignupLandingPage() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
 
   const handleAuthSuccess = () => {
-    router.push("/");
+    router.push("/profile");
   };
 
   return (

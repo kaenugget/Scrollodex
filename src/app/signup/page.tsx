@@ -9,7 +9,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignupSuccess = () => {
-    router.push("/");
+    router.push("/profile");
   };
 
   return (
