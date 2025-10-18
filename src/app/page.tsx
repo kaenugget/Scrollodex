@@ -1,7 +1,6 @@
 "use client";
 
 import { ContactCard } from "@/components/ContactCard";
-import { DexCard } from "@/components/DexCard";
 import { SeedDataButton } from "@/components/SeedDataButton";
 import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { ClerkAuth, ClerkSignUp } from "@/components/ClerkAuth";
@@ -10,7 +9,6 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { SignupLandingPage } from "@/components/SignupLandingPage";
 import { useContacts } from "@/hooks/useContacts";
-import { useDexEntries } from "@/hooks/useDex";
 import { useAuth } from "@/hooks/useAuth";
 // import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
 import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
@@ -23,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
+  // Removed dex tab - focusing on core contact management
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
@@ -42,10 +40,6 @@ export default function Home() {
   const dummyUserId = "demo" as Id<"users">;
   
   const { contacts, pinContact, isLoading: contactsLoading } = useContacts(
-    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
-    !!(isUserAuthenticated && hasValidConvexUserId)
-  );
-  const { dexEntries, isLoading: dexLoading } = useDexEntries(
     hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
     !!(isUserAuthenticated && hasValidConvexUserId)
   );
@@ -83,19 +77,15 @@ export default function Home() {
     <main className="scrollodex-bg">
       <AnimatedBackground />
       <AppHeader 
-        currentPage={activeTab === 'dex' ? 'dex' : 'home'} 
-        onNavigate={(page) => {
-          if (page === 'dex') {
-            setActiveTab('dex');
-          }
-        }}
+        currentPage="home" 
+        onNavigate={() => {}} // No navigation needed since Dex menu is removed
         user={currentUser || undefined}
         onSignOut={handleSignOut}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
 
         {/* Content */}
-        {activeTab === "contacts" && (
+        {(
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
@@ -141,45 +131,6 @@ export default function Home() {
                     onView={handleContactView}
                   />
                 ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "dex" && (
-          <div className="space-y-4 sm:space-y-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold scrollodex-text-white-bold">Your Dex</h2>
-              <p className="scrollodex-text-white mt-1">Track your relationship progress</p>
-            </div>
-            {dexLoading ? (
-              <LoadingSpinner text="Loading dex entries..." />
-            ) : dexEntries.length === 0 ? (
-              <div className="scrollodex-card text-center py-12">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="text-lg font-medium mb-2 scrollodex-text-dark">No dex entries yet</p>
-                <p className="scrollodex-text-gray">Interact with contacts to generate dex entries!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {dexEntries.map((dexEntry: any) => {
-                  // Find the contact for this dex entry
-                  const contact = contacts.find((c: any) => c._id === dexEntry.contactId);
-                  if (!contact) return null;
-                  
-                  return (
-                    <DexCard
-                      key={dexEntry._id}
-                      dexEntry={dexEntry}
-                      contact={contact}
-                      onView={handleContactView}
-                    />
-                  );
-                })}
               </div>
             )}
           </div>

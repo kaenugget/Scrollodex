@@ -45,7 +45,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ currentPage, onNavigate, u
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <NavButton label="Dex" isActive={currentPage === 'dex'} onClick={() => onNavigate('dex')} />
+            {/* Dex menu removed - not essential to core functionality */}
           </nav>
 
           {/* Desktop User Menu */}
@@ -77,14 +77,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ currentPage, onNavigate, u
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <nav className="flex flex-col space-y-2">
-              <NavButton 
-                label="Dex" 
-                isActive={currentPage === 'dex'} 
-                onClick={() => {
-                  onNavigate('dex');
-                  setIsMobileMenuOpen(false);
-                }} 
-              />
+              {/* Dex menu removed - not essential to core functionality */}
             </nav>
           </div>
         )}

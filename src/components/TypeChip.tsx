@@ -25,6 +25,19 @@ export const TypeChip: React.FC<TypeChipProps> = ({ type, size = 'md' }) => {
   const color = TYPE_COLORS[type];
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm';
 
+  // Fallback to NORM if type is not found
+  if (!color) {
+    const fallbackColor = TYPE_COLORS.NORM;
+    return (
+      <div
+        className={`font-pixel uppercase rounded-full tracking-widest ${sizeClasses} ${fallbackColor.bg} ${fallbackColor.text} border ${fallbackColor.border}`}
+        aria-label={`Type: ${type}`}
+      >
+        {type}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`font-pixel uppercase rounded-full tracking-widest ${sizeClasses} ${color.bg} ${color.text} border ${color.border}`}
