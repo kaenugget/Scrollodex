@@ -5,6 +5,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useNotes } from '@/hooks/useNotes';
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { PixelFrame } from './PixelFrame';
 import { Plus, Trash2, Edit3, Check, X } from 'lucide-react';
 
@@ -90,7 +91,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
   if (isLoading) {
     return (
       <div className="text-center py-8">
-        <div className="font-pixel text-neutral-400">Loading notes...</div>
+        <LoadingSpinner text="Loading notes..." />
       </div>
     );
   }
@@ -148,7 +149,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
       {/* Notes List */}
       {notes.length === 0 ? (
         <div className="text-neutral-400 text-center py-8">
-          No notes yet. Click "Add Note" to get started.
+          No notes yet. Click &quot;Add Note&quot; to get started.
         </div>
       ) : (
         <div className="space-y-3">

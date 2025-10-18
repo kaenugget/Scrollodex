@@ -4,8 +4,8 @@ import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 
 export function useClerkConvexUser() {
-  const { user: clerkUser, isSignedIn } = useUser();
-  const [convexUser, setConvexUser] = useState<any>(null);
+  const { user: clerkUser, isSignedIn, isLoaded: clerkLoaded } = useUser();
+  const [convexUser, setConvexUser] = useState<{ _id: string; displayName?: string; avatarUrl?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const createOrFindUser = useMutation(api.clerk.createOrFindUser);
@@ -16,6 +16,11 @@ export function useClerkConvexUser() {
 
   useEffect(() => {
     const handleClerkUser = async () => {
+      // Wait for Clerk to load first
+      if (!clerkLoaded) {
+        return;
+      }
+
       if (!isSignedIn || !clerkUser) {
         setConvexUser(null);
         setIsLoading(false);
@@ -47,7 +52,7 @@ export function useClerkConvexUser() {
     };
 
     handleClerkUser();
-  }, [isSignedIn, clerkUser, getUserByClerkId, createOrFindUser]);
+  }, [isSignedIn, clerkUser, getUserByClerkId, createOrFindUser, clerkLoaded]);
 
   return {
     convexUser,

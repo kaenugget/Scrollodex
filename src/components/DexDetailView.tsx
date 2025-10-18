@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import React from 'react';
 import { Id } from "../../convex/_generated/dataModel";
 import { useContacts } from '@/hooks/useContacts';
 import { useDexEntries } from '@/hooks/useDex';
 import { PixelFrame } from './PixelFrame';
 import { TypeChip } from './TypeChip';
 import { XpProgress } from './XpProgress';
-import { ArrowLeft, Star, TrendingUp, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 
 interface DexDetailViewProps {
   contactId: string;
@@ -38,7 +38,7 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
     return (
       <div className="text-center">
         <div className="font-pixel text-xl mb-4 text-emerald-400">Dex Entry Not Found</div>
-        <div className="text-neutral-400">This dex entry doesn't exist or you don't have access to it</div>
+        <div className="text-neutral-400">This dex entry doesn&apos;t exist or you don&apos;t have access to it</div>
       </div>
     );
   }
@@ -49,13 +49,6 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
     return thresholds[dexEntry.level] - dexEntry.xp;
   };
 
-  const getXpProgress = () => {
-    if (dexEntry.level === 3) return 100;
-    const thresholds = [0, 10, 25];
-    const currentThreshold = thresholds[dexEntry.level - 1] || 0;
-    const nextThreshold = thresholds[dexEntry.level];
-    return ((dexEntry.xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
-  };
 
   const getTypeEffectiveness = (type: string) => {
     // Mock type effectiveness data
@@ -113,7 +106,7 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
 
               <div className="flex items-center justify-center gap-2 mb-6">
                 {dexEntry.types.map(type => (
-                  <TypeChip key={type} type={type as any} size="md"/>
+                  <TypeChip key={type} type={type as "FIRE" | "WATER" | "GRASS" | "ELEC" | "PSY" | "STEEL" | "DARK" | "ART" | "NORM"} size="md"/>
                 ))}
               </div>
 
@@ -139,7 +132,7 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
                 <span className="text-neutral-300">Types</span>
                 <div className="flex gap-1">
                   {dexEntry.types.map(type => (
-                    <TypeChip key={type} type={type as any} size="sm"/>
+                    <TypeChip key={type} type={type as "FIRE" | "WATER" | "GRASS" | "ELEC" | "PSY" | "STEEL" | "DARK" | "ART" | "NORM"} size="sm"/>
                   ))}
                 </div>
               </div>

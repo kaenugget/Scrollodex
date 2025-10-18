@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 interface GoogleSignInButtonProps {
@@ -11,14 +11,55 @@ interface GoogleSignInButtonProps {
 
 declare global {
   interface Window {
-    google: any;
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (response: GoogleCredentialResponse) => void }) => void;
+          renderButton: (element: HTMLElement, config: { theme?: string; size?: string }) => void;
+          prompt: () => void;
+        };
+      };
+    };
   }
+}
+
+interface GoogleCredentialResponse {
+  credential: string;
 }
 
 export function GoogleSignInButton({ onSuccess, text = "Continue with Google", className = "" }: GoogleSignInButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { signInWithGoogle } = useAuth();
+
+  const handleCredentialResponse = useCallback(async (response: GoogleCredentialResponse) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Decode the JWT token to get user info
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      const userInfo = JSON.parse(jsonPayload);
+      
+      await signInWithGoogle(
+        userInfo.sub,
+        userInfo.email,
+        userInfo.name,
+        userInfo.picture
+      );
+      
+      onSuccess?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Google sign-in failed");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [signInWithGoogle, onSuccess]);
 
   useEffect(() => {
     // Load Google Identity Services
@@ -40,30 +81,7 @@ export function GoogleSignInButton({ onSuccess, text = "Continue with Google", c
     return () => {
       document.head.removeChild(script);
     };
-  }, []);
-
-  const handleCredentialResponse = async (response: any) => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      // Decode the JWT token to get user info
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      
-      await signInWithGoogle(
-        payload.sub, // Google ID
-        payload.email,
-        payload.name,
-        payload.picture
-      );
-      
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Google sign-in failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [handleCredentialResponse]);
 
   const handleClick = () => {
     if (window.google) {

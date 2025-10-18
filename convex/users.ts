@@ -21,6 +21,32 @@ export const getUserById = query({
   },
 });
 
+// Get or create demo user
+export const getOrCreateDemoUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // First, try to find an existing demo user
+    const existingDemoUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), "demo@scrollodex.com"))
+      .first();
+
+    if (existingDemoUser) {
+      return existingDemoUser._id;
+    }
+
+    // If no demo user exists, create one
+    const demoUserId = await ctx.db.insert("users", {
+      email: "demo@scrollodex.com",
+      displayName: "Demo User",
+      passwordHash: "demo123", // Simple hash for demo
+      createdAt: Date.now(),
+    });
+
+    return demoUserId;
+  },
+});
+
 // Update user profile
 export const updateProfile = mutation({
   args: {

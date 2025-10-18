@@ -178,11 +178,11 @@ export const getUsage = query({
       .filter((q) => q.eq(q.field("ownerId"), args.ownerId));
 
     if (args.startDate) {
-      query = query.filter((q) => q.gte(q.field("date"), args.startDate));
+      query = query.filter((q) => q.gte(q.field("date"), args.startDate!));
     }
 
     if (args.endDate) {
-      query = query.filter((q) => q.lte(q.field("date"), args.endDate));
+      query = query.filter((q) => q.lte(q.field("date"), args.endDate!));
     }
 
     return await query.collect();

@@ -129,8 +129,7 @@ export const getCurrentUser = query({
 
     // Check if session is expired
     if (session.expiresAt < Date.now()) {
-      // Delete expired session
-      await ctx.db.delete(session._id);
+      // Session expired - return null (cleanup handled elsewhere)
       return null;
     }
 

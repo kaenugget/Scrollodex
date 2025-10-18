@@ -194,6 +194,8 @@ export default defineSchema({
     code: v.string(),
     kind: v.string(), // "card"
     cardId: v.optional(v.id("cards")),
+    shareToken: v.optional(v.string()),
+    shareType: v.optional(v.string()),
     createdAt: v.number(),
     expiresAt: v.number(),
   }),

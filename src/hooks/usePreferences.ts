@@ -6,7 +6,7 @@ import { Id } from "../../convex/_generated/dataModel";
 
 export function usePreferences(contactId: Id<"contacts">, enabled: boolean = true) {
   const preferences = useQuery(
-    api.preferences.get,
+    api.preferences.getPreferences,
     enabled ? { contactId } : "skip"
   );
 

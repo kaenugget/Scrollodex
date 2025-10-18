@@ -129,14 +129,14 @@ export const seedDemoData = mutation({
 
     // Create dex entries for contacts
     const dexEntries = [
-      { contactId: contactIds[0], dexNumber: 1, types: ["ELEC", "NORM"], level: 2, xp: 15 },
-      { contactId: contactIds[1], dexNumber: 2, types: ["ART", "CREATIVE"], level: 3, xp: 28 },
-      { contactId: contactIds[2], dexNumber: 3, types: ["PSY", "ELEC"], level: 2, xp: 12 },
-      { contactId: contactIds[3], dexNumber: 4, types: ["FIRE", "NORM"], level: 1, xp: 7 },
-      { contactId: contactIds[4], dexNumber: 5, types: ["STEEL", "NORM"], level: 3, xp: 30 },
-      { contactId: contactIds[5], dexNumber: 6, types: ["ELEC", "STEEL"], level: 2, xp: 18 },
-      { contactId: contactIds[6], dexNumber: 7, types: ["ART", "GRASS"], level: 1, xp: 5 },
-      { contactId: contactIds[7], dexNumber: 8, types: ["FIRE", "NORM"], level: 2, xp: 14 },
+      { contactId: contactIds[0], dexNumber: 1, types: ["ELEC", "NORM"], level: 2, xp: 15, prefs: "{}" },
+      { contactId: contactIds[1], dexNumber: 2, types: ["ART", "CREATIVE"], level: 3, xp: 28, prefs: "{}" },
+      { contactId: contactIds[2], dexNumber: 3, types: ["PSY", "ELEC"], level: 2, xp: 12, prefs: "{}" },
+      { contactId: contactIds[3], dexNumber: 4, types: ["FIRE", "NORM"], level: 1, xp: 7, prefs: "{}" },
+      { contactId: contactIds[4], dexNumber: 5, types: ["STEEL", "NORM"], level: 3, xp: 30, prefs: "{}" },
+      { contactId: contactIds[5], dexNumber: 6, types: ["ELEC", "STEEL"], level: 2, xp: 18, prefs: "{}" },
+      { contactId: contactIds[6], dexNumber: 7, types: ["ART", "GRASS"], level: 1, xp: 5, prefs: "{}" },
+      { contactId: contactIds[7], dexNumber: 8, types: ["FIRE", "NORM"], level: 2, xp: 14, prefs: "{}" },
     ];
 
     const dexIds = [];

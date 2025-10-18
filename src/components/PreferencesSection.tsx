@@ -5,8 +5,9 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { usePreferences } from '@/hooks/usePreferences';
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { PixelFrame } from './PixelFrame';
-import { Plus, Trash2, Save, X } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
 
 interface PreferencesSectionProps {
   contactId: Id<"contacts">;
@@ -122,7 +123,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
   if (isLoading) {
     return (
       <div className="text-center py-8">
-        <div className="font-pixel text-neutral-400">Loading preferences...</div>
+        <LoadingSpinner text="Loading preferences..." />
       </div>
     );
   }
@@ -354,7 +355,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
 
             {food.length === 0 && music.length === 0 && hobbies.length === 0 && !notes && (
               <div className="text-neutral-400 text-center py-8">
-                No preferences set yet. Click "Edit Preferences" to add food, music, hobbies, and other preferences.
+                No preferences set yet. Click &quot;Edit Preferences&quot; to add food, music, hobbies, and other preferences.
               </div>
             )}
           </div>

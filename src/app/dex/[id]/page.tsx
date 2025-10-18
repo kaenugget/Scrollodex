@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import React from 'react';
 import { useParams } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { DexDetailView } from '@/components/DexDetailView';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
 import { useUser } from '@clerk/nextjs';
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function DexDetailPage() {
   const params = useParams();
@@ -14,7 +16,7 @@ export default function DexDetailPage() {
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
-  const { user: clerkUser, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
@@ -28,43 +30,31 @@ export default function DexDetailPage() {
   };
 
   if (authLoading || clerkConvexLoading) {
-    return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="font-pixel text-2xl mb-4 text-emerald-400">Loading...</div>
-          <div className="text-neutral-400">Loading dex entry</div>
-        </div>
-      </main>
-    );
+    return <LoadingSpinner fullScreen text="Loading dex entry..." />;
   }
 
   if (!isUserAuthenticated || !currentUser) {
-    return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="font-pixel text-2xl mb-4 text-emerald-400">Access Denied</div>
-          <div className="text-neutral-400">Please sign in to view dex entries</div>
-        </div>
-      </main>
-    );
+    return <LoadingSpinner fullScreen text="Redirecting to login..." />;
   }
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-200">
+    <main className="min-h-screen bg-gray-50">
       <AppHeader 
         currentPage="dex" 
         onNavigate={(page) => {
-          if (page === 'contacts' || page === 'dex') {
+          if (page === 'contacts' || page === 'dex' || page === 'home') {
             window.location.href = '/';
+          } else if (page === 'settings') {
+            window.location.href = '/settings';
           }
         }}
         user={currentUser}
         onSignOut={handleSignOut}
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DexDetailView 
           contactId={contactId}
-          userId={currentUser._id}
+          userId={currentUser._id as Id<"users">}
         />
       </div>
     </main>

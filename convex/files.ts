@@ -52,8 +52,9 @@ export const uploadAvatar = mutation({
     if (!user) throw new Error("User not found");
 
     // Update user with new avatar
+    const avatarUrl = await ctx.storage.getUrl(args.fileId);
     await ctx.db.patch(args.userId, {
-      avatarUrl: await ctx.storage.getUrl(args.fileId),
+      avatarUrl: avatarUrl || undefined,
     });
 
     return args.fileId;

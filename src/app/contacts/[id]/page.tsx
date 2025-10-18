@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { ContactDetailView } from '@/components/ContactDetailView';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
 import { useUser } from '@clerk/nextjs';
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function ContactDetailPage() {
   const params = useParams();
@@ -15,7 +17,7 @@ export default function ContactDetailPage() {
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
-  const { user: clerkUser, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
@@ -29,43 +31,31 @@ export default function ContactDetailPage() {
   };
 
   if (authLoading || clerkConvexLoading) {
-    return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="font-pixel text-2xl mb-4 text-emerald-400">Loading...</div>
-          <div className="text-neutral-400">Loading contact details</div>
-        </div>
-      </main>
-    );
+    return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 
   if (!isUserAuthenticated || !currentUser) {
-    return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="font-pixel text-2xl mb-4 text-emerald-400">Access Denied</div>
-          <div className="text-neutral-400">Please sign in to view contact details</div>
-        </div>
-      </main>
-    );
+    return <LoadingSpinner fullScreen text="Redirecting to login..." />;
   }
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-200">
+    <main className="min-h-screen bg-gray-50">
       <AppHeader 
         currentPage="contacts" 
         onNavigate={(page) => {
-          if (page === 'contacts' || page === 'dex') {
+          if (page === 'contacts' || page === 'dex' || page === 'home') {
             window.location.href = '/';
+          } else if (page === 'settings') {
+            window.location.href = '/settings';
           }
         }}
         user={currentUser}
         onSignOut={handleSignOut}
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ContactDetailView 
           contactId={contactId}
-          userId={currentUser._id}
+          userId={currentUser._id as Id<"users">}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />

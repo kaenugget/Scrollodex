@@ -37,6 +37,14 @@ export const getPeerPages = query({
   },
 });
 
+// Get a single peer page
+export const getPeerPage = query({
+  args: { peerPageId: v.id("peerPages") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.peerPageId);
+  },
+});
+
 // Moments Functions
 
 // Add a moment to a peer page
@@ -171,5 +179,91 @@ export const deleteCard = mutation({
   args: { cardId: v.id("cards") },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.cardId);
+  },
+});
+
+// Card Sharing Functions
+
+// Create a shareable link for a card
+export const createCardShare = mutation({
+  args: {
+    cardId: v.id("cards"),
+    shareType: v.union(v.literal("view"), v.literal("claim")),
+    expiresAt: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // Generate a unique share token
+    const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    return await ctx.db.insert("invites", {
+      cardId: args.cardId,
+      shareToken,
+      shareType: args.shareType,
+      kind: "card",
+      code: shareToken, // Use shareToken as code for now
+      expiresAt: args.expiresAt || Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days default
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Get card by share token
+export const getCardByShareToken = query({
+  args: { shareToken: v.string() },
+  handler: async (ctx, args) => {
+    const invite = await ctx.db
+      .query("invites")
+      .filter((q) => q.eq(q.field("shareToken"), args.shareToken))
+      .first();
+    
+    if (!invite || invite.expiresAt < Date.now()) {
+      return null;
+    }
+    
+    return await ctx.db.get(invite.cardId);
+  },
+});
+
+// Claim a shared card
+export const claimCard = mutation({
+  args: {
+    shareToken: v.string(),
+    claimerUserId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const invite = await ctx.db
+      .query("invites")
+      .filter((q) => q.eq(q.field("shareToken"), args.shareToken))
+      .first();
+    
+    if (!invite || invite.expiresAt < Date.now()) {
+      throw new Error("Share link expired or invalid");
+    }
+    
+    if (invite.shareType !== "claim") {
+      throw new Error("This card is not claimable");
+    }
+    
+    // Check if already claimed
+    const existingClaim = await ctx.db
+      .query("cardClaims")
+      .filter((q) => q.eq(q.field("cardId"), invite.cardId))
+      .first();
+    
+    if (existingClaim) {
+      throw new Error("Card has already been claimed");
+    }
+    
+    // Create claim record
+    await ctx.db.insert("cardClaims", {
+      cardId: invite.cardId,
+      claimerUserId: args.claimerUserId,
+      claimedAt: Date.now(),
+    });
+    
+    // Delete the invite to prevent reuse
+    await ctx.db.delete(invite._id);
+    
+    return invite.cardId;
   },
 });

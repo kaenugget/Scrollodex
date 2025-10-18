@@ -11,10 +11,10 @@ interface NavButtonProps {
 const NavButton: React.FC<NavButtonProps> = ({ label, isActive, onClick }) => (
     <button 
         onClick={onClick}
-        className={`font-pixel text-sm px-4 py-2 transition-colors duration-200 ${
+        className={`font-medium text-sm px-4 py-2 transition-colors duration-200 ${
             isActive 
-                ? 'bg-emerald-500 text-neutral-900' 
-                : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
+                ? 'text-blue-600 border-b-2 border-blue-600' 
+                : 'text-gray-600 hover:text-gray-900'
         }`}
     >
         {label}
@@ -24,38 +24,42 @@ const NavButton: React.FC<NavButtonProps> = ({ label, isActive, onClick }) => (
 interface AppHeaderProps {
     currentPage: string;
     onNavigate: (page: string) => void;
-    user?: any;
+    user?: { _id: string; displayName?: string; avatarUrl?: string };
     onSignOut?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ currentPage, onNavigate, user, onSignOut }) => {
   return (
-    <header className="px-4 sm:px-6 lg:px-8 py-3 bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-20 border-b-4 border-neutral-800">
-      <div className="flex items-center justify-between">
-        <h1 className="font-pixel text-lg md:text-xl text-emerald-400 tracking-wider">Scrollodex</h1>
-        
-        <nav className="pixel-border-outset flex items-center bg-neutral-900">
-            <NavButton label="Dex" isActive={currentPage === 'dex'} onClick={() => onNavigate('dex')} />
-            <NavButton label="Contacts" isActive={currentPage === 'contacts'} onClick={() => onNavigate('contacts')} />
-            <NavButton label="Peer" isActive={currentPage === 'peer'} onClick={() => onNavigate('peer')} />
-            <NavButton label="Deck" isActive={currentPage === 'deck'} onClick={() => onNavigate('deck')} />
-            <NavButton label="Avatar" isActive={currentPage === 'avatar'} onClick={() => onNavigate('avatar')} />
-            <NavButton label="Settings" isActive={currentPage === 'settings'} onClick={() => onNavigate('settings')} />
-        </nav>
-
-        {user && onSignOut && (
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-neutral-400">
-              Welcome, {user?.displayName || user?.fullName || user?.firstName || 'User'}
-            </span>
-            <button
-              onClick={onSignOut}
-              className="px-3 py-1 text-sm pixel-border-outset text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
-            >
-              Sign Out
-            </button>
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <h1 className="font-bold text-xl text-gray-900">Scrollodex</h1>
+            <p className="ml-3 text-sm text-gray-500">Your Personal Index of Amazing Contacts</p>
           </div>
-        )}
+          
+          <nav className="flex items-center space-x-8">
+            <NavButton label="Home" isActive={currentPage === 'home'} onClick={() => onNavigate('home')} />
+            <NavButton label="Contacts" isActive={currentPage === 'contacts'} onClick={() => onNavigate('contacts')} />
+            <NavButton label="Dex" isActive={currentPage === 'dex'} onClick={() => onNavigate('dex')} />
+            <NavButton label="Peer" isActive={currentPage === 'peer'} onClick={() => onNavigate('peer')} />
+            <NavButton label="Settings" isActive={currentPage === 'settings'} onClick={() => onNavigate('settings')} />
+          </nav>
+
+          {user && onSignOut && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user?.displayName || 'User'}
+              </span>
+              <button
+                onClick={onSignOut}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

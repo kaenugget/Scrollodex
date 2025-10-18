@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Star, Phone, Mail, MapPin, Building } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -45,77 +42,117 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
     return `${Math.floor(days / 7)} weeks ago`;
   };
 
+  // Generate a consistent color for the accent bar based on contact name
+  const getAccentColor = (name: string) => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500', 
+      'bg-yellow-500',
+      'bg-purple-500',
+      'bg-pink-500',
+      'bg-red-500',
+      'bg-indigo-500',
+      'bg-teal-500'
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
   return (
-    <div className="bg-neutral-800/50 rounded-2xl transition-all duration-200 hover:bg-neutral-800 focus-within:bg-neutral-800 hover:-translate-y-1 focus-within:-translate-y-1 card-shadow">
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="font-pixel text-lg text-neutral-100">{contact.name}</h3>
-            {contact.company && (
-              <div className="flex items-center gap-1 text-sm text-neutral-400 mt-1">
-                <Building className="w-3 h-3" />
-                {contact.company}
-              </div>
-            )}
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+      <div className="p-6">
+        {/* Profile Image */}
+        <div className="flex justify-center mb-4">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-2xl font-bold">
+              {contact.name.charAt(0).toUpperCase()}
+            </span>
           </div>
-          <button
-            onClick={handlePin}
-            className={`p-1 transition-colors ${isPinned ? 'text-yellow-400' : 'text-neutral-500 hover:text-yellow-400'}`}
-          >
-            <Star className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
-          </button>
         </div>
-        
-        <div className="space-y-2 mb-4">
-          {contact.emails.length > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="w-3 h-3 text-cyan-400" />
-              <span className="text-neutral-300">{contact.emails[0]}</span>
-            </div>
-          )}
-          
-          {contact.phones.length > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <Phone className="w-3 h-3 text-emerald-400" />
-              <span className="text-neutral-300">{contact.phones[0]}</span>
-            </div>
-          )}
-          
-          {contact.location && (
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="w-3 h-3 text-red-400" />
-              <span className="text-neutral-300">{contact.location}</span>
-            </div>
-          )}
+
+        {/* Contact Number */}
+        <div className="text-center mb-2">
+          <span className="text-sm text-gray-500 font-mono">
+            #{String(contact._id).slice(-3).padStart(3, '0')}
+          </span>
         </div>
-        
+
+        {/* Name */}
+        <h3 className="text-lg font-semibold text-gray-900 text-center mb-3">{contact.name}</h3>
+
+        {/* Tags */}
         {contact.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
-            {contact.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="px-2 py-1 text-xs bg-neutral-700 text-neutral-300 pixel-border-outset">
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {contact.tags.slice(0, 2).map((tag) => (
+              <span 
+                key={tag} 
+                className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700"
+              >
                 {tag}
               </span>
             ))}
-            {contact.tags.length > 3 && (
-              <span className="px-2 py-1 text-xs bg-neutral-700 text-neutral-300 pixel-border-outset">
-                +{contact.tags.length - 3}
+            {contact.tags.length > 2 && (
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                +{contact.tags.length - 2}
               </span>
             )}
           </div>
         )}
-        
-        <div className="flex justify-between items-center pt-2">
-          <span className="text-xs text-neutral-500">
-            Last seen: {formatLastInteraction(contact.lastInteractionAt)}
-          </span>
-          <button 
-            onClick={() => onView(contact._id)}
-            className="px-3 py-1 text-xs bg-emerald-500 text-neutral-900 font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 focus:bg-emerald-400 outline-none"
+
+        {/* Contact Info */}
+        <div className="space-y-2 mb-4 text-sm text-gray-600">
+          {contact.company && (
+            <div className="flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              <span>{contact.company}</span>
+            </div>
+          )}
+          
+          {contact.emails.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              <span>{contact.emails[0]}</span>
+            </div>
+          )}
+          
+          {contact.phones.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              <span>{contact.phones[0]}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Last Interaction */}
+        <div className="text-xs text-gray-500 text-center mb-4">
+          Last seen: {formatLastInteraction(contact.lastInteractionAt)}
+        </div>
+
+        {/* Pin Button */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handlePin}
+            className={`p-2 rounded-full transition-colors ${
+              isPinned 
+                ? 'text-yellow-500 bg-yellow-50' 
+                : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'
+            }`}
           >
-            View Dex
+            <Star className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
           </button>
         </div>
+
+        {/* View Button */}
+        <button 
+          onClick={() => onView(contact._id)}
+          className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          View Profile
+        </button>
       </div>
+
+      {/* Accent Bar */}
+      <div className={`h-1 ${getAccentColor(contact.name)}`}></div>
     </div>
   );
 }

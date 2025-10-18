@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { PixelFrame } from './PixelFrame';
 import { Plus, Trash2, Check, Clock, Calendar, X } from 'lucide-react';
 
@@ -91,7 +92,7 @@ export function ActionsSection({ contactId, userId }: ActionsSectionProps) {
   if (isLoading) {
     return (
       <div className="text-center py-8">
-        <div className="font-pixel text-neutral-400">Loading actions...</div>
+        <LoadingSpinner text="Loading actions..." />
       </div>
     );
   }
@@ -197,7 +198,7 @@ export function ActionsSection({ contactId, userId }: ActionsSectionProps) {
       {/* Actions List */}
       {actions.length === 0 ? (
         <div className="text-neutral-400 text-center py-8">
-          No actions yet. Click "Add Action" to create a todo or followup.
+          No actions yet. Click &quot;Add Action&quot; to create a todo or followup.
         </div>
       ) : (
         <div className="space-y-3">

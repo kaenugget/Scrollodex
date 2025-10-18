@@ -6,7 +6,7 @@ interface ClerkAuthProps {
   onSuccess?: () => void;
 }
 
-export function ClerkAuth({ onSuccess }: ClerkAuthProps) {
+export function ClerkAuth({ onSuccess: _onSuccess }: ClerkAuthProps) {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
@@ -40,7 +40,7 @@ export function ClerkAuth({ onSuccess }: ClerkAuthProps) {
   );
 }
 
-export function ClerkSignUp({ onSuccess }: ClerkAuthProps) {
+export function ClerkSignUp({ onSuccess: _onSuccess }: ClerkAuthProps) {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">

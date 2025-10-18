@@ -6,38 +6,47 @@ import { SeedDataButton } from "@/components/SeedDataButton";
 import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { ClerkAuth, ClerkSignUp } from "@/components/ClerkAuth";
 import { AppHeader } from "@/components/AppHeader";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useContacts } from "@/hooks/useContacts";
 import { useDexEntries } from "@/hooks/useDex";
 import { useAuth } from "@/hooks/useAuth";
 import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
 import { useUser } from '@clerk/nextjs';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Id } from "../../convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | "clerk-login" | "clerk-signup" | null>(null);
-  const { user: clerkUser, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   
   // Use Clerk authentication if available, otherwise fall back to custom auth
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
+
+  // Mutations for creating peer pages and demo user
+  const createPeerPage = useMutation(api.social.createPeerPage);
+  const getOrCreateDemoUser = useMutation(api.users.getOrCreateDemoUser);
   
   // Only use hooks when we have a valid Convex user ID
   const hasValidConvexUserId = currentUser?._id && typeof currentUser._id === 'string' && currentUser._id !== 'demo';
   
   // Use a dummy ID when we don't have a valid user ID, but disable the queries
-  const dummyUserId = "demo" as any;
+  const dummyUserId = "demo" as Id<"users">;
   
   const { contacts, pinContact, isLoading: contactsLoading } = useContacts(
-    hasValidConvexUserId ? (currentUser._id as any) : dummyUserId, 
-    isUserAuthenticated && hasValidConvexUserId
+    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
+    !!(isUserAuthenticated && hasValidConvexUserId)
   );
   const { dexEntries, isLoading: dexLoading } = useDexEntries(
-    hasValidConvexUserId ? (currentUser._id as any) : dummyUserId, 
-    isUserAuthenticated && hasValidConvexUserId
+    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
+    !!(isUserAuthenticated && hasValidConvexUserId)
   );
 
   const handleContactView = (contactId: string) => {
@@ -48,36 +57,52 @@ export default function Home() {
     setShowAuth(null);
   };
 
+  const createDemoPeerPage = async () => {
+    if (!currentUser?._id) {
+      alert('Please sign in first');
+      return;
+    }
+
+    try {
+      // Get or create a demo user
+      const demoUserId = await getOrCreateDemoUser();
+      
+      // Create a peer page with the current user and demo user
+      const peerPageId = await createPeerPage({
+        aUserId: currentUser._id as Id<"users">,
+        bUserId: demoUserId as Id<"users">,
+        title: "Demo Peer Page",
+        visibility: "private",
+      });
+      
+      // Navigate to the peer page
+      window.location.href = `/peer/${peerPageId}`;
+    } catch (error) {
+      console.error('Error creating peer page:', error);
+      alert('Failed to create peer page. Please try again.');
+    }
+  };
+
   // Show loading while checking authentication
   if (authLoading || clerkConvexLoading) {
-    return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="font-pixel text-2xl mb-4 text-emerald-400">Loading...</div>
-          <div className="text-neutral-400">Checking authentication</div>
-        </div>
-      </main>
-    );
+    return <LoadingSpinner fullScreen text="Loading Scrollodex..." />;
   }
 
   // Show auth forms if not authenticated
   if (!isUserAuthenticated) {
     return (
-      <main className="min-h-screen bg-neutral-900 text-neutral-200 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-12">
             <div className="mb-6">
-              <h1 className="text-6xl font-pixel mb-4 glow text-emerald-400">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 Scrollodex
               </h1>
-              <div className="w-16 h-1 bg-emerald-400 mx-auto"></div>
+              <p className="text-lg text-gray-600">Your Personal Index of Amazing Contacts</p>
             </div>
-            <p className="text-xl text-neutral-300 mb-2">
-              Your pixel-art social contact manager
-            </p>
-            <p className="text-sm text-neutral-500">
-              Gamify your relationships and build meaningful connections
+            <p className="text-gray-500">
+              Build meaningful connections and manage your network
             </p>
           </div>
 
@@ -96,13 +121,13 @@ export default function Home() {
               <div className="space-y-4">
                 <button
                   onClick={() => setShowAuth("clerk-login")}
-                  className="w-full px-8 py-4 bg-emerald-600 text-white font-pixel text-sm tracking-wider pixel-border-outset hover:bg-emerald-700 transition-all duration-300"
+                  className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Sign In (with Google, GitHub, etc.)
                 </button>
                 <button
                   onClick={() => setShowAuth("clerk-signup")}
-                  className="w-full px-8 py-4 border-2 border-emerald-500 text-emerald-400 font-pixel text-sm tracking-wider hover:bg-emerald-500 hover:text-white transition-all duration-300"
+                  className="w-full px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   Create Account (with Google, GitHub, etc.)
                 </button>
@@ -110,22 +135,22 @@ export default function Home() {
                 {/* Divider */}
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-neutral-600"></div>
+                    <div className="w-full border-t border-gray-300"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-neutral-900 text-neutral-400">or use email/password</span>
+                    <span className="px-2 bg-gray-50 text-gray-500">or use email/password</span>
                   </div>
                 </div>
                 
                 <button
                   onClick={() => setShowAuth("login")}
-                  className="w-full px-8 py-3 bg-neutral-800 border border-neutral-600 text-neutral-300 font-pixel text-sm tracking-wider hover:bg-neutral-700 transition-all duration-300"
+                  className="w-full px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Sign In with Email
                 </button>
                 <button
                   onClick={() => setShowAuth("signup")}
-                  className="w-full px-8 py-3 border border-neutral-600 text-neutral-400 font-pixel text-sm tracking-wider hover:bg-neutral-800 transition-all duration-300"
+                  className="w-full px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Create Account with Email
                 </button>
@@ -133,25 +158,25 @@ export default function Home() {
 
               {/* Features Preview */}
               <div className="mt-12 space-y-4">
-                <h3 className="text-lg font-pixel text-neutral-300 text-center mb-6">
-                  What you'll get:
+                <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">
+                  What you&apos;ll get:
                 </h3>
-                <div className="grid grid-cols-1 gap-4 text-sm text-neutral-400">
+                <div className="grid grid-cols-1 gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-emerald-500"></div>
-                    <span>Gamified contact management</span>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Clean contact management</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-emerald-500"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <span>Social features & memory sharing</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-emerald-500"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <span>AI-powered relationship insights</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-emerald-500"></div>
-                    <span>Beautiful pixel-art interface</span>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Beautiful modern interface</span>
                   </div>
                 </div>
               </div>
@@ -163,7 +188,7 @@ export default function Home() {
             <div className="text-center mt-8">
               <button
                 onClick={() => setShowAuth(null)}
-                className="text-gray-500 hover:text-white transition-colors flex items-center gap-2 mx-auto"
+                className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-2 mx-auto"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -187,33 +212,68 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-900 text-neutral-200">
+    <main className="min-h-screen bg-gray-50">
       <AppHeader 
-        currentPage={activeTab} 
-        onNavigate={(page) => setActiveTab(page as "contacts" | "dex")}
-        user={currentUser}
+        currentPage={activeTab === 'contacts' ? 'contacts' : activeTab === 'dex' ? 'dex' : 'home'} 
+        onNavigate={(page) => {
+          if (page === 'contacts') {
+            setActiveTab('contacts');
+          } else if (page === 'dex') {
+            setActiveTab('dex');
+          } else if (page === 'settings') {
+            window.location.href = '/settings';
+          } else if (page === 'home') {
+            setActiveTab('contacts');
+          } else if (page === 'peer') {
+            // Handle peer navigation - could create a demo peer page or show a message
+            if (currentUser?._id) {
+              createDemoPeerPage();
+            }
+          }
+        }}
+        user={currentUser || undefined}
         onSignOut={handleSignOut}
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Content */}
         {activeTab === "contacts" && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-pixel text-emerald-400">Your Contacts</h2>
-              {contacts.length === 0 && currentUser && (
-                <SeedDataButton userId={currentUser._id} />
-              )}
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Your Contacts</h2>
+                <p className="text-gray-600 mt-1">Manage your personal network</p>
+              </div>
+              <div className="flex gap-3">
+                {currentUser && (
+                  <Button
+                    onClick={createDemoPeerPage}
+                    variant="outline"
+                    size="sm"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Demo Peer Page
+                  </Button>
+                )}
+                {contacts.length === 0 && currentUser && (
+                  <SeedDataButton userId={currentUser._id as Id<"users">} />
+                )}
+              </div>
             </div>
             {contactsLoading ? (
-              <div className="text-center text-neutral-500 font-pixel">Loading contacts...</div>
+              <LoadingSpinner text="Loading contacts..." />
             ) : contacts.length === 0 ? (
-              <div className="text-center text-neutral-500 space-y-4">
-                <p>No contacts yet. Add your first contact to start building your dex!</p>
-                {currentUser && <SeedDataButton userId={currentUser._id} />}
+              <div className="text-center text-gray-500 py-12">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-lg font-medium mb-2">No contacts yet</p>
+                <p className="mb-6">Add your first contact to start building your network!</p>
+                {currentUser && <SeedDataButton userId={currentUser._id as Id<"users">} />}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {contacts.map((contact) => (
                   <ContactCard
                     key={contact._id}
@@ -228,16 +288,25 @@ export default function Home() {
         )}
 
         {activeTab === "dex" && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-pixel text-emerald-400 mb-4">Your Dex</h2>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900">Your Dex</h2>
+              <p className="text-gray-600 mt-1">Track your relationship progress</p>
+            </div>
             {dexLoading ? (
-              <div className="text-center text-neutral-500 font-pixel">Loading dex entries...</div>
+              <LoadingSpinner text="Loading dex entries..." />
             ) : dexEntries.length === 0 ? (
-              <div className="text-center text-neutral-500">
-                <p>No dex entries yet. Interact with contacts to generate dex entries!</p>
+              <div className="text-center text-gray-500 py-12">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-medium mb-2">No dex entries yet</p>
+                <p>Interact with contacts to generate dex entries!</p>
               </div>
             ) : (
-              <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-x-auto md:overflow-visible pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {dexEntries.map((dexEntry) => {
                   // Find the contact for this dex entry
                   const contact = contacts.find(c => c._id === dexEntry.contactId);

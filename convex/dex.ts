@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 // List dex entries for a user
 export const list = query({
@@ -118,6 +119,7 @@ export const computeEntry = mutation({
       types,
       level,
       xp,
+      prefs: "{}", // Default empty preferences JSON string
       updatedAt: Date.now(),
     };
 
@@ -145,7 +147,7 @@ export const updateXp = mutation({
 
     if (!dexEntry) {
       // Create dex entry if it doesn't exist
-      await ctx.runMutation("api.dex.computeEntry", { contactId: args.contactId });
+      await ctx.runMutation(api.dex.computeEntry, { contactId: args.contactId });
       return;
     }
 

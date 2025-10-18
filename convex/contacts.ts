@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 // List all contacts for a user
 export const list = query({
@@ -91,7 +92,7 @@ export const upsert = mutation({
       const contactId = await ctx.db.insert("contacts", contactData);
       
       // Automatically create a dex entry for new contacts
-      await ctx.runMutation("api.dex.computeEntry", { contactId });
+      await ctx.runMutation(api.dex.computeEntry, { contactId });
       
       return contactId;
     }
