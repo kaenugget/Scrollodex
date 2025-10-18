@@ -43,7 +43,7 @@ export const seedDemoData = mutation({
       "fdee818f54b8c3fba3690e004d2a4967c796d17d.png"
     ];
 
-    // Create demo contacts with more comprehensive data
+    // Create demo contacts with more comprehensive data and varied relationship factors
     const contacts = [
       {
         name: "Alice Chen",
@@ -52,8 +52,8 @@ export const seedDemoData = mutation({
         company: "TechCorp",
         role: "Senior Software Engineer",
         location: "San Francisco, CA",
-        tags: ["tech", "engineer", "javascript", "react", "node"],
-        notes: ["Met at React conference", "Loves hiking", "Coffee enthusiast"],
+        tags: ["close-friend", "tech-mentor", "hiking-buddy", "coffee-lover", "react-expert"],
+        notes: ["Met at React conference", "Loves hiking", "Coffee enthusiast", "Always helpful with code reviews", "Great hiking partner", "Introduced me to climbing"],
         lastInteractionAt: Date.now() - 86400000, // 1 day ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[0]}`,
@@ -65,7 +65,7 @@ export const seedDemoData = mutation({
         company: "Design Studio",
         role: "Creative Director",
         location: "New York, NY",
-        tags: ["design", "creative", "art", "branding", "ui"],
+        tags: ["creative-collaborator", "design-mentor", "skateboarder", "color-expert", "startup-advisor"],
         notes: ["Great eye for color", "Works with startups", "Skateboarding"],
         lastInteractionAt: Date.now() - 172800000, // 2 days ago
         pinned: false,
@@ -78,8 +78,8 @@ export const seedDemoData = mutation({
         company: "Independent Music Label",
         role: "Music Producer & Artist",
         location: "Los Angeles, CA",
-        tags: ["music", "creative", "sound", "electronic", "indie"],
-        notes: ["Amazing producer", "Into electronic music", "Night owl"],
+        tags: ["music-producer", "electronic-artist", "night-owl", "collaborative", "sound-designer"],
+        notes: ["Amazing producer", "Into electronic music", "Night owl", "Collaborated on my podcast intro", "Great at mixing"],
         lastInteractionAt: Date.now() - 259200000, // 3 days ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[2]}`,
@@ -91,8 +91,8 @@ export const seedDemoData = mutation({
         company: "Park's Food Truck",
         role: "Chef & Owner",
         location: "Austin, TX",
-        tags: ["food", "cooking", "business", "korean", "fusion"],
-        notes: ["Best Korean fusion", "Food truck entrepreneur", "Family man"],
+        tags: ["korean-fusion-chef", "food-entrepreneur", "family-man", "local-business", "spice-expert"],
+        notes: ["Best Korean fusion", "Food truck entrepreneur", "Family man", "Always experimenting with new recipes"],
         lastInteractionAt: Date.now() - 432000000, // 5 days ago
         pinned: false,
         profilePictureUrl: `/assets-moji/${emojiAssets[3]}`,
@@ -104,8 +104,8 @@ export const seedDemoData = mutation({
         company: "Business Consulting Co",
         role: "Senior Business Consultant",
         location: "Chicago, IL",
-        tags: ["business", "consulting", "sales", "strategy", "leadership"],
-        notes: ["Great networker", "Helps with business strategy", "Yoga instructor"],
+        tags: ["business-consultant", "yoga-instructor", "networking-expert", "strategy-guru", "wellness-advocate"],
+        notes: ["Great networker", "Helps with business strategy", "Yoga instructor", "Helped me with my business plan", "Always has great advice"],
         lastInteractionAt: Date.now() - 604800000, // 1 week ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[4]}`,
@@ -117,7 +117,7 @@ export const seedDemoData = mutation({
         company: "StartupXYZ",
         role: "Founder & CEO",
         location: "Seattle, WA",
-        tags: ["startup", "tech", "entrepreneur", "ai", "venture"],
+        tags: ["serial-entrepreneur", "ai-expert", "coffee-addict", "venture-mentor", "tech-visionary"],
         notes: ["Serial entrepreneur", "AI enthusiast", "Coffee addict"],
         lastInteractionAt: Date.now() - 1209600000, // 2 weeks ago
         pinned: false,
@@ -130,8 +130,8 @@ export const seedDemoData = mutation({
         company: "Grace Photography",
         role: "Photographer",
         location: "Portland, OR",
-        tags: ["photography", "creative", "art", "wedding", "portrait"],
-        notes: ["Amazing photographer", "Loves nature", "Vegan"],
+        tags: ["wedding-photographer", "nature-lover", "vegan-advocate", "art-enthusiast", "portrait-specialist"],
+        notes: ["Amazing photographer", "Loves nature", "Vegan", "Did our engagement photos", "Great eye for composition"],
         lastInteractionAt: Date.now() - 1814400000, // 3 weeks ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[6]}`,
@@ -143,7 +143,7 @@ export const seedDemoData = mutation({
         company: "FitLife Gym",
         role: "Personal Trainer",
         location: "Miami, FL",
-        tags: ["fitness", "health", "training", "nutrition", "motivation"],
+        tags: ["personal-trainer", "nutrition-expert", "early-riser", "motivation-coach", "fitness-enthusiast"],
         notes: ["Personal trainer", "Nutrition expert", "Early riser"],
         lastInteractionAt: Date.now() - 2419200000, // 4 weeks ago
         pinned: false,
@@ -160,16 +160,16 @@ export const seedDemoData = mutation({
       contactIds.push(contactId);
     }
 
-    // Create dex entries for contacts
+    // Create dex entries for contacts with meaningful types and varied levels/XP
     const dexEntries = [
-      { contactId: contactIds[0], dexNumber: 1, types: ["ELEC", "NORM"], level: 2, xp: 15, prefs: "{}" },
-      { contactId: contactIds[1], dexNumber: 2, types: ["ART", "CREATIVE"], level: 3, xp: 28, prefs: "{}" },
-      { contactId: contactIds[2], dexNumber: 3, types: ["PSY", "ELEC"], level: 2, xp: 12, prefs: "{}" },
-      { contactId: contactIds[3], dexNumber: 4, types: ["FIRE", "NORM"], level: 1, xp: 7, prefs: "{}" },
-      { contactId: contactIds[4], dexNumber: 5, types: ["STEEL", "NORM"], level: 3, xp: 30, prefs: "{}" },
-      { contactId: contactIds[5], dexNumber: 6, types: ["ELEC", "STEEL"], level: 2, xp: 18, prefs: "{}" },
-      { contactId: contactIds[6], dexNumber: 7, types: ["ART", "GRASS"], level: 1, xp: 5, prefs: "{}" },
-      { contactId: contactIds[7], dexNumber: 8, types: ["FIRE", "NORM"], level: 2, xp: 14, prefs: "{}" },
+      { contactId: contactIds[0], dexNumber: 1, types: ["TECH", "NATURE"], level: 4, xp: 85, prefs: "{}" },
+      { contactId: contactIds[1], dexNumber: 2, types: ["CREATIVE", "URBAN"], level: 3, xp: 45, prefs: "{}" },
+      { contactId: contactIds[2], dexNumber: 3, types: ["MUSIC", "NIGHT"], level: 5, xp: 120, prefs: "{}" },
+      { contactId: contactIds[3], dexNumber: 4, types: ["FOOD", "FAMILY"], level: 2, xp: 25, prefs: "{}" },
+      { contactId: contactIds[4], dexNumber: 5, types: ["BUSINESS", "WELLNESS"], level: 6, xp: 150, prefs: "{}" },
+      { contactId: contactIds[5], dexNumber: 6, types: ["STARTUP", "INNOVATION"], level: 3, xp: 35, prefs: "{}" },
+      { contactId: contactIds[6], dexNumber: 7, types: ["ART", "NATURE"], level: 4, xp: 75, prefs: "{}" },
+      { contactId: contactIds[7], dexNumber: 8, types: ["FITNESS", "ENERGY"], level: 2, xp: 20, prefs: "{}" },
     ];
 
     const dexIds = [];
@@ -182,14 +182,52 @@ export const seedDemoData = mutation({
       dexIds.push(dexId);
     }
 
-    // Create notes for contacts
+    // Create varied notes for contacts to create different relationship stats
     const notes = [
+      // Alice Chen - High connection contact (6 notes)
       { contactId: contactIds[0], body: "Met at React conference 2024. She's working on a new AI project and might be interested in collaborating.", createdAt: Date.now() - 86400000 },
       { contactId: contactIds[0], body: "Follow up about the hiking trip she mentioned. She loves outdoor activities.", createdAt: Date.now() - 172800000 },
+      { contactId: contactIds[0], body: "Always helpful with code reviews. She's become a great mentor and friend.", createdAt: Date.now() - 259200000 },
+      { contactId: contactIds[0], body: "Great hiking partner - we did Half Dome together last month. Very reliable.", createdAt: Date.now() - 345600000 },
+      { contactId: contactIds[0], body: "Introduced me to climbing. She's really passionate about outdoor activities.", createdAt: Date.now() - 432000000 },
+      { contactId: contactIds[0], body: "Coffee enthusiast - we meet every Tuesday for our weekly tech chat.", createdAt: Date.now() - 518400000 },
+      
+      // Bob Rodriguez - Medium connection contact (2 notes)
       { contactId: contactIds[1], body: "Amazing designer with a great eye for detail. He mentioned wanting to work on more mobile projects.", createdAt: Date.now() - 259200000 },
+      { contactId: contactIds[1], body: "Great color theory knowledge. Helped me with my startup's branding.", createdAt: Date.now() - 345600000 },
+      
+      // Carol Kim - High connection contact (5 notes)
       { contactId: contactIds[2], body: "Working on a new album. She's looking for collaborators for some electronic tracks.", createdAt: Date.now() - 345600000 },
+      { contactId: contactIds[2], body: "Collaborated on my podcast intro - amazing sound design skills.", createdAt: Date.now() - 432000000 },
+      { contactId: contactIds[2], body: "Night owl who works best in the evening. Very creative and inspiring.", createdAt: Date.now() - 518400000 },
+      { contactId: contactIds[2], body: "Great at mixing and mastering. Her production quality is top-notch.", createdAt: Date.now() - 604800000 },
+      { contactId: contactIds[2], body: "Electronic music expert. Always has the latest gear and techniques.", createdAt: Date.now() - 691200000 },
+      
+      // David Park - Low connection contact (1 note)
       { contactId: contactIds[3], body: "His food truck is expanding to a second location. Might need help with business strategy.", createdAt: Date.now() - 432000000 },
+      
+      // Emma Watson - Very high connection contact (7 notes)
       { contactId: contactIds[4], body: "Great consultant, helped me with my business plan. She's also a certified yoga instructor.", createdAt: Date.now() - 518400000 },
+      { contactId: contactIds[4], body: "Excellent networker - introduced me to several key contacts in the industry.", createdAt: Date.now() - 604800000 },
+      { contactId: contactIds[4], body: "Always has great strategic advice. Very reliable and professional.", createdAt: Date.now() - 691200000 },
+      { contactId: contactIds[4], body: "Yoga sessions are amazing - she's a great instructor and motivator.", createdAt: Date.now() - 777600000 },
+      { contactId: contactIds[4], body: "Helped me navigate a difficult business decision. Very wise and experienced.", createdAt: Date.now() - 864000000 },
+      { contactId: contactIds[4], body: "Wellness advocate - always encouraging work-life balance.", createdAt: Date.now() - 950400000 },
+      { contactId: contactIds[4], body: "Strategy guru - her frameworks have transformed how I approach business problems.", createdAt: Date.now() - 1036800000 },
+      
+      // Frank Liu - Medium connection contact (3 notes)
+      { contactId: contactIds[5], body: "Serial entrepreneur with great insights. AI enthusiast who's always ahead of trends.", createdAt: Date.now() - 1209600000 },
+      { contactId: contactIds[5], body: "Coffee addict - we bonded over our love of specialty coffee.", createdAt: Date.now() - 1296000000 },
+      { contactId: contactIds[5], body: "Tech visionary with big ideas. Always thinking about the future.", createdAt: Date.now() - 1382400000 },
+      
+      // Grace Thompson - High connection contact (4 notes)
+      { contactId: contactIds[6], body: "Amazing photographer - did our engagement photos. Great eye for composition.", createdAt: Date.now() - 1814400000 },
+      { contactId: contactIds[6], body: "Nature lover who's always exploring new hiking trails and photo spots.", createdAt: Date.now() - 1900800000 },
+      { contactId: contactIds[6], body: "Vegan advocate with great restaurant recommendations.", createdAt: Date.now() - 1987200000 },
+      { contactId: contactIds[6], body: "Art enthusiast - we often visit galleries and museums together.", createdAt: Date.now() - 2073600000 },
+      
+      // Henry Davis - Low connection contact (1 note)
+      { contactId: contactIds[7], body: "Personal trainer with great nutrition knowledge. Early riser who's very disciplined.", createdAt: Date.now() - 2419200000 },
     ];
 
     for (const noteData of notes) {
@@ -199,13 +237,44 @@ export const seedDemoData = mutation({
       });
     }
 
-    // Create actions for contacts
+    // Create varied actions for contacts to show different engagement patterns
     const actions = [
+      // Alice Chen - Active follow-ups (3 actions)
       { contactId: contactIds[0], title: "Schedule coffee meeting", dueAt: Date.now() + 86400000, kind: "followup" },
+      { contactId: contactIds[0], title: "Plan hiking trip for next weekend", dueAt: Date.now() + 172800000, kind: "todo" },
+      { contactId: contactIds[0], title: "Review her new React project", dueAt: Date.now() + 259200000, kind: "followup" },
+      
+      // Bob Rodriguez - Medium engagement (2 actions)
       { contactId: contactIds[1], title: "Send portfolio review feedback", dueAt: Date.now() + 172800000, kind: "todo" },
+      { contactId: contactIds[1], title: "Discuss mobile project collaboration", dueAt: Date.now() + 432000000, kind: "followup" },
+      
+      // Carol Kim - High engagement (4 actions)
       { contactId: contactIds[2], title: "Listen to her new tracks", dueAt: Date.now() + 259200000, kind: "followup" },
+      { contactId: contactIds[2], title: "Schedule studio session", dueAt: Date.now() + 345600000, kind: "todo" },
+      { contactId: contactIds[2], title: "Discuss podcast collaboration", dueAt: Date.now() + 432000000, kind: "followup" },
+      { contactId: contactIds[2], title: "Send electronic music playlist", dueAt: Date.now() + 518400000, kind: "todo" },
+      
+      // David Park - Low engagement (1 action)
       { contactId: contactIds[3], title: "Visit his food truck", dueAt: Date.now() + 432000000, kind: "followup" },
+      
+      // Emma Watson - Very high engagement (5 actions)
       { contactId: contactIds[4], title: "Book yoga session", dueAt: Date.now() + 604800000, kind: "todo" },
+      { contactId: contactIds[4], title: "Schedule business strategy call", dueAt: Date.now() + 691200000, kind: "followup" },
+      { contactId: contactIds[4], title: "Send networking event invites", dueAt: Date.now() + 777600000, kind: "todo" },
+      { contactId: contactIds[4], title: "Review business plan updates", dueAt: Date.now() + 864000000, kind: "followup" },
+      { contactId: contactIds[4], title: "Plan wellness retreat weekend", dueAt: Date.now() + 950400000, kind: "todo" },
+      
+      // Frank Liu - Medium engagement (2 actions)
+      { contactId: contactIds[5], title: "Discuss AI project ideas", dueAt: Date.now() + 1209600000, kind: "followup" },
+      { contactId: contactIds[5], title: "Send startup pitch deck", dueAt: Date.now() + 1296000000, kind: "todo" },
+      
+      // Grace Thompson - High engagement (3 actions)
+      { contactId: contactIds[6], title: "Plan photo shoot for next month", dueAt: Date.now() + 1814400000, kind: "todo" },
+      { contactId: contactIds[6], title: "Visit new art gallery together", dueAt: Date.now() + 1900800000, kind: "followup" },
+      { contactId: contactIds[6], title: "Try new vegan restaurant", dueAt: Date.now() + 1987200000, kind: "todo" },
+      
+      // Henry Davis - Low engagement (1 action)
+      { contactId: contactIds[7], title: "Schedule personal training session", dueAt: Date.now() + 2419200000, kind: "followup" },
     ];
 
     for (const actionData of actions) {

@@ -1,5 +1,8 @@
-// Script to populate dummy data for kaelanwanshengfung@gmail.com
+// Script to populate dummy data for any user
 // Run this with: node seed-dummy-data.js
+// 
+// This script will create demo contacts with varied relationship stats
+// and meaningful tags for testing the application features.
 
 const { ConvexHttpClient } = require("convex/browser");
 
@@ -98,16 +101,20 @@ async function createCard(deckId, cardData) {
 }
 
 // Main function to seed all dummy data
-async function seedDummyData() {
+async function seedDummyData(userEmail = null, displayName = null) {
   console.log("🌱 Starting to seed dummy data...");
   
-  const userEmail = "kaelanwanshengfung@gmail.com";
-  const displayName = "Kaelan Wan";
+  // Allow custom user email/name or use defaults
+  const finalUserEmail = userEmail || "demo@scrollodex.com";
+  const finalDisplayName = displayName || "Demo User";
+  
+  console.log(`📧 Using email: ${finalUserEmail}`);
+  console.log(`👤 Using display name: ${finalDisplayName}`);
   
   try {
     // Step 1: Create or find the user
     console.log("👤 Creating user...");
-    const userId = await createUser(userEmail, displayName);
+    const userId = await createUser(finalUserEmail, finalDisplayName);
     
     if (!userId) {
       console.log("⚠️  User creation failed, but continuing with dummy data...");
@@ -152,27 +159,27 @@ async function seedDummyData() {
         emails: ["alex.chen@tech.com"],
         phones: ["+1-555-0101"],
         birthday: "1995-03-15",
-        tags: ["work", "tech", "friend"],
+        tags: ["close-friend", "tech-mentor", "hiking-buddy", "coffee-lover", "react-expert"],
         company: "TechCorp",
         role: "Software Engineer",
         location: "San Francisco, CA",
-        notes: ["Met at tech conference", "Great at React"],
+        notes: ["Met at tech conference", "Great at React", "Always helpful with code reviews", "Great hiking partner", "Coffee enthusiast"],
         lastInteractionAt: Date.now() - (2 * 24 * 60 * 60 * 1000), // 2 days ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[0]}`,
         petData: {
           petType: "cat",
           petName: "Whiskers",
-          level: 3,
-          happiness: 85,
+          level: 4,
+          happiness: 90,
           color: "orange",
           pattern: "stripes",
           accessory: "bow",
           templateId: "cat_orange_stripes_bow",
           generatedAt: Date.now() - (5 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (10 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 5,
-          totalEvolutions: 2,
+          evolutionTokens: 8,
+          totalEvolutions: 3,
         }
       },
       {
@@ -180,27 +187,27 @@ async function seedDummyData() {
         emails: ["sarah.j@design.com"],
         phones: ["+1-555-0102"],
         birthday: "1992-07-22",
-        tags: ["design", "creative", "friend"],
+        tags: ["creative-collaborator", "design-mentor", "skateboarder", "color-expert", "startup-advisor"],
         company: "Design Studio",
         role: "UX Designer",
         location: "New York, NY",
-        notes: ["Amazing designer", "Loves coffee"],
+        notes: ["Amazing designer", "Loves coffee", "Great color theory knowledge"],
         lastInteractionAt: Date.now() - (1 * 24 * 60 * 60 * 1000), // 1 day ago
         pinned: false,
         profilePictureUrl: `/assets-moji/${emojiAssets[1]}`,
         petData: {
           petType: "dog",
           petName: "Buddy",
-          level: 2,
-          happiness: 70,
+          level: 3,
+          happiness: 75,
           color: "golden",
           pattern: "solid",
           accessory: "collar",
           templateId: "dog_golden_solid_collar",
           generatedAt: Date.now() - (3 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (7 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 3,
-          totalEvolutions: 1,
+          evolutionTokens: 5,
+          totalEvolutions: 2,
         }
       },
       {
@@ -208,11 +215,11 @@ async function seedDummyData() {
         emails: ["mike.r@startup.com"],
         phones: ["+1-555-0103"],
         birthday: "1988-11-08",
-        tags: ["startup", "entrepreneur", "mentor"],
+        tags: ["serial-entrepreneur", "ai-expert", "coffee-addict", "venture-mentor", "tech-visionary"],
         company: "StartupXYZ",
         role: "CEO",
         location: "Austin, TX",
-        notes: ["Great mentor", "Very inspiring"],
+        notes: ["Great mentor", "Very inspiring", "AI enthusiast", "Coffee addict"],
         lastInteractionAt: Date.now() - (7 * 24 * 60 * 60 * 1000), // 1 week ago
         pinned: true,
         profilePictureUrl: `/assets-moji/${emojiAssets[2]}`,
@@ -227,8 +234,8 @@ async function seedDummyData() {
           templateId: "dragon_red_scales_crown",
           generatedAt: Date.now() - (14 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (21 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 8,
-          totalEvolutions: 3,
+          evolutionTokens: 10,
+          totalEvolutions: 4,
         }
       },
       {
@@ -236,11 +243,11 @@ async function seedDummyData() {
         emails: ["emma.w@art.com"],
         phones: ["+1-555-0104"],
         birthday: "1990-05-12",
-        tags: ["art", "creative", "friend"],
+        tags: ["wedding-photographer", "nature-lover", "vegan-advocate", "art-enthusiast", "portrait-specialist"],
         company: "Art Gallery",
         role: "Curator",
         location: "Los Angeles, CA",
-        notes: ["Talented artist", "Very creative"],
+        notes: ["Talented artist", "Very creative", "Amazing photographer", "Nature lover"],
         lastInteractionAt: Date.now() - (3 * 24 * 60 * 60 * 1000), // 3 days ago
         pinned: false,
         profilePictureUrl: `/assets-moji/${emojiAssets[3]}`,
@@ -248,15 +255,15 @@ async function seedDummyData() {
           petType: "fox",
           petName: "Sage",
           level: 4,
-          happiness: 80,
+          happiness: 85,
           color: "silver",
           pattern: "gradient",
           accessory: "glasses",
           templateId: "fox_silver_gradient_glasses",
           generatedAt: Date.now() - (8 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (15 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 6,
-          totalEvolutions: 2,
+          evolutionTokens: 7,
+          totalEvolutions: 3,
         }
       },
       {
@@ -264,11 +271,11 @@ async function seedDummyData() {
         emails: ["david.k@music.com"],
         phones: ["+1-555-0105"],
         birthday: "1993-09-30",
-        tags: ["music", "producer", "friend"],
+        tags: ["music-producer", "electronic-artist", "night-owl", "collaborative", "sound-designer"],
         company: "Music Studio",
         role: "Music Producer",
         location: "Nashville, TN",
-        notes: ["Amazing musician", "Great collaborator"],
+        notes: ["Amazing musician", "Great collaborator", "Electronic music expert", "Night owl"],
         lastInteractionAt: Date.now() - (5 * 24 * 60 * 60 * 1000), // 5 days ago
         pinned: false,
         profilePictureUrl: `/assets-moji/${emojiAssets[4]}`,
@@ -276,15 +283,15 @@ async function seedDummyData() {
           petType: "bird",
           petName: "Melody",
           level: 3,
-          happiness: 75,
+          happiness: 80,
           color: "rainbow",
           pattern: "feathers",
           accessory: "hat",
           templateId: "bird_rainbow_feathers_hat",
           generatedAt: Date.now() - (6 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (12 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 4,
-          totalEvolutions: 1,
+          evolutionTokens: 6,
+          totalEvolutions: 2,
         }
       },
       {
@@ -292,7 +299,7 @@ async function seedDummyData() {
         emails: ["lisa.z@finance.com"],
         phones: ["+1-555-0106"],
         birthday: "1987-12-03",
-        tags: ["finance", "advisor", "professional"],
+        tags: ["financial-advisor", "investment-expert", "professional", "wealth-management", "retirement-planning"],
         company: "Finance Corp",
         role: "Financial Advisor",
         location: "Chicago, IL",
@@ -304,15 +311,15 @@ async function seedDummyData() {
           petType: "rabbit",
           petName: "Cotton",
           level: 2,
-          happiness: 65,
+          happiness: 70,
           color: "white",
           pattern: "spots",
           accessory: "bow",
           templateId: "rabbit_white_spots_bow",
           generatedAt: Date.now() - (4 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (9 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 2,
-          totalEvolutions: 0,
+          evolutionTokens: 3,
+          totalEvolutions: 1,
         }
       },
       {
@@ -320,11 +327,11 @@ async function seedDummyData() {
         emails: ["james.b@sports.com"],
         phones: ["+1-555-0107"],
         birthday: "1991-04-18",
-        tags: ["sports", "fitness", "friend"],
+        tags: ["sports-agent", "fitness-coach", "athlete-mentor", "motivation-expert", "team-builder"],
         company: "Sports Agency",
         role: "Sports Agent",
         location: "Miami, FL",
-        notes: ["Great athlete", "Very motivated"],
+        notes: ["Great athlete", "Very motivated", "Fitness enthusiast"],
         lastInteractionAt: Date.now() - (6 * 24 * 60 * 60 * 1000), // 6 days ago
         pinned: false,
         profilePictureUrl: `/assets-moji/${emojiAssets[6]}`,
@@ -339,8 +346,8 @@ async function seedDummyData() {
           templateId: "phoenix_fire_flames_crown",
           generatedAt: Date.now() - (20 * 24 * 60 * 60 * 1000),
           hatchedAt: Date.now() - (30 * 24 * 60 * 60 * 1000),
-          evolutionTokens: 12,
-          totalEvolutions: 4,
+          evolutionTokens: 15,
+          totalEvolutions: 5,
         }
       }
     ];
@@ -655,7 +662,7 @@ async function seedDummyData() {
     
     console.log("🎉 Dummy data seeding completed successfully!");
     console.log(`📊 Summary:`);
-    console.log(`   - User: ${displayName} (${userEmail})`);
+    console.log(`   - User: ${finalDisplayName} (${finalUserEmail})`);
     console.log(`   - Contacts: ${contactIds.length}`);
     console.log(`   - Pet Templates: ${petTemplates.length}`);
     console.log(`   - Moments: ${moments.length}`);
@@ -672,7 +679,20 @@ async function seedDummyData() {
 
 // Run the seeding function
 if (require.main === module) {
-  seedDummyData().then(() => {
+  // Check for command line arguments for custom user
+  const args = process.argv.slice(2);
+  const customEmail = args[0] || null;
+  const customName = args[1] || null;
+  
+  if (customEmail && customName) {
+    console.log(`🎯 Using custom user: ${customName} (${customEmail})`);
+  } else if (customEmail) {
+    console.log(`🎯 Using custom email: ${customEmail}`);
+  } else {
+    console.log("🎯 Using default demo user");
+  }
+  
+  seedDummyData(customEmail, customName).then(() => {
     console.log("✅ Seeding completed");
     process.exit(0);
   }).catch((error) => {

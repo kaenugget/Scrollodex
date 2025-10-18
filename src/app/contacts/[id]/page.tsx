@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { ContactDetailView } from '@/components/ContactDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -13,6 +13,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function ContactDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const contactId = params.id as string;
   const [activeTab, setActiveTab] = useState<"overview" | "notes" | "actions" | "preferences" | "moments">("overview");
   
@@ -41,13 +42,25 @@ export default function ContactDetailPage() {
     signOut();
   };
 
-  if (authLoading || contactsLoading || dexLoading) {
-    console.log('Loading states:', { authLoading, contactsLoading, dexLoading });
+  // Show loading while authentication is being checked
+  if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 
-  if (!isUserAuthenticated || !hasValidConvexUserId) {
-    return <LoadingSpinner fullScreen text="Redirecting to login..." />;
+  // If we have a token but no user yet, wait for the user query to resolve
+  if (!isUserAuthenticated && currentUser === undefined) {
+    return <LoadingSpinner fullScreen text="Authenticating..." />;
+  }
+
+  // Only redirect if we're definitively not authenticated (no token or user query failed)
+  if (!isUserAuthenticated && currentUser === null) {
+    router.push('/');
+    return <LoadingSpinner fullScreen text="Redirecting..." />;
+  }
+
+  // Show loading for data while authenticated
+  if (contactsLoading || dexLoading) {
+    return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 
   return (
@@ -57,24 +70,22 @@ export default function ContactDetailPage() {
         currentPage="home" 
         onNavigate={(page) => {
           if (page === 'dex') {
-            window.location.href = '/';
+            router.push('/');
           } else if (page === 'settings') {
-            window.location.href = '/settings';
+            router.push('/settings');
           }
         }}
         user={currentUser}
         onSignOut={handleSignOut}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <ContactDetailView 
-          contactId={contactId}
-          userId={currentUser._id as Id<"users">}
-          contacts={contacts}
-          dexEntries={dexEntries}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-      </div>
+      <ContactDetailView 
+        contactId={contactId}
+        userId={currentUser._id as Id<"users">}
+        contacts={contacts}
+        dexEntries={dexEntries}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
     </main>
   );
 }

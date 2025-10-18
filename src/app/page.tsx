@@ -23,13 +23,14 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
 export default function Home() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
-  const router = useRouter();
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   // const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
+  
   
   // Use custom auth only for now due to React 19 compatibility issues with Clerk
   const isUserAuthenticated = isAuthenticated;
@@ -65,6 +66,7 @@ export default function Home() {
     setShowAuth(null);
   };
 
+  
 
   // Show loading while checking authentication
   if (authLoading) {

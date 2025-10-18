@@ -9,6 +9,7 @@ export function useAuth() {
   // Get token from localStorage on mount
   useEffect(() => {
     const savedToken = localStorage.getItem("authToken");
+    console.log('useAuth: Loading token from localStorage:', savedToken ? 'Token found' : 'No token');
     setToken(savedToken);
     setIsLoading(false);
   }, []);
@@ -17,6 +18,11 @@ export function useAuth() {
   const currentUser = useQuery(api.auth.getCurrentUser, 
     token ? { token } : "skip"
   );
+
+  // Debug logging
+  useEffect(() => {
+    console.log('useAuth: currentUser changed:', currentUser ? 'User found' : 'No user', currentUser?._id);
+  }, [currentUser]);
 
   // Mutations
   const register = useMutation(api.auth.register);
@@ -87,11 +93,14 @@ export function useAuth() {
     localStorage.removeItem("authToken");
   };
 
+  // Check if we're still waiting for the user query to resolve
+  const isUserLoading = token && currentUser === undefined;
+  
   return {
     // State
     user: currentUser,
     token,
-    isLoading,
+    isLoading: isLoading || isUserLoading,
     isAuthenticated: !!currentUser,
 
     // Actions
