@@ -6,7 +6,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { motion } from 'framer-motion';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
@@ -33,8 +33,34 @@ export default function ProfilePage() {
   const isUserAuthenticated = isAuthenticated;
   const currentUser = user;
 
-  // Mutations
+  // Mutations and Queries
   const createUserShare = useMutation(api.social.createUserShare);
+  const avatarUrlFromStorage = useQuery(
+    api.auth.getAvatarUrl,
+    currentUser?.avatarFileId ? { avatarFileId: currentUser.avatarFileId } : "skip"
+  );
+
+  // Debug logging for avatar data
+  useEffect(() => {
+    if (currentUser) {
+      console.log('Profile page - User data:', {
+        displayName: currentUser.displayName,
+        avatarUrl: currentUser.avatarUrl,
+        avatarFileId: currentUser.avatarFileId,
+        avatarUrlFromStorage: avatarUrlFromStorage
+      });
+    }
+  }, [currentUser, avatarUrlFromStorage]);
+
+  // Debug the query parameters
+  useEffect(() => {
+    console.log('Avatar query debug:', {
+      hasCurrentUser: !!currentUser,
+      avatarFileId: currentUser?.avatarFileId,
+      queryCalled: !!currentUser?.avatarFileId,
+      avatarUrlFromStorage: avatarUrlFromStorage
+    });
+  }, [currentUser?.avatarFileId, avatarUrlFromStorage]);
 
   // Mock relationship health data based on PRD requirements
   const relationshipHealth = {
@@ -188,11 +214,18 @@ export default function ProfilePage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        {currentUser.avatarUrl ? (
+        {(currentUser.avatarUrl || avatarUrlFromStorage) ? (
           <img 
-            src={currentUser.avatarUrl} 
+            src={currentUser.avatarUrl || avatarUrlFromStorage || ''} 
             alt={`${currentUser.displayName}'s avatar`}
             className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl"
+            onError={(e) => {
+              console.error('Avatar image failed to load:', e);
+              console.log('Failed to load avatar URL:', currentUser.avatarUrl || avatarUrlFromStorage);
+            }}
+            onLoad={() => {
+              console.log('Avatar loaded successfully:', currentUser.avatarUrl || avatarUrlFromStorage);
+            }}
           />
         ) : (
           <div className="w-48 h-48 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center border-4 border-white shadow-2xl">
