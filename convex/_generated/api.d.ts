@@ -12,7 +12,6 @@ import type * as actions from "../actions.js";
 import type * as agents from "../agents.js";
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
-import type * as clerk from "../clerk.js";
 import type * as contacts from "../contacts.js";
 import type * as dex from "../dex.js";
 import type * as files from "../files.js";
@@ -47,7 +46,6 @@ declare const fullApi: ApiFromModules<{
   agents: typeof agents;
   ai: typeof ai;
   auth: typeof auth;
-  clerk: typeof clerk;
   contacts: typeof contacts;
   dex: typeof dex;
   files: typeof files;
