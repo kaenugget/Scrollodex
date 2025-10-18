@@ -6,9 +6,12 @@ export default defineSchema({
   users: defineTable({
     email: v.string(),
     displayName: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
     passwordHash: v.optional(v.string()), // Optional for existing users
     clerkUserId: v.optional(v.string()), // Clerk user ID for integration
     avatarUrl: v.optional(v.string()),
+    selfieFileId: v.optional(v.id("_storage")), // Selfie photo for signup
     bio: v.optional(v.string()),
     createdAt: v.number(),
     lastLoginAt: v.optional(v.number()),

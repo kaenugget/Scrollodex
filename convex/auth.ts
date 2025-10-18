@@ -30,6 +30,9 @@ export const register = mutation({
     email: v.string(),
     displayName: v.string(),
     password: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    selfieFileId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     // Check if user already exists
@@ -51,6 +54,9 @@ export const register = mutation({
     const userId = await ctx.db.insert("users", {
       email: args.email,
       displayName: args.displayName,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      selfieFileId: args.selfieFileId,
       passwordHash: simpleHash(args.password),
       createdAt: Date.now(),
     });

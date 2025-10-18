@@ -30,11 +30,11 @@ export function CardComposer({ peerPageId, onClose }: CardComposerProps) {
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   const createCard = useMutation(api.social.createCard);
   const createDeck = useMutation(api.social.createDeck);
-  const getDecks = useQuery(api.social.getDecks, {});
   
   // Get current user and contacts
   const { convexUser: currentUser } = useClerkConvexUser();
-  const contacts = useQuery(api.contacts.list, currentUser ? { ownerId: currentUser._id } : "skip");
+  const getDecks = useQuery(api.social.getDecks, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
+  const contacts = useQuery(api.contacts.list, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);

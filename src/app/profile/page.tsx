@@ -127,7 +127,7 @@ export default function ProfilePage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                       <input
                         type="email"
-                        value={currentUser.email || 'No email provided'}
+                        value={(currentUser as { email?: string })?.email || 'No email provided'}
                         disabled
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                       />

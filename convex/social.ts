@@ -249,7 +249,7 @@ export const getCardByShareToken = query({
       .filter((q) => q.eq(q.field("shareToken"), args.shareToken))
       .first();
     
-    if (!invite || invite.expiresAt < Date.now()) {
+    if (!invite || invite.expiresAt < Date.now() || !invite.cardId) {
       return null;
     }
     
@@ -269,7 +269,7 @@ export const claimCard = mutation({
       .filter((q) => q.eq(q.field("shareToken"), args.shareToken))
       .first();
     
-    if (!invite || invite.expiresAt < Date.now()) {
+    if (!invite || invite.expiresAt < Date.now() || !invite.cardId) {
       throw new Error("Share link expired or invalid");
     }
     

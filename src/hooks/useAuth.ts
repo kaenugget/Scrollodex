@@ -27,9 +27,9 @@ export function useAuth() {
   const deleteAccount = useMutation(api.auth.deleteAccount);
 
   // Auth actions
-  const signUp = async (email: string, displayName: string, password: string) => {
+  const signUp = async (email: string, displayName: string, password: string, firstName?: string, lastName?: string, selfieFileId?: string) => {
     try {
-      const result = await register({ email, displayName, password });
+      const result = await register({ email, displayName, password, firstName, lastName, selfieFileId });
       setToken(result.token);
       localStorage.setItem("authToken", result.token);
       return result;

@@ -155,6 +155,12 @@ export default function Home() {
                 >
                   Create Account with Email
                 </button>
+                <a
+                  href="/signup"
+                  className="w-full px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-center block"
+                >
+                  Multi-Step Signup (Name + Email + Selfie)
+                </a>
               </div>
 
               {/* Features Preview */}
