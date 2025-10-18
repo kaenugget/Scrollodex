@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Phone, Mail, MapPin, Building, Wifi } from "lucide-react";
+import { Building, Wifi } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
 
 interface Contact {
@@ -25,13 +25,6 @@ interface ContactCardProps {
 }
 
 export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
-  const [isPinned, setIsPinned] = useState(contact.pinned);
-
-  const handlePin = () => {
-    const newPinned = !isPinned;
-    setIsPinned(newPinned);
-    onPin(contact._id, newPinned);
-  };
 
   // List of available memoji images
   const memojiImages = [
@@ -130,10 +123,10 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
 
   return (
     <div className="scrollodex-card scrollodex-card-entrance hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-      <div className="p-4 sm:p-6">
+      <div className="p-3 sm:p-4">
         {/* Profile Image */}
-        <div className="flex justify-center mb-3 sm:mb-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+        <div className="flex justify-center mb-2 sm:mb-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
             <img 
               src={`/assets-moji/${getMemojiImage(contact.name)}`}
               alt={`${contact.name} memoji`}
@@ -143,10 +136,10 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
         </div>
 
         {/* Name */}
-        <h3 className="text-base sm:text-lg font-semibold scrollodex-text-dark text-center mb-2 sm:mb-3">{contact.name}</h3>
+        <h3 className="text-sm sm:text-base font-semibold scrollodex-text-dark text-center mb-1 sm:mb-2">{contact.name}</h3>
 
         {/* Contact Type Tag, Role Tag and Dynamic Indicator */}
-        <div className="text-center mb-2">
+        <div className="text-center mb-1">
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
               getContactType(contact.name) === 'Personal' 
@@ -168,53 +161,23 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
         </div>
 
         {/* Industry Tag */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-3">
           <span className={`px-3 py-1 text-xs font-medium rounded-full text-white ${getIndustry(contact.name).color}`}>
             {getIndustry(contact.name).name}
           </span>
         </div>
 
         {/* Contact Info */}
-        <div className="space-y-2 mb-4 text-sm scrollodex-text-gray">
-          {contact.company && (
-            <div className="flex items-center gap-2">
-              <Building className="w-4 h-4" />
-              <span>{contact.company}</span>
-            </div>
-          )}
-          
-          {contact.emails.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>{contact.emails[0]}</span>
-            </div>
-          )}
-          
-          {contact.phones.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span>{contact.phones[0]}</span>
-            </div>
-          )}
-        </div>
+        {contact.company && (
+          <div className="flex items-center justify-center gap-2 mb-3 text-sm scrollodex-text-gray">
+            <Building className="w-4 h-4" />
+            <span>{contact.company}</span>
+          </div>
+        )}
 
         {/* Last Interaction */}
-        <div className="text-xs scrollodex-text-light-gray text-center mb-4">
+        <div className="text-xs scrollodex-text-light-gray text-center mb-3">
           Last seen: {formatLastInteraction(contact.lastInteractionAt)}
-        </div>
-
-        {/* Pin Button */}
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={handlePin}
-            className={`p-2 rounded-full transition-colors ${
-              isPinned 
-                ? 'text-yellow-500 bg-yellow-50' 
-                : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'
-            }`}
-          >
-            <Star className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
-          </button>
         </div>
 
         {/* View Button */}
