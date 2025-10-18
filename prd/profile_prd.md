@@ -9,20 +9,12 @@
 
 ## 2. User Stories
 
-<<<<<<< Updated upstream
-- **As a user,** after selecting a friend, I want to see their detailed profile page so I can learn more about them.
-- **As a user,** I want to see a large version of their picture, their full description, and their "Pokédex data" (e.g., name, birthday, category).
-- **As a user,** I want to view their base stats (HP, Attack, etc.) in a clear, graphical format like progress bars.
-- **As a user,** I want to easily identify their "types" and "weaknesses" through colored badges.
-- **As a user,** I want a clear and simple way to navigate back to the main list of friends.
-=======
 - **As a user,** after selecting a contact, I want to see their detailed profile page so I can get a full picture of our relationship.
 - **As a user,** I want to see an AI-generated summary of our relationship so I can get a quick, dynamic insight that updates over time.
 - **As a user,** I want to see relevant CRM information like their role, company, and when we last talked.
 - **As a user,** I want to see a clear "Relationship Score" and detailed stats to quickly gauge the health and nature of our connection.
 - **As a user,** I want to easily find their contact details, like email and social media links.
 - **As a user,** I want a clear and simple way to navigate back to the main list of contacts.
->>>>>>> Stashed changes
 
 ## 3. Functional Requirements
 
