@@ -70,6 +70,37 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
     return index === 0 ? 'Personal' : 'Professional';
   };
 
+  // Industry options with colors
+  const industries = [
+    { name: 'Tech', color: 'bg-yellow-500' },
+    { name: 'Finance', color: 'bg-purple-500' },
+    { name: 'Healthcare', color: 'bg-teal-500' },
+    { name: 'Education', color: 'bg-pink-500' },
+    { name: 'Marketing', color: 'bg-blue-500' },
+    { name: 'Design', color: 'bg-indigo-500' },
+    { name: 'Sales', color: 'bg-red-500' },
+    { name: 'Consulting', color: 'bg-green-500' }
+  ];
+
+  // Generate a consistent industry based on contact name
+  const getIndustry = (name: string) => {
+    const index = name.charCodeAt(0) % industries.length;
+    return industries[index];
+  };
+
+  // Role options
+  const roles = [
+    'Mentor', 'Investor', 'Childhood Friend', 'Golf Buddy', 'Colleague', 
+    'Client', 'Partner', 'Advisor', 'Friend', 'Acquaintance', 
+    'Family', 'Neighbor', 'Classmate', 'Teammate', 'Business Contact'
+  ];
+
+  // Generate a consistent role based on contact name
+  const getRole = (name: string) => {
+    const index = name.charCodeAt(0) % roles.length;
+    return roles[index];
+  };
+
   const formatLastInteraction = (timestamp: number) => {
     const now = Date.now();
     const diff = now - timestamp;
@@ -111,15 +142,21 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
           </div>
         </div>
 
-        {/* Contact Type Tag and Dynamic Indicator */}
+        {/* Name */}
+        <h3 className="text-base sm:text-lg font-semibold scrollodex-text-dark text-center mb-2 sm:mb-3">{contact.name}</h3>
+
+        {/* Contact Type Tag, Role Tag and Dynamic Indicator */}
         <div className="text-center mb-2">
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             <div className={`px-3 py-1 rounded-full text-xs font-medium ${
               getContactType(contact.name) === 'Personal' 
                 ? 'bg-green-500 text-white' 
                 : 'bg-blue-500 text-white'
             }`}>
               {getContactType(contact.name)}
+            </div>
+            <div className="px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
+              {getRole(contact.name)}
             </div>
             {contact.isDynamicContact && (
               <div className="flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs">
@@ -130,27 +167,12 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
           </div>
         </div>
 
-        {/* Name */}
-        <h3 className="text-base sm:text-lg font-semibold scrollodex-text-dark text-center mb-2 sm:mb-3">{contact.name}</h3>
-
-        {/* Tags */}
-        {contact.tags.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {contact.tags.slice(0, 2).map((tag) => (
-              <span 
-                key={tag} 
-                className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700"
-              >
-                {tag}
-              </span>
-            ))}
-            {contact.tags.length > 2 && (
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
-                +{contact.tags.length - 2}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Industry Tag */}
+        <div className="flex justify-center mb-4">
+          <span className={`px-3 py-1 text-xs font-medium rounded-full text-white ${getIndustry(contact.name).color}`}>
+            {getIndustry(contact.name).name}
+          </span>
+        </div>
 
         {/* Contact Info */}
         <div className="space-y-2 mb-4 text-sm scrollodex-text-gray">
