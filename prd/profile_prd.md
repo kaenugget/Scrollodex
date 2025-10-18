@@ -66,8 +66,8 @@
 
 - **Framework:** React
 - **Styling:** Tailwind CSS
-- **Components:** `FriendexDetail.tsx`, `StatBar.tsx`.
-- **Data:** The `FriendexDetail` component receives a single `friend` object as a prop from the main `App` component.
+- **Components:** `ScrolladexDetail.tsx`, `StatBar.tsx`.
+- **Data:** The `ScrolladexDetail` component receives a single `friend` object as a prop from the main `App` component.
 
 ## 6. Out of Scope for this Feature
 

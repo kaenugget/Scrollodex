@@ -54,7 +54,7 @@
 
 - **Framework:** React
 - **Styling:** Tailwind CSS
-- **Components:** `FriendexList.tsx`, which contains the `FriendCard` component.
+- **Components:** `ScrolladexList.tsx`, which contains the `FriendCard` component.
 - **Data Source:** A static array of `Friend` objects located in `constants.ts`.
 
 ## 6. Out of Scope for this Feature
