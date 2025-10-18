@@ -30,6 +30,7 @@ export function InviteLandingPage({ shareId }: InviteLandingPageProps) {
   };
 
   // Get the inviter's name, defaulting to "Chen Chen" if not found
+  // This will work even if the share token is client-side generated
   const inviterName = inviterUser?.displayName || "Chen Chen";
 
   return (

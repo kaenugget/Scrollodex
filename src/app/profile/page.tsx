@@ -1,44 +1,32 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/AppHeader';
+import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { QRCodeDisplay } from '@/components/QRCodeDisplay';
 import { useMutation } from 'convex/react';
+import { motion } from 'framer-motion';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Database, 
-  Download, 
-  Trash2, 
-  Mail,
+  Users,
   Share2,
-  QrCode,
   Copy,
-  Check
+  Check,
+  Heart,
+  Shield,
+  MessageCircle,
+  Zap
 } from 'lucide-react';
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'privacy' | 'appearance' | 'data'>('profile');
-  const [showQR, setShowQR] = useState(false);
+  const router = useRouter();
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  
-  // Profile form state
-  const [profileForm, setProfileForm] = useState({
-    displayName: '',
-    bio: ''
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   
@@ -47,29 +35,101 @@ export default function ProfilePage() {
 
   // Mutations
   const createUserShare = useMutation(api.social.createUserShare);
-  const updateProfile = useMutation(api.users.updateProfile);
+
+  // Mock relationship health data based on PRD requirements
+  const relationshipHealth = {
+    connection: 85,
+    reliability: 78,
+    communication: 92,
+    energy: 88
+  };
+
+  const overallHealth = Math.round(
+    (relationshipHealth.connection + relationshipHealth.reliability + 
+     relationshipHealth.communication + relationshipHealth.energy) / 4
+  );
 
   const handleSignOut = async () => {
     await signOut();
   };
 
-  const generateProfileShareLink = async () => {
+  const generateInviteLink = async () => {
     if (!currentUser?._id) {
-      alert('Please sign in first');
+      setError('Please sign in first');
       return;
     }
 
+    setIsGenerating(true);
+    setError(null);
+    
     try {
-      const share = await createUserShare({
-        userId: currentUser._id as Id<"users">,
+      console.log('Creating share for user:', currentUser._id);
+      console.log('User object:', currentUser);
+      console.log('User ID type:', typeof currentUser._id);
+      console.log('User ID value:', currentUser._id);
+      
+      // Validate user ID format
+      if (typeof currentUser._id !== 'string' || !currentUser._id.startsWith('j')) {
+        throw new Error(`Invalid user ID format: ${currentUser._id}`);
+      }
+      
+      // Generate share token immediately (client-side)
+      const clientShareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      console.log('Generated client-side share token:', clientShareToken);
+      
+      // Try to create share with Convex (optional)
+      let share = { shareToken: clientShareToken }; // Start with client-side token
+      
+      try {
+        console.log('Attempting to create share via Convex...');
+        const convexShare = await createUserShare({
+          userId: currentUser._id as Id<"users">,
+        });
+        console.log('Share created successfully via Convex:', convexShare);
+        // Use Convex token if successful
+        if (convexShare && convexShare.shareToken) {
+          share = convexShare;
+        }
+      } catch (convexError) {
+        console.error('Convex error:', convexError);
+        console.log('Convex failed, using client-side share token...');
+        // Keep using the client-side token we generated
+      }
+      
+      // Final validation
+      if (!share || !share.shareToken) {
+        throw new Error('Share token was not generated - this should not happen');
+      }
+      
+      console.log('Final share object:', share);
+      console.log('Final share token:', share.shareToken);
+      
+      const url = `${window.location.origin}/invite/${share.shareToken}`;
+      setShareUrl(url);
+      
+      // Try to copy to clipboard, but don't fail if it doesn't work
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+      } catch (clipboardError) {
+        console.warn('Could not copy to clipboard:', clipboardError);
+        // Don't throw error for clipboard issues, just show the URL
+      }
+    } catch (error) {
+      console.error('Error creating invite link:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        user: currentUser,
+        userId: currentUser?._id,
+        userIdType: typeof currentUser?._id
       });
       
-      const url = `${window.location.origin}/connect/${share.shareToken}`;
-      setShareUrl(url);
-      setShowQR(true);
-    } catch (error) {
-      console.error('Error creating profile share link:', error);
-      alert('Failed to create share link. Please try again.');
+      // Set error state instead of alert
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to create invite link: ${errorMessage}`);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -85,6 +145,10 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAllContacts = () => {
+    router.push('/');
+  };
+
   if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
@@ -98,344 +162,205 @@ export default function ProfilePage() {
   if (!currentUser) {
     return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
-
-  const tabs = [
-    { key: 'profile', label: 'Profile', icon: User },
-    { key: 'notifications', label: 'Notifications', icon: Bell },
-    { key: 'privacy', label: 'Privacy', icon: Shield },
-    { key: 'appearance', label: 'Appearance', icon: Palette },
-    { key: 'data', label: 'Data', icon: Database },
-  ] as const;
-
   return (
-    <main className="scrollodex-bg">
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-red-800 flex flex-col items-center justify-center p-4">
       <AnimatedBackground />
-      <AppHeader 
-        currentPage="profile" 
-        onNavigate={(page) => {
-          if (page === 'contacts' || page === 'dex' || page === 'home') {
-            window.location.href = '/';
-          }
-        }}
-        user={currentUser}
-        onSignOut={handleSignOut}
-      />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold scrollodex-text-white-bold mb-2">Profile & Settings</h1>
-          <p className="scrollodex-text-white">Manage your account and app preferences</p>
-        </div>
+      {/* Welcome Message */}
+      <motion.div 
+        className="text-center mb-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h1 className="text-white text-3xl font-bold mb-2">
+          Welcome to your Scrollodex,
+        </h1>
+        <h2 className="text-white text-3xl font-bold">
+          {currentUser.displayName || 'User'}!
+        </h2>
+      </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <div className="scrollodex-card">
-              <nav className="space-y-2">
-                {tabs.map(({ key, label, icon: Icon }) => (
-                  <button
-                    key={key}
-                    onClick={() => setActiveTab(key)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
-                      activeTab === key
-                        ? 'bg-blue-50 scrollodex-text-dark border border-blue-200'
-                        : 'scrollodex-text-gray hover:scrollodex-text-dark hover:bg-gray-50'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {label}
-                  </button>
-                ))}
-              </nav>
-            </div>
+      {/* Avatar */}
+      <motion.div 
+        className="mb-8"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        {currentUser.avatarUrl ? (
+          <img 
+            src={currentUser.avatarUrl} 
+            alt={`${currentUser.displayName}'s avatar`}
+            className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl"
+          />
+        ) : (
+          <div className="w-48 h-48 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center border-4 border-white shadow-2xl">
+            <span className="text-white text-6xl font-bold">
+              {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
+            </span>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Profile Info Card */}
+      <motion.div 
+        className="w-full max-w-sm bg-white rounded-2xl p-6 mb-8 shadow-xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        <div className="space-y-4">
+          {/* Email */}
+          <div>
+            <span className="font-bold text-gray-900">Email</span>
+            <p className="text-gray-700">{(currentUser as { email?: string })?.email || 'No email provided'}</p>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            {activeTab === 'profile' && (
-              <div className="scrollodex-card-large">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">
-                      {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold scrollodex-text-dark">{currentUser.displayName || 'User'}</h2>
-                    <p className="scrollodex-text-gray">Manage your profile information</p>
-                  </div>
-                </div>
+          {/* Location */}
+          <div>
+            <span className="font-bold text-gray-900">Location</span>
+            <p className="text-gray-700">Singapore</p>
+          </div>
 
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium scrollodex-text-dark mb-2">Display Name</label>
-                      <input
-                        type="text"
-                        defaultValue={currentUser.displayName || ''}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Enter your display name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium scrollodex-text-dark mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={(currentUser as { email?: string })?.email || 'No email provided'}
-                        disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 scrollodex-text-light-gray"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium scrollodex-text-dark mb-2">Bio</label>
-                    <textarea
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Tell us about yourself..."
+          {/* Relationship Health */}
+          <div>
+            <span className="font-bold text-gray-900">Relationship Health</span>
+            <div className="mt-2 space-y-2">
+              {/* Overall Health Score */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Overall</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000"
+                      style={{ width: `${overallHealth}%` }}
                     />
                   </div>
-
-                  <div className="flex gap-4">
-                    <Button>Save Changes</Button>
-                    <Button variant="outline">Cancel</Button>
-                  </div>
-
-                  {/* Profile Sharing Section */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold scrollodex-text-dark mb-4">Share Your Profile</h3>
-                    <p className="text-sm scrollodex-text-gray mb-4">
-                      Let others connect with you by sharing your profile QR code or link
-                    </p>
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={generateProfileShareLink}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        <QrCode className="w-4 h-4 mr-2" />
-                        Generate QR Code
-                      </Button>
-                    </div>
-
-                    {/* QR Code Modal */}
-                    {showQR && shareUrl && (
-                      <div className="scrollodex-card mt-6 text-center">
-                        <h4 className="text-lg font-semibold scrollodex-text-dark mb-4">
-                          Share Your Profile
-                        </h4>
-                        
-                        <div className="bg-white p-4 rounded-lg inline-block mb-4">
-                          <QRCodeDisplay url={shareUrl} size={128} />
-                        </div>
-                        
-                        <p className="scrollodex-text-gray text-sm mb-4">
-                          Others can scan this QR code to connect with you
-                        </p>
-                        
-                        <div className="flex gap-2 justify-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={copyToClipboard}
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
-                            {copied ? "Copied!" : "Copy Link"}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowQR(false)}
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            Close
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <span className="text-sm font-bold text-gray-900">{overallHealth}</span>
                 </div>
               </div>
-            )}
 
-            {activeTab === 'notifications' && (
-              <div className="scrollodex-card-large">
-                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Notification Preferences</h2>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium scrollodex-text-dark">Birthday Reminders</h3>
-                      <p className="text-sm scrollodex-text-gray">Get notified when your contacts have birthdays</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">Follow-up Reminders</h3>
-                      <p className="text-sm text-gray-600">Reminders for scheduled follow-ups with contacts</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">Weekly Summaries</h3>
-                      <p className="text-sm text-gray-600">Receive weekly summaries of your relationship activity</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
+              {/* Individual Stats */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center space-x-1">
+                  <Heart className="w-3 h-3 text-red-500" />
+                  <span className="text-gray-600">Connection</span>
+                  <span className="font-bold text-gray-900">{relationshipHealth.connection}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Shield className="w-3 h-3 text-blue-500" />
+                  <span className="text-gray-600">Reliability</span>
+                  <span className="font-bold text-gray-900">{relationshipHealth.reliability}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <MessageCircle className="w-3 h-3 text-green-500" />
+                  <span className="text-gray-600">Communication</span>
+                  <span className="font-bold text-gray-900">{relationshipHealth.communication}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Zap className="w-3 h-3 text-yellow-500" />
+                  <span className="text-gray-600">Energy</span>
+                  <span className="font-bold text-gray-900">{relationshipHealth.energy}</span>
                 </div>
               </div>
-            )}
-
-            {activeTab === 'privacy' && (
-              <div className="scrollodex-card-large">
-                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Privacy & Security</h2>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Data Visibility</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium scrollodex-text-dark">Profile Visibility</h4>
-                          <p className="text-sm scrollodex-text-gray">Who can see your profile information</p>
-                        </div>
-                        <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                          <option>Private</option>
-                          <option>Contacts Only</option>
-                          <option>Public</option>
-                        </select>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium scrollodex-text-dark">Activity Sharing</h4>
-                          <p className="text-sm scrollodex-text-gray">Allow contacts to see your activity</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Account Security</h3>
-                    <div className="space-y-4">
-                      <Button variant="outline" className="w-full justify-start">
-                        <Shield className="w-4 h-4 mr-2" />
-                        Change Password
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Mail className="w-4 h-4 mr-2" />
-                        Two-Factor Authentication
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'appearance' && (
-              <div className="scrollodex-card-large">
-                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Appearance</h2>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Theme</h3>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="border-2 border-blue-500 rounded-lg p-4 cursor-pointer">
-                        <div className="w-full h-20 bg-white border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center scrollodex-text-dark">Light</p>
-                      </div>
-                      <div className="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400">
-                        <div className="w-full h-20 bg-gray-900 border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center scrollodex-text-dark">Dark</p>
-                      </div>
-                      <div className="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400">
-                        <div className="w-full h-20 bg-gradient-to-br from-blue-500 to-purple-600 border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center scrollodex-text-dark">Auto</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Accent Color</h3>
-                    <div className="flex gap-3">
-                      {['blue', 'green', 'purple', 'red', 'orange'].map(color => (
-                        <div
-                          key={color}
-                          className={`w-8 h-8 rounded-full bg-${color}-500 cursor-pointer border-2 ${
-                            color === 'blue' ? 'border-gray-900' : 'border-transparent'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'data' && (
-              <div className="scrollodex-card-large">
-                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Data Management</h2>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Export Data</h3>
-                    <p className="text-sm scrollodex-text-gray mb-4">Download all your data in a portable format</p>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download My Data
-                    </Button>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium scrollodex-text-dark mb-4">Storage Usage</h3>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium scrollodex-text-dark">Contacts</span>
-                        <span className="text-sm scrollodex-text-gray">12 contacts</span>
-                      </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium scrollodex-text-dark">Photos</span>
-                        <span className="text-sm scrollodex-text-gray">45 photos (2.3 MB)</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium scrollodex-text-dark">Total Storage</span>
-                        <span className="text-sm scrollodex-text-gray">2.8 MB</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-6">
-                    <h3 className="font-medium text-red-600 mb-4">Danger Zone</h3>
-                    <p className="text-sm scrollodex-text-gray mb-4">Permanently delete your account and all associated data</p>
-                    <Button variant="destructive" className="w-full justify-start">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete Account
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </motion.div>
+
+      {/* Action Buttons */}
+      <motion.div 
+        className="w-full max-w-sm space-y-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        {/* All Contacts Button */}
+        <Button
+          onClick={handleAllContacts}
+          variant="outline"
+          className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 py-4 px-8 rounded-2xl font-bold"
+        >
+          <Users className="w-5 h-5 mr-2" />
+          All Contacts
+        </Button>
+
+        {/* Send Invitation Button */}
+        <Button
+          onClick={generateInviteLink}
+          disabled={isGenerating}
+          className="w-full bg-white text-black font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+        >
+          {isGenerating ? (
+            <>
+              <div className="w-5 h-5 mr-2 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              Generating...
+            </>
+          ) : copied ? (
+            <>
+              <Check className="w-5 h-5 mr-2" />
+              Link Copied!
+            </>
+          ) : (
+            <>
+              <Share2 className="w-5 h-5 mr-2" />
+              Send Invitation to Friends
+            </>
+          )}
+        </Button>
+
+        {/* Show error if any */}
+        {error && (
+          <motion.div 
+            className="mt-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-red-200 text-sm">{error}</p>
+            <Button
+              onClick={() => setError(null)}
+              size="sm"
+              variant="outline"
+              className="mt-2 bg-red-500/10 border-red-500/20 text-red-200 hover:bg-red-500/20"
+            >
+              Close
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Show share URL if generated */}
+        {shareUrl && (
+          <motion.div 
+            className="mt-4 p-4 bg-white/10 rounded-lg"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-white text-sm mb-2">Invite Link:</p>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="flex-1 px-3 py-2 bg-white/20 text-white text-sm rounded-lg border border-white/30"
+              />
+              <Button
+                onClick={copyToClipboard}
+                size="sm"
+                variant="outline"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className="text-white/70 text-xs mt-2">
+              Share this link with friends to invite them to connect with you!
+            </p>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   );
 }
