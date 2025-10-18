@@ -10,7 +10,8 @@ export default defineSchema({
     lastName: v.optional(v.string()),
     passwordHash: v.optional(v.string()), // Optional for existing users
     clerkUserId: v.optional(v.string()), // Clerk user ID for integration
-    avatarUrl: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()), // Keep for backward compatibility
+    avatarFileId: v.optional(v.id("_storage")), // Avatar image stored in Convex storage
     selfieFileId: v.optional(v.id("_storage")), // Selfie photo for signup
     bio: v.optional(v.string()),
     createdAt: v.number(),

@@ -14,7 +14,7 @@ interface MultiStepSignupFormProps {
   setIsLoading: (loading: boolean) => void;
 }
 
-type SignupStep = "selfie" | "name" | "credentials";
+type SignupStep = "selfie" | "avatar" | "name" | "credentials";
 
 export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: MultiStepSignupFormProps) {
   const [currentStep, setCurrentStep] = useState<SignupStep>("selfie");
@@ -25,6 +25,9 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarFileId, setAvatarFileId] = useState<string | null>(null);
+  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const [error, setError] = useState("");
   const [isVideoReady, setIsVideoReady] = useState(false);
   
@@ -34,7 +37,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const steps: SignupStep[] = ["selfie", "name", "credentials"];
+  const steps: SignupStep[] = ["selfie", "avatar", "name", "credentials"];
   const currentStepIndex = steps.indexOf(currentStep);
 
   // Handle video setup when stream changes
@@ -135,6 +138,10 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
               setSelfieFile(file);
               setSelfiePreview(URL.createObjectURL(blob));
               stopCamera();
+              // Automatically proceed to avatar step
+              setTimeout(() => {
+                setCurrentStep("avatar");
+              }, 500);
             } else {
               console.error('Failed to create blob from canvas');
               setError("Failed to capture photo. Please try again.");
@@ -150,6 +157,10 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
             setSelfieFile(file);
             setSelfiePreview(dataURL);
             stopCamera();
+            // Automatically proceed to avatar step
+            setTimeout(() => {
+              setCurrentStep("avatar");
+            }, 500);
           } catch (fallbackError) {
             console.error('Fallback capture failed:', fallbackError);
             setError("Failed to capture photo. Please try again.");
@@ -172,8 +183,155 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
   const retakeSelfie = () => {
     setSelfieFile(null);
     setSelfiePreview(null);
+    setAvatarUrl(null);
+    setAvatarFileId(null);
     startCamera();
   };
+
+  const generateAvatar = async () => {
+    if (!selfieFile) return;
+    
+    setIsGeneratingAvatar(true);
+    setError("");
+    
+    try {
+      console.log('Starting avatar generation with gpt-image-1...');
+      
+      // Generate avatar using gpt-image-1 with direct image editing
+      console.log('Sending selfie to gpt-image-1 for avatar generation...');
+      console.log('Selfie file details:', {
+        name: selfieFile.name,
+        size: selfieFile.size,
+        type: selfieFile.type
+      });
+      
+      // Use the edits endpoint with proper FormData for gpt-image-1
+      const formData = new FormData();
+      formData.append('image', selfieFile);
+      formData.append('prompt', 'Transform this selfie into a cute memoji-style avatar with transparent background, kawaii style, digital art');
+      formData.append('model', 'gpt-image-1');
+      formData.append('n', '1');
+      formData.append('size', '1024x1024');
+      
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      
+      const openaiResponse = await fetch("https://api.openai.com/v1/images/edits", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+        },
+        body: formData,
+      });
+
+      console.log('API Response status:', openaiResponse.status);
+      console.log('API Response headers:', Object.fromEntries(openaiResponse.headers.entries()));
+
+      if (openaiResponse.ok) {
+        const openaiData = await openaiResponse.json();
+        console.log('OpenAI API response:', openaiData);
+        
+        // Try different possible response structures
+        let generatedAvatarUrl = null;
+        
+        if (openaiData.data && openaiData.data[0]) {
+          const imageData = openaiData.data[0];
+          
+          // Check for URL format
+          if (imageData.url) {
+            generatedAvatarUrl = imageData.url;
+          }
+          // Check for base64 format (gpt-image-1 returns this)
+          else if (imageData.b64_json) {
+            console.log('Found base64 image data, converting to data URL...');
+            generatedAvatarUrl = `data:image/png;base64,${imageData.b64_json}`;
+          }
+        } else if (openaiData.url) {
+          generatedAvatarUrl = openaiData.url;
+        } else if (openaiData.image_url) {
+          generatedAvatarUrl = openaiData.image_url;
+        } else if (openaiData.images && openaiData.images[0] && openaiData.images[0].url) {
+          generatedAvatarUrl = openaiData.images[0].url;
+        }
+        
+        console.log('Extracted avatar URL:', generatedAvatarUrl);
+        
+        if (generatedAvatarUrl) {
+          // If it's a base64 data URL, convert to file and upload to Convex storage
+          if (generatedAvatarUrl.startsWith('data:image/')) {
+            try {
+              console.log('Converting base64 avatar to file and uploading to Convex storage...');
+              
+              // Convert data URL to blob
+              const response = await fetch(generatedAvatarUrl);
+              const blob = await response.blob();
+              const avatarFile = new File([blob], "avatar.png", { type: "image/png" });
+              
+              // Upload to Convex storage
+              const uploadUrl = await generateUploadUrl();
+              const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': avatarFile.type },
+                body: avatarFile,
+              });
+              
+              if (!uploadResponse.ok) {
+                throw new Error('Avatar upload failed');
+              }
+              
+              const { storageId } = await uploadResponse.json();
+              console.log('Avatar uploaded to Convex storage with ID:', storageId);
+              
+              // Store the storage ID instead of the data URL
+              setAvatarFileId(storageId);
+              // Keep the data URL for immediate display
+              setAvatarUrl(generatedAvatarUrl);
+              
+              // Automatically proceed to name step after avatar generation
+              setTimeout(() => {
+                setCurrentStep("name");
+              }, 1000);
+            } catch (uploadError) {
+              console.error('Avatar upload error:', uploadError);
+              // Don't store base64 data URL - it will cause size errors
+              // Just show error and let user proceed without avatar
+              setError('Avatar upload failed, but you can continue without it');
+              setTimeout(() => {
+                setCurrentStep("name");
+              }, 1000);
+            }
+          } else {
+            // It's already a regular URL, store it directly
+            setAvatarUrl(generatedAvatarUrl);
+            setTimeout(() => {
+              setCurrentStep("name");
+            }, 1000);
+          }
+        } else {
+          console.error('No URL found in response:', openaiData);
+          throw new Error('Avatar generation failed - no URL returned');
+        }
+      } else {
+        const errorData = await openaiResponse.json();
+        console.error('OpenAI API error response:', errorData);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || 'Failed to generate avatar'}`);
+      }
+    } catch (err) {
+      console.error('Avatar generation error:', err);
+      setError(err instanceof Error ? err.message : "Failed to generate avatar");
+    } finally {
+      setIsGeneratingAvatar(false);
+    }
+  };
+
+  // Auto-start avatar generation when avatar step is shown
+  useEffect(() => {
+    if (currentStep === "avatar" && selfieFile && !avatarUrl && !isGeneratingAvatar) {
+      generateAvatar();
+    }
+  }, [currentStep]); // Only depend on currentStep to prevent infinite loops
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -205,7 +363,22 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
         selfieFileId = storageId;
       }
 
-      await signUp(email, `${firstName} ${lastName}`.trim(), password, firstName, lastName, selfieFileId);
+      // Only pass avatarUrl if it's not a base64 data URL (to avoid size limits)
+      const safeAvatarUrl = avatarUrl && !avatarUrl.startsWith('data:image/') ? avatarUrl : undefined;
+      
+      console.log('Signup data:', {
+        email,
+        displayName: `${firstName} ${lastName}`.trim(),
+        firstName,
+        lastName,
+        selfieFileId,
+        avatarUrl: safeAvatarUrl,
+        avatarFileId,
+        avatarUrlSize: avatarUrl ? avatarUrl.length : 0,
+        isBase64: avatarUrl ? avatarUrl.startsWith('data:image/') : false
+      });
+      
+      await signUp(email, `${firstName} ${lastName}`.trim(), password, firstName, lastName, selfieFileId, safeAvatarUrl, avatarFileId || undefined);
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign up failed");
@@ -309,9 +482,59 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
           </div>
         );
 
+      case "avatar":
+        return (
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="mb-4">
+                {/* Shimmering selfie effect */}
+                <div className="relative w-48 h-48 mx-auto rounded-lg overflow-hidden">
+                  <img
+                    src={selfiePreview || ""}
+                    alt="Selfie"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Shimmer overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse">
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-orange-400/30 via-pink-400/30 to-purple-400/30 animate-pulse"></div>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-gray-300 mb-2 mt-4">
+                  ✨ Generating your 3D twin...
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  Creating your personalized memoji avatar
+                </p>
+              </div>
+              
+              {error && (
+                <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 rounded-lg p-3">
+                  {error}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
       case "name":
         return (
           <div className="space-y-4">
+            {/* Show generated avatar */}
+            {avatarUrl && (
+              <div className="text-center mb-6">
+                <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-green-400">
+                  <img
+                    src={avatarUrl}
+                    alt="Generated Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-gray-400 text-sm mt-2">
+                  Your personalized avatar is ready!
+                </p>
+              </div>
+            )}
+            
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium mb-2 text-gray-300">
                 First Name
@@ -386,6 +609,8 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
     switch (currentStep) {
       case "selfie":
         return selfieFile !== null;
+      case "avatar":
+        return true; // Avatar step auto-proceeds, no manual validation needed
       case "name":
         const nameValid = firstName.trim() && lastName.trim();
         console.log('Name validation:', { firstName: firstName.trim(), lastName: lastName.trim(), valid: nameValid });
@@ -401,6 +626,8 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
     switch (currentStep) {
       case "selfie":
         return "Take a selfie";
+      case "avatar":
+        return "Generating your avatar";
       case "name":
         return "What's your name?";
       case "credentials":
@@ -414,6 +641,8 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
     switch (currentStep) {
       case "selfie":
         return "This will be your profile photo";
+      case "avatar":
+        return "Creating your personalized memoji";
       case "name":
         return "Let's start with your name";
       case "credentials":
@@ -467,16 +696,18 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
           )}
 
           <div className="flex justify-between mt-6">
-            <Button
-              type="button"
-              onClick={handlePrevious}
-              disabled={currentStepIndex === 0}
-              variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-800 disabled:opacity-50"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Previous
-            </Button>
+            {currentStep !== "avatar" && (
+              <Button
+                type="button"
+                onClick={handlePrevious}
+                disabled={currentStepIndex === 0}
+                variant="outline"
+                className="border-gray-600 text-gray-300 hover:bg-gray-800 disabled:opacity-50"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Previous
+              </Button>
+            )}
 
             {currentStepIndex === steps.length - 1 ? (
               <Button
@@ -487,7 +718,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
               >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
-            ) : (
+            ) : currentStep !== "avatar" ? (
               <Button
                 type="button"
                 onClick={handleNext}
@@ -497,7 +728,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            )}
+            ) : null}
           </div>
         </form>
       </CardContent>

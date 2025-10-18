@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId } from "@clerk/nextjs/server";
 
 // Simple password hashing (in production, use bcrypt or similar)
 function simpleHash(password: string): string {
@@ -33,6 +34,8 @@ export const register = mutation({
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
     selfieFileId: v.optional(v.id("_storage")),
+    avatarUrl: v.optional(v.string()),
+    avatarFileId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     // Check if user already exists
@@ -57,6 +60,8 @@ export const register = mutation({
       firstName: args.firstName,
       lastName: args.lastName,
       selfieFileId: args.selfieFileId,
+      avatarUrl: args.avatarUrl,
+      avatarFileId: args.avatarFileId,
       passwordHash: simpleHash(args.password),
       createdAt: Date.now(),
     });
@@ -151,6 +156,7 @@ export const getCurrentUser = query({
       email: user.email,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
+      avatarFileId: user.avatarFileId,
       bio: user.bio,
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
@@ -312,5 +318,13 @@ export const deleteAccount = mutation({
     await ctx.db.delete(user._id);
 
     return { success: true };
+  },
+});
+
+// Get avatar URL from storage
+export const getAvatarUrl = query({
+  args: { avatarFileId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.avatarFileId);
   },
 });
