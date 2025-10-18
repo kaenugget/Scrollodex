@@ -6,10 +6,23 @@ export default defineSchema({
   users: defineTable({
     email: v.string(),
     displayName: v.string(),
+    passwordHash: v.optional(v.string()), // Optional for existing users
+    clerkUserId: v.optional(v.string()), // Clerk user ID for integration
     avatarUrl: v.optional(v.string()),
     bio: v.optional(v.string()),
     createdAt: v.number(),
-  }).index("by_email", ["email"]),
+    lastLoginAt: v.optional(v.number()),
+  }).index("by_email", ["email"])
+    .index("by_clerk_id", ["clerkUserId"]),
+
+  // Sessions table for authentication
+  sessions: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    expiresAt: v.number(),
+    createdAt: v.number(),
+  }).index("by_token", ["token"])
+    .index("by_user", ["userId"]),
 
   // Contacts table
   contacts: defineTable({

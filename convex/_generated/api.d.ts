@@ -8,10 +8,20 @@
  * @module
  */
 
+import type * as ai from "../ai.js";
+import type * as auth from "../auth.js";
+import type * as clerk from "../clerk.js";
 import type * as contacts from "../contacts.js";
 import type * as dex from "../dex.js";
+import type * as files from "../files.js";
 import type * as notes from "../notes.js";
+import type * as nudges from "../nudges.js";
+import type * as preferences from "../preferences.js";
+import type * as seed from "../seed.js";
+import type * as sharing from "../sharing.js";
+import type * as social from "../social.js";
 import type * as users from "../users.js";
+import type * as wallet from "../wallet.js";
 
 import type {
   ApiFromModules,
@@ -28,10 +38,20 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  ai: typeof ai;
+  auth: typeof auth;
+  clerk: typeof clerk;
   contacts: typeof contacts;
   dex: typeof dex;
+  files: typeof files;
   notes: typeof notes;
+  nudges: typeof nudges;
+  preferences: typeof preferences;
+  seed: typeof seed;
+  sharing: typeof sharing;
+  social: typeof social;
   users: typeof users;
+  wallet: typeof wallet;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

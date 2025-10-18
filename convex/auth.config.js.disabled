@@ -1,0 +1,8 @@
+// Temporarily disable auth due to configuration issues
+// We'll implement a custom auth solution later
+
+// import { convexAuth } from "@convex-dev/auth/server";
+
+// export default convexAuth({
+//   providers: [],
+// });

@@ -88,7 +88,12 @@ export const upsert = mutation({
       return id;
     } else {
       // Create new contact
-      return await ctx.db.insert("contacts", contactData);
+      const contactId = await ctx.db.insert("contacts", contactData);
+      
+      // Automatically create a dex entry for new contacts
+      await ctx.runMutation("api.dex.computeEntry", { contactId });
+      
+      return contactId;
     }
   },
 });
