@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
 // import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -22,12 +23,14 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
 export default function Home() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   // const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
+  
   
   // Use custom auth only for now due to React 19 compatibility issues with Clerk
   const isUserAuthenticated = isAuthenticated;
@@ -55,13 +58,34 @@ export default function Home() {
   );
 
   const handleContactView = (contactId: string) => {
-    window.location.href = `/contacts/${contactId}`;
+    console.log('handleContactView called with contactId:', contactId);
+    console.log('Current URL before navigation:', window.location.href);
+    
+    // Test direct navigation first
+    console.log('Attempting to navigate to:', `/contacts/${contactId}`);
+    
+    try {
+      router.push(`/contacts/${contactId}`);
+      console.log('Router.push called successfully');
+      
+      // Check if navigation actually happened
+      setTimeout(() => {
+        console.log('URL after navigation attempt:', window.location.href);
+      }, 100);
+      
+    } catch (error) {
+      console.error('Router navigation failed:', error);
+      // Only use window.location as absolute fallback
+      console.log('Falling back to window.location');
+      window.location.href = `/contacts/${contactId}`;
+    }
   };
 
   const handleAuthSuccess = () => {
     setShowAuth(null);
   };
 
+  
 
   // Show loading while checking authentication
   if (authLoading) {

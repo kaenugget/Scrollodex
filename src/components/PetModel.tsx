@@ -43,8 +43,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
   const [isGenerating, setIsGenerating] = useState(false);
   const [petModel, setPetModel] = useState(petData);
   const [showEvolve, setShowEvolve] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'unknown'>('unknown');
-  const [debugStyle, setDebugStyle] = useState<'happy' | 'neutral' | 'sad' | 'excited' | null>(null);
   
   const hatchPet = useAction(api.pets.hatchPet);
   const updatePetHappiness = useMutation(api.pets.updatePetHappiness);
@@ -52,9 +50,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
   const generatePetVideos = useAction(api.pets.generatePetVideos);
   const getCustomizationOptions = useQuery(api.pets.getCustomizationOptions, 
     petData?.petType ? { petType: petData.petType } : "skip"
-  );
-  const debugPetData = useQuery(api.pets.debugPetData, 
-    contactId ? { contactId } : "skip"
   );
   
   // Video generation hook
@@ -73,62 +68,17 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
 
   // Update pet model when petData changes
   useEffect(() => {
-    console.log('🐣 PetModel: petData changed:', petData);
     setPetModel(petData);
   }, [petData]);
-
-  // Test Convex connection
-  const testConnection = async () => {
-    try {
-      console.log('🐣 PetModel: Testing Convex connection...');
-      setConnectionStatus('unknown');
-      
-      // Try a simple query to test connection
-      const testResult = await hatchPet({
-        contactId,
-        userId,
-        relationshipHealth: 50, // Use a test value
-      });
-      
-      console.log('🐣 PetModel: Connection test successful:', testResult);
-      setConnectionStatus('connected');
-    } catch (error) {
-      console.error('🐣 PetModel: Connection test failed:', error);
-      setConnectionStatus('disconnected');
-    }
-  };
 
   // Check if pet actually exists (has essential data)
   const hasExistingPet = !!(petModel && petModel.petType && petModel.level && petModel.happiness !== undefined);
   
-  // Check if we're still loading pet data (petData is undefined but we expect it)
-  const isLoadingPetData = petData === undefined;
+  // Check if we're still loading contact data (petData is undefined)
+  const isLoadingContactData = petData === undefined;
   
-  console.log('🐣 PetModel: State check:', {
-    petData,
-    petModel,
-    hasExistingPet,
-    isLoadingPetData,
-    isGenerating,
-    contactId,
-    userId,
-    relationshipStats,
-  });
-
-  // Enhanced debugging for pet existence check
-  console.log('🐣 PetModel: Pet existence debug:', {
-    'petData exists': !!petData,
-    'petData.petType': petData?.petType,
-    'petData.level': petData?.level,
-    'petData.happiness': petData?.happiness,
-    'petModel exists': !!petModel,
-    'petModel.petType': petModel?.petType,
-    'petModel.level': petModel?.level,
-    'petModel.happiness': petModel?.happiness,
-    'hasExistingPet calculation': hasExistingPet,
-    'petData === petModel': petData === petModel,
-    'JSON comparison': JSON.stringify(petData) === JSON.stringify(petModel),
-  });
+  // Check if contact is loaded but has no pet (petData is null or empty)
+  const hasNoPet = petData !== undefined && !hasExistingPet;
 
   // Calculate overall relationship health for pet nurturing
   const overallHealth = Math.round(
@@ -136,17 +86,79 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
      relationshipStats.communication + relationshipStats.energy) / 4
   );
 
-  // Debug relationship health calculation
-  console.log('🐣 PetModel: Relationship health calculation:', {
-    connection: relationshipStats.connection,
-    reliability: relationshipStats.reliability,
-    communication: relationshipStats.communication,
-    energy: relationshipStats.energy,
-    sum: relationshipStats.connection + relationshipStats.reliability + relationshipStats.communication + relationshipStats.energy,
-    average: (relationshipStats.connection + relationshipStats.reliability + relationshipStats.communication + relationshipStats.energy) / 4,
-    overallHealth,
-    timestamp: new Date().toISOString(),
-  });
+  // Hatch a new pet
+  const handleHatchPet = async () => {
+    console.log('🐣 PetModel: handleHatchPet called');
+    console.log('🐣 PetModel: Current state:', { hasExistingPet, isGenerating, overallHealth });
+    
+    // Allow regenerating existing pets, but log the action
+    if (hasExistingPet) {
+      console.log('🐣 PetModel: Regenerating existing pet');
+      // Regenerating existing pet
+    }
+    
+    setIsGenerating(true);
+    
+    try {
+      // Add timeout and retry logic for connection issues
+      // Increased timeout to 3 minutes since pet generation can take time
+      const result = await Promise.race([
+        hatchPet({
+          contactId,
+          userId,
+          relationshipHealth: overallHealth,
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Pet generation timed out')), 180000) // 3 minutes
+        )
+      ]);
+      
+      console.log('🐣 PetModel: Pet generation completed:', result);
+      
+      // Show success message
+      const userMessage = hasExistingPet 
+        ? 'Your pet has been regenerated successfully! 🎉'
+        : 'Your pet has been hatched successfully! 🐣';
+      
+      alert(userMessage);
+    } catch (error) {
+      console.error('🐣 PetModel: Pet hatching error:', error);
+      
+      let userMessage = 'Failed to hatch pet. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message?.includes('timed out')) {
+          userMessage = 'Pet generation is taking longer than expected. Please check back in a few minutes.';
+        } else if (error.message?.includes('permission')) {
+          userMessage = 'You do not have permission to generate a pet for this contact.';
+        } else if (error.message?.includes('not found')) {
+          userMessage = 'Contact not found.';
+        } else if (error.message?.includes('configured')) {
+          userMessage = 'Pet generation service is temporarily unavailable. Please try again later.';
+        } else {
+          userMessage = `Pet generation failed: ${error.message}. Please try again.`;
+        }
+      }
+
+      
+      alert(userMessage);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Auto-generate pet when user has no pet and meets requirements
+  useEffect(() => {
+    // Only auto-generate if:
+    // 1. Contact data is loaded (not undefined)
+    // 2. No existing pet
+    // 3. Not currently generating
+    // 4. Relationship health is good enough (>= 30%)
+    if (hasNoPet && !isGenerating && overallHealth >= 30) {
+      console.log('🐣 PetModel: Auto-generating pet for contact with', overallHealth, '% relationship health');
+      handleHatchPet();
+    }
+  }, [hasNoPet, isGenerating, overallHealth, handleHatchPet]);
 
   // Get current pet state based on happiness
   const getPetState = () => {
@@ -155,11 +167,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
     if (petModel.happiness >= 60) return 'happy';
     if (petModel.happiness >= 40) return 'neutral';
     return 'sad';
-  };
-
-  // Get debug pet state (for testing different styles)
-  const getDebugPetState = () => {
-    return debugStyle || getPetState();
   };
 
   // Get current pet video based on state
@@ -189,124 +196,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
     return imageUrl || null;
   };
 
-  // Hatch a new pet
-  const handleHatchPet = async () => {
-    console.log('🐣 PetModel: handleHatchPet called');
-    console.log('🐣 PetModel: hasExistingPet =', hasExistingPet);
-    console.log('🐣 PetModel: contactId =', contactId);
-    console.log('🐣 PetModel: userId =', userId);
-    console.log('🐣 PetModel: overallHealth =', overallHealth);
-    console.log('🐣 PetModel: petData at click time =', petData);
-    console.log('🐣 PetModel: petModel at click time =', petModel);
-    
-    // Allow regenerating existing pets, but log the action
-    if (hasExistingPet) {
-      console.log('🐣 PetModel: Regenerating existing pet:', {
-        petModel: !!petModel,
-        petType: petModel?.petType,
-        level: petModel?.level,
-        happiness: petModel?.happiness,
-      });
-    }
-    
-    console.log('🐣 PetModel: Starting pet hatching process...');
-    setIsGenerating(true);
-    
-    try {
-      console.log('🐣 PetModel: Calling hatchPet action with:', {
-        contactId,
-        userId,
-        relationshipHealth: overallHealth,
-      });
-      
-      // Add timeout and retry logic for connection issues
-      // Increased timeout to 3 minutes since pet generation can take time
-      const result = await Promise.race([
-        hatchPet({
-          contactId,
-          userId,
-          relationshipHealth: overallHealth,
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Pet generation timeout after 3 minutes. The process may still be running in the background.')), 180000)
-        )
-      ]) as { success: boolean; petData?: any; isRegeneration?: boolean };
 
-      console.log('🐣 PetModel: hatchPet result =', result);
-
-      if (result.success) {
-        if ((result as any).isRegeneration) {
-          console.log('🐣 PetModel: Pet regenerated successfully, updating state');
-        } else {
-          console.log('🐣 PetModel: Pet hatched successfully, updating state');
-        }
-        setPetModel(result.petData);
-        
-        // Start video generation in the background
-        try {
-          console.log('🎬 PetModel: Starting video generation after pet creation...');
-          await handleStartVideoGeneration();
-        } catch (videoError) {
-          console.error('🎬 PetModel: Failed to start video generation:', videoError);
-          // Don't fail the whole operation if video generation fails
-        }
-      } else {
-        console.error('🐣 PetModel: Pet hatching failed - result.success is false');
-      }
-    } catch (error) {
-      console.error('🐣 PetModel: Failed to hatch pet:', error);
-      
-      // Enhanced error logging
-      if (error instanceof Error) {
-        console.error('🐣 PetModel: Error details:', {
-          message: error.message,
-          stack: error.stack,
-          name: error.name,
-        });
-        
-        // Check for specific error types
-        if (error.message.includes('Connection lost')) {
-          console.error('🐣 PetModel: CONVEX CONNECTION ERROR - Check your internet connection and Convex status');
-        } else if (error.message.includes('timeout')) {
-          console.error('🐣 PetModel: REQUEST TIMEOUT - The operation took too long');
-        } else if (error.message.includes('permission')) {
-          console.error('🐣 PetModel: PERMISSION ERROR - Check user authentication');
-        } else if (error.message.includes('FAL_KEY')) {
-          console.error('🐣 PetModel: FAL API KEY ERROR - Check environment configuration');
-        } else if (error.message.includes('rate limit')) {
-          console.error('🐣 PetModel: API RATE LIMIT ERROR - Too many requests');
-        }
-      } else {
-        console.error('🐣 PetModel: Unknown error type:', typeof error);
-      }
-      
-      // Show user-friendly error message based on error type
-      let userMessage = 'Pet generation failed. Please try again.';
-      
-      if (error instanceof Error) {
-        if (error.message?.includes('timeout')) {
-          userMessage = 'Pet generation is taking longer than expected. Please refresh the page and check if your pet was created.';
-        } else if (error.message?.includes('Connection lost')) {
-          userMessage = 'Connection lost during pet generation. Please check your internet connection and try again.';
-        } else if (error.message?.includes('permission')) {
-          userMessage = 'You do not have permission to generate a pet for this contact.';
-        } else if (error.message?.includes('not found')) {
-          userMessage = 'Contact not found. Please refresh the page and try again.';
-        } else if (error.message?.includes('FAL_KEY')) {
-          userMessage = 'Pet generation service is not configured. Please contact support.';
-        } else if (error.message?.includes('rate limit')) {
-          userMessage = 'Too many requests. Please wait a moment and try again.';
-        } else {
-          userMessage = `Pet generation failed: ${error.message}. Please try again.`;
-        }
-      }
-      
-      alert(userMessage);
-    } finally {
-      console.log('🐣 PetModel: Setting isGenerating to false');
-      setIsGenerating(false);
-    }
-  };
 
   // Generate videos for pet (now uses async system)
   const handleGenerateVideos = async () => {
@@ -471,19 +361,19 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
-          {isLoadingPetData ? 'Loading...' : hasExistingPet ? `Your ${petModel?.petType || 'Pet'}` : 'Hatch Your Pet'}
+          {isLoadingContactData ? 'Loading...' : hasExistingPet ? `Your ${petModel?.petType || 'Pet'}` : 'Hatch Your Pet'}
         </h3>
         <div className="flex items-center gap-2">
           <Heart className="w-4 h-4 text-red-500" />
           <span className="text-sm font-medium text-gray-700">
-            {isLoadingPetData ? '...' : hasExistingPet ? `${petHappiness}%` : `${petHappiness}% potential`}
+            {isLoadingContactData ? '...' : hasExistingPet ? `${petHappiness}%` : `${petHappiness}% potential`}
           </span>
         </div>
       </div>
 
       {/* Pet Display Area */}
       <div className="relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-8 mb-4 min-h-[200px] flex items-center justify-center">
-        {isLoadingPetData ? (
+        {isLoadingContactData ? (
           <div className="text-center">
             <LoadingSpinner size="xl" className="mx-auto mb-4" />
             <div className="text-sm text-gray-600">Loading pet data...</div>
@@ -499,18 +389,8 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
             {/* Pet Video/Image */}
             <div className="w-32 h-32 mb-4 mx-auto rounded-full overflow-hidden bg-white shadow-lg">
               {(() => {
-                // Use debug functions when debugStyle is set, otherwise use normal functions
-                const videoUrl = debugStyle ? getDebugPetVideo() : getCurrentPetVideo();
-                const imageUrl = debugStyle ? getDebugPetImage() : getCurrentPetImage();
-                
-                // Debug logging
-                console.log('🐣 PetModel: Media URLs for display:', {
-                  debugStyle,
-                  videoUrl,
-                  imageUrl,
-                  hasVideo: !!(videoUrl && videoUrl.trim() !== ""),
-                  hasImage: !!(imageUrl && imageUrl.trim() !== "")
-                });
+                const videoUrl = getCurrentPetVideo();
+                const imageUrl = getCurrentPetImage();
                 
                 return videoUrl && videoUrl.trim() !== "" ? (
                   <video 
@@ -521,7 +401,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                     playsInline
                     className="w-full h-full object-cover"
                     onError={(e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-                      console.log('🐣 PetModel: Video failed to load, falling back to image:', videoUrl);
                       // Fallback to image if video fails
                       const video = e.currentTarget;
                       const img = document.createElement('img');
@@ -529,7 +408,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                       img.className = 'w-full h-full object-cover';
                       img.alt = `${petModel.petName} the ${petModel.petType}`;
                       img.onerror = () => {
-                        console.log('🐣 PetModel: Image also failed to load, showing placeholder');
                         // Final fallback to placeholder
                         video.parentElement!.innerHTML = `
                           <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
@@ -542,8 +420,8 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                       };
                       video.parentElement!.replaceChild(img, video);
                     }}
-                    onLoadStart={() => console.log('🐣 PetModel: Video loading started:', videoUrl)}
-                    onCanPlay={() => console.log('🐣 PetModel: Video can play:', videoUrl)}
+                    onLoadStart={() => {}}
+                    onCanPlay={() => {}}
                   />
                 ) : imageUrl && imageUrl.trim() !== "" ? (
                   <img 
@@ -551,7 +429,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                     alt={`${petModel.petName} the ${petModel.petType}`}
                     className="w-full h-full object-cover"
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                      console.log('🐣 PetModel: Image failed to load, showing placeholder:', imageUrl);
                       // Fallback to placeholder if image fails to load
                       e.currentTarget.style.display = 'none';
                       e.currentTarget.parentElement!.innerHTML = `
@@ -563,7 +440,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                         </div>
                       `;
                     }}
-                    onLoad={() => console.log('🐣 PetModel: Image loaded successfully:', imageUrl)}
+                    onLoad={() => {}}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
@@ -843,129 +720,6 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
         </div>
       )}
 
-      {/* Debug Panel - Remove this in production */}
-      <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-        <div className="text-xs text-yellow-800">
-          <strong>🐛 Debug Info:</strong>
-          <div className="mt-2 space-y-1 text-xs">
-            <div>Pet Data: {petData ? '✅ Exists' : '❌ Missing'}</div>
-            <div>Pet Model: {petModel ? '✅ Exists' : '❌ Missing'}</div>
-            <div>Has Existing Pet: {hasExistingPet ? '✅ Yes' : '❌ No'}</div>
-            <div>Is Loading: {isLoadingPetData ? '✅ Yes' : '❌ No'}</div>
-            <div>Is Generating: {isGenerating ? '✅ Yes' : '❌ No'}</div>
-            <div>Pet Type: {petModel?.petType || 'None'}</div>
-            <div>Pet Level: {petModel?.level || 'None'}</div>
-            <div>Pet Happiness: {petModel?.happiness || 'None'}</div>
-            <div>Overall Health: {overallHealth}%</div>
-            <div>Connection Status: {
-              connectionStatus === 'connected' ? '✅ Connected' : 
-              connectionStatus === 'disconnected' ? '❌ Disconnected' : 
-              '❓ Unknown'
-            }</div>
-            <div>Relationship Stats: {JSON.stringify(relationshipStats)}</div>
-            <div className="mt-2">
-              <strong>Image URLs:</strong>
-              <div className="text-xs ml-2">
-                <div>Happy: {petModel?.happyImageUrl ? '✅' : '❌'} {petModel?.happyImageUrl?.substring(0, 50) || 'None'}</div>
-                <div>Neutral: {petModel?.neutralImageUrl ? '✅' : '❌'} {petModel?.neutralImageUrl?.substring(0, 50) || 'None'}</div>
-                <div>Sad: {petModel?.sadImageUrl ? '✅' : '❌'} {petModel?.sadImageUrl?.substring(0, 50) || 'None'}</div>
-                <div>Excited: {petModel?.excitedImageUrl ? '✅' : '❌'} {petModel?.excitedImageUrl?.substring(0, 50) || 'None'}</div>
-              </div>
-            </div>
-            <div className="mt-2">
-              <strong>Video URLs:</strong>
-              <div className="text-xs ml-2">
-                <div>Happy: {petModel?.happyVideoUrl ? '✅' : '❌'} {petModel?.happyVideoUrl?.substring(0, 50) || 'None'}</div>
-                <div>Neutral: {petModel?.neutralVideoUrl ? '✅' : '❌'} {petModel?.neutralVideoUrl?.substring(0, 50) || 'None'}</div>
-                <div>Sad: {petModel?.sadVideoUrl ? '✅' : '❌'} {petModel?.sadVideoUrl?.substring(0, 50) || 'None'}</div>
-                <div>Excited: {petModel?.excitedVideoUrl ? '✅' : '❌'} {petModel?.excitedVideoUrl?.substring(0, 50) || 'None'}</div>
-              </div>
-            </div>
-            <div className="mt-2">
-              <strong>Video Generation Status:</strong>
-              <div className="text-xs ml-2">
-                <div>Status: {videoStatus.status}</div>
-                <div>Is Polling: {isPolling ? '✅ Yes' : '❌ No'}</div>
-                <div>Has Videos: {hasVideos ? '✅ Yes' : '❌ No'}</div>
-                <div>Time Elapsed: {getTimeElapsed()}s</div>
-                <div>Estimated Remaining: {getEstimatedTimeRemaining()}</div>
-                {videoStatus.error && (
-                  <div className="text-red-600">Error: {videoStatus.error}</div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="mt-2">
-            <div className="text-xs font-semibold text-yellow-800 mb-2">Style Testing:</div>
-            <div className="flex gap-1 mb-2 flex-wrap">
-              {(['happy', 'neutral', 'sad', 'excited'] as const).map((style) => (
-                <button
-                  key={style}
-                  onClick={() => setDebugStyle(style)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    debugStyle === style 
-                      ? 'bg-yellow-200 text-yellow-900 font-semibold' 
-                      : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                  }`}
-                >
-                  {style.charAt(0).toUpperCase() + style.slice(1)}
-                </button>
-              ))}
-              <button
-                onClick={() => setDebugStyle(null)}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  debugStyle === null 
-                    ? 'bg-green-200 text-green-900 font-semibold' 
-                    : 'bg-green-100 text-green-700 hover:bg-green-200'
-                }`}
-              >
-                Reset
-              </button>
-            </div>
-            <div className="text-xs text-yellow-700 mb-2">
-              Current Debug Style: <span className="font-semibold">
-                {debugStyle ? debugStyle : 'Normal (based on happiness)'}
-              </span>
-              {debugStyle && (
-                <span className="ml-2 text-yellow-600">
-                  (Testing {debugStyle} state)
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <button
-              onClick={testConnection}
-              className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded hover:bg-blue-200"
-            >
-              Test Connection
-            </button>
-            <button
-              onClick={() => console.log('🐣 PetModel: Full state dump:', {
-                petData,
-                petModel,
-                hasExistingPet,
-                isLoadingPetData,
-                isGenerating,
-                connectionStatus,
-                contactId,
-                userId,
-                relationshipStats,
-                debugStyle
-              })}
-              className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded hover:bg-green-200"
-            >
-              Log State
-            </button>
-            <button
-              onClick={() => console.log('🐛 Debug Pet Data:', debugPetData)}
-              className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded hover:bg-purple-200"
-            >
-              Debug Pet Data
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Nurturing Tips */}
       <div className="mt-4 p-3 bg-blue-50 rounded-lg">

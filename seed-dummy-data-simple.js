@@ -1,4 +1,12 @@
-// Simple script to populate dummy data for kaelanwanshengfung@gmail.com
+// Simple script to populate dummy data for any user
+// 
+// This script creates demo contacts with varied relationship stats
+// and meaningful tags for testing the application features.
+//
+// Usage:
+//   node seed-dummy-data-simple.js                    # Uses default demo user
+//   node seed-dummy-data-simple.js user@email.com     # Uses custom email
+//   node seed-dummy-data-simple.js user@email.com "User Name"  # Uses custom email and name
 // This script creates the user and populates comprehensive dummy data
 
 import { ConvexHttpClient } from "convex/browser";
@@ -30,7 +38,7 @@ async function seedDummyData() {
         emails: ["alex.chen@tech.com"],
         phones: ["+1-555-0101"],
         birthday: "1995-03-15",
-        tags: ["work", "tech", "friend"],
+        tags: ["close-friend", "tech-mentor", "hiking-buddy", "coffee-lover", "react-expert"],
         company: "TechCorp",
         role: "Software Engineer",
         location: "San Francisco, CA",
@@ -58,7 +66,7 @@ async function seedDummyData() {
         emails: ["sarah.j@design.com"],
         phones: ["+1-555-0102"],
         birthday: "1992-07-22",
-        tags: ["design", "creative", "friend"],
+        tags: ["creative-collaborator", "design-mentor", "skateboarder", "color-expert", "startup-advisor"],
         company: "Design Studio",
         role: "UX Designer",
         location: "New York, NY",
@@ -86,7 +94,7 @@ async function seedDummyData() {
         emails: ["mike.r@startup.com"],
         phones: ["+1-555-0103"],
         birthday: "1988-11-08",
-        tags: ["startup", "entrepreneur", "mentor"],
+        tags: ["serial-entrepreneur", "ai-expert", "coffee-addict", "venture-mentor", "tech-visionary"],
         company: "StartupXYZ",
         role: "CEO",
         location: "Austin, TX",
@@ -114,7 +122,7 @@ async function seedDummyData() {
         emails: ["emma.w@art.com"],
         phones: ["+1-555-0104"],
         birthday: "1990-05-12",
-        tags: ["art", "creative", "friend"],
+        tags: ["wedding-photographer", "nature-lover", "vegan-advocate", "art-enthusiast", "portrait-specialist"],
         company: "Art Gallery",
         role: "Curator",
         location: "Los Angeles, CA",
@@ -142,7 +150,7 @@ async function seedDummyData() {
         emails: ["david.k@music.com"],
         phones: ["+1-555-0105"],
         birthday: "1993-09-30",
-        tags: ["music", "producer", "friend"],
+        tags: ["music-producer", "electronic-artist", "night-owl", "collaborative", "sound-designer"],
         company: "Music Studio",
         role: "Music Producer",
         location: "Nashville, TN",
@@ -170,7 +178,7 @@ async function seedDummyData() {
         emails: ["lisa.z@finance.com"],
         phones: ["+1-555-0106"],
         birthday: "1987-12-03",
-        tags: ["finance", "advisor", "professional"],
+        tags: ["financial-advisor", "investment-expert", "professional", "wealth-management", "retirement-planning"],
         company: "Finance Corp",
         role: "Financial Advisor",
         location: "Chicago, IL",
@@ -198,7 +206,7 @@ async function seedDummyData() {
         emails: ["james.b@sports.com"],
         phones: ["+1-555-0107"],
         birthday: "1991-04-18",
-        tags: ["sports", "fitness", "friend"],
+        tags: ["sports-agent", "fitness-coach", "athlete-mentor", "motivation-expert", "team-builder"],
         company: "Sports Agency",
         role: "Sports Agent",
         location: "Miami, FL",
