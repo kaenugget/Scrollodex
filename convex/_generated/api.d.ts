@@ -16,6 +16,7 @@ import type * as dex from "../dex.js";
 import type * as files from "../files.js";
 import type * as notes from "../notes.js";
 import type * as nudges from "../nudges.js";
+import type * as pets from "../pets.js";
 import type * as preferences from "../preferences.js";
 import type * as seed from "../seed.js";
 import type * as sharing from "../sharing.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   notes: typeof notes;
   nudges: typeof nudges;
+  pets: typeof pets;
   preferences: typeof preferences;
   seed: typeof seed;
   sharing: typeof sharing;

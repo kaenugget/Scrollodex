@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { UserDropdown } from './UserDropdown';
 
 interface NavButtonProps {
   label: string;
@@ -39,25 +40,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ currentPage, onNavigate, u
           </div>
           
           <nav className="flex items-center space-x-8">
-            <NavButton label="Home" isActive={currentPage === 'home'} onClick={() => onNavigate('home')} />
-            <NavButton label="Contacts" isActive={currentPage === 'contacts'} onClick={() => onNavigate('contacts')} />
             <NavButton label="Dex" isActive={currentPage === 'dex'} onClick={() => onNavigate('dex')} />
-            <NavButton label="Peer" isActive={currentPage === 'peer'} onClick={() => onNavigate('peer')} />
-            <NavButton label="Settings" isActive={currentPage === 'settings'} onClick={() => onNavigate('settings')} />
           </nav>
 
           {user && onSignOut && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user?.displayName || 'User'}
-              </span>
-              <button
-                onClick={onSignOut}
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
+            <UserDropdown user={user} onSignOut={onSignOut} />
           )}
         </div>
       </div>

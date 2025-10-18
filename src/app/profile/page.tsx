@@ -5,7 +5,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { 
@@ -19,26 +19,27 @@ import {
   Mail
 } from 'lucide-react';
 
-export default function SettingsPage() {
+export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'privacy' | 'appearance' | 'data'>('profile');
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   const { isSignedIn } = useUser();
+  const { signOut: clerkSignOut } = useClerk();
   
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (isSignedIn) {
-      window.location.href = '/';
+      await clerkSignOut();
     } else {
       // Handle custom auth sign out
     }
   };
 
   if (authLoading || clerkConvexLoading) {
-    return <LoadingSpinner fullScreen text="Loading settings..." />;
+    return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
 
   if (!isUserAuthenticated || !currentUser) {
@@ -56,7 +57,7 @@ export default function SettingsPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <AppHeader 
-        currentPage="settings" 
+        currentPage="profile" 
         onNavigate={(page) => {
           if (page === 'contacts' || page === 'dex' || page === 'home') {
             window.location.href = '/';
@@ -68,7 +69,7 @@ export default function SettingsPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile & Settings</h1>
           <p className="text-gray-600">Manage your account and app preferences</p>
         </div>
 

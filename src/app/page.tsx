@@ -11,7 +11,7 @@ import { useContacts } from "@/hooks/useContacts";
 import { useDexEntries } from "@/hooks/useDex";
 import { useAuth } from "@/hooks/useAuth";
 import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
-import { useUser } from '@clerk/nextjs';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
@@ -23,6 +23,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | "clerk-login" | "clerk-signup" | null>(null);
   const { isSignedIn } = useUser();
+  const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   
@@ -202,10 +203,10 @@ export default function Home() {
     );
   }
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (isSignedIn) {
       // Clerk sign out
-      window.location.href = '/';
+      await clerkSignOut();
     } else {
       signOut();
     }
@@ -214,21 +215,10 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
       <AppHeader 
-        currentPage={activeTab === 'contacts' ? 'contacts' : activeTab === 'dex' ? 'dex' : 'home'} 
+        currentPage={activeTab === 'dex' ? 'dex' : 'home'} 
         onNavigate={(page) => {
-          if (page === 'contacts') {
-            setActiveTab('contacts');
-          } else if (page === 'dex') {
+          if (page === 'dex') {
             setActiveTab('dex');
-          } else if (page === 'settings') {
-            window.location.href = '/settings';
-          } else if (page === 'home') {
-            setActiveTab('contacts');
-          } else if (page === 'peer') {
-            // Handle peer navigation - could create a demo peer page or show a message
-            if (currentUser?._id) {
-              createDemoPeerPage();
-            }
           }
         }}
         user={currentUser || undefined}

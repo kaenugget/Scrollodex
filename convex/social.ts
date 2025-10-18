@@ -45,6 +45,39 @@ export const getPeerPage = query({
   },
 });
 
+// Find or create a peer page between two users
+export const findOrCreatePeerPage = mutation({
+  args: {
+    userId1: v.id("users"),
+    userId2: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    // First, try to find an existing peer page
+    const existingPage = await ctx.db
+      .query("peerPages")
+      .filter((q) => 
+        q.or(
+          q.and(q.eq(q.field("aUserId"), args.userId1), q.eq(q.field("bUserId"), args.userId2)),
+          q.and(q.eq(q.field("aUserId"), args.userId2), q.eq(q.field("bUserId"), args.userId1))
+        )
+      )
+      .first();
+
+    if (existingPage) {
+      return existingPage._id;
+    }
+
+    // If no existing page, create a new one
+    return await ctx.db.insert("peerPages", {
+      aUserId: args.userId1,
+      bUserId: args.userId2,
+      title: "Shared Moments",
+      visibility: "private",
+      createdAt: Date.now(),
+    });
+  },
+});
+
 // Moments Functions
 
 // Add a moment to a peer page

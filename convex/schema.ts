@@ -38,6 +38,36 @@ export default defineSchema({
     notes: v.array(v.string()),
     lastInteractionAt: v.number(),
     pinned: v.boolean(),
+    petData: v.optional(v.object({
+      // Core pet info
+      petType: v.optional(v.string()), // "cat", "dog", "dragon", "fox", "bird", "rabbit", etc.
+      petName: v.optional(v.string()), // Custom name
+      level: v.optional(v.number()),
+      happiness: v.optional(v.number()),
+      
+      // Visual customization
+      color: v.optional(v.string()), // "blue", "purple", "gold", etc.
+      pattern: v.optional(v.string()), // "spots", "stripes", "solid", etc.
+      accessory: v.optional(v.string()), // "hat", "bow", "collar", etc.
+      
+      // State images
+      happyImageUrl: v.optional(v.string()),
+      neutralImageUrl: v.optional(v.string()),
+      sadImageUrl: v.optional(v.string()),
+      excitedImageUrl: v.optional(v.string()),
+      
+      // State videos (4s GIFs)
+      happyVideoUrl: v.optional(v.string()),
+      neutralVideoUrl: v.optional(v.string()),
+      sadVideoUrl: v.optional(v.string()),
+      excitedVideoUrl: v.optional(v.string()),
+      
+      // Generation data
+      templateId: v.optional(v.string()), // Reference to egg template
+      generatedAt: v.optional(v.number()),
+      lastUpdated: v.optional(v.number()),
+      hatchedAt: v.optional(v.number()),
+    })),
   }).index("by_owner", ["ownerId"]),
 
   // Peer pages for social features
@@ -208,4 +238,18 @@ export default defineSchema({
     username: v.string(),
     createdAt: v.number(),
   }),
+
+  // Pet templates for egg hatching
+  petTemplates: defineTable({
+    templateId: v.string(), // Unique identifier
+    petType: v.string(), // "cat", "dog", "dragon", etc.
+    rarity: v.string(), // "common", "rare", "epic", "legendary"
+    basePrompt: v.string(), // Base prompt for generation
+    colors: v.array(v.string()), // Available colors
+    patterns: v.array(v.string()), // Available patterns
+    accessories: v.array(v.string()), // Available accessories
+    hatchChance: v.number(), // Probability of hatching this type
+    createdAt: v.number(),
+  }).index("by_template_id", ["templateId"])
+    .index("by_rarity", ["rarity"]),
 });

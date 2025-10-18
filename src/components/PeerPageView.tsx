@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { MomentsFeed } from "./MomentsFeed";
 import { DeckGrid } from "./DeckGrid";
+import { AppHeader } from "./AppHeader";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -62,15 +63,35 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
+  const handleSignOut = () => {
+    if (isSignedIn) {
+      window.location.href = '/';
+    } else {
+      // Handle custom auth sign out
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900">
+    <main className="min-h-screen bg-gray-50">
+      <AppHeader 
+        currentPage="home" 
+        onNavigate={(page) => {
+          if (page === 'dex') {
+            window.location.href = '/';
+          } else if (page === 'settings') {
+            window.location.href = '/settings';
+          }
+        }}
+        user={currentUser || undefined}
+        onSignOut={handleSignOut}
+      />
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">{peerPage.title}</h1>
-              <div className="flex items-center gap-4 text-gray-400">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{peerPage.title}</h1>
+              <div className="flex items-center gap-4 text-gray-600">
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4" />
                   <span>{userA.displayName} & {userB.displayName}</span>
@@ -79,7 +100,7 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(peerPage.createdAt).toLocaleDateString()}</span>
                 </div>
-                <Badge variant="secondary" className="bg-emerald-900 text-emerald-300">
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                   {peerPage.visibility}
                 </Badge>
               </div>
@@ -89,9 +110,9 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex space-x-1">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -99,10 +120,10 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
                   key={tab.id}
                   variant={activeTab === tab.id ? "default" : "ghost"}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-none border-b-2 ${
+                  className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-colors rounded-md ${
                     activeTab === tab.id
-                      ? "border-emerald-400 bg-emerald-900 text-emerald-300"
-                      : "border-transparent text-gray-400 hover:text-white hover:bg-gray-700"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -115,7 +136,7 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === "moments" && (
           <MomentsFeed peerPageId={peerPageId as Id<"peerPages">} />
         )}
@@ -124,33 +145,33 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
         )}
         {activeTab === "settings" && (
           <div className="space-y-6">
-            <Card className="bg-gray-800 border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Peer Page Settings</h3>
+            <Card className="bg-white border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Peer Page Settings</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Page Title
                   </label>
                   <input
                     type="text"
                     value={peerPage.title}
                     readOnly
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Visibility
                   </label>
-                  <Badge variant="secondary" className="bg-emerald-900 text-emerald-300">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                     {peerPage.visibility}
                   </Badge>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Created
                   </label>
-                  <p className="text-gray-400">
+                  <p className="text-gray-600">
                     {new Date(peerPage.createdAt).toLocaleString()}
                   </p>
                 </div>
@@ -159,6 +180,6 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

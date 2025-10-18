@@ -13,7 +13,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 export default function ContactDetailPage() {
   const params = useParams();
   const contactId = params.id as string;
-  const [activeTab, setActiveTab] = useState<"overview" | "notes" | "actions" | "preferences">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "notes" | "actions" | "preferences" | "moments">("overview");
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
@@ -41,9 +41,9 @@ export default function ContactDetailPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <AppHeader 
-        currentPage="contacts" 
+        currentPage="home" 
         onNavigate={(page) => {
-          if (page === 'contacts' || page === 'dex' || page === 'home') {
+          if (page === 'dex') {
             window.location.href = '/';
           } else if (page === 'settings') {
             window.location.href = '/settings';

@@ -9,13 +9,15 @@ import { XpProgress } from './XpProgress';
 import { NotesSection } from './NotesSection';
 import { ActionsSection } from './ActionsSection';
 import { PreferencesSection } from './PreferencesSection';
+import { ContactMomentsFeed } from './ContactMomentsFeed';
+import { PetModel } from './PetModel';
 import { Star, Phone, Mail, MapPin, Building, ArrowLeft, Calendar, User } from 'lucide-react';
 
 interface ContactDetailViewProps {
   contactId: string;
   userId: Id<"users">;
-  activeTab: "overview" | "notes" | "actions" | "preferences";
-  onTabChange: (tab: "overview" | "notes" | "actions" | "preferences") => void;
+  activeTab: "overview" | "notes" | "actions" | "preferences" | "moments";
+  onTabChange: (tab: "overview" | "notes" | "actions" | "preferences" | "moments") => void;
 }
 
 export function ContactDetailView({ contactId, userId, activeTab, onTabChange }: ContactDetailViewProps) {
@@ -123,6 +125,13 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
               <div className="text-4xl font-bold text-gray-900">{overallScore}</div>
             </div>
           </div>
+
+          {/* Pet Model */}
+          <PetModel 
+            contactId={contactId as Id<"contacts">} 
+            relationshipStats={relationshipStats}
+            petData={contact.petData}
+          />
 
           {/* Relationship Stats */}
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -320,11 +329,12 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
               { key: 'overview', label: 'Overview' },
               { key: 'notes', label: 'Notes' },
               { key: 'actions', label: 'Actions' },
-              { key: 'preferences', label: 'Preferences' }
+              { key: 'preferences', label: 'Preferences' },
+              { key: 'moments', label: 'Moments' }
             ].map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => onTabChange(key as "overview" | "notes" | "actions" | "preferences")}
+                onClick={() => onTabChange(key as "overview" | "notes" | "actions" | "preferences" | "moments")}
                 className={`px-6 py-3 font-medium text-sm transition-colors rounded-md ${
                   activeTab === key
                     ? 'bg-white text-blue-600 shadow-sm'
@@ -366,6 +376,10 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
 
               {activeTab === 'preferences' && (
                 <PreferencesSection contactId={contactId as Id<"contacts">} userId={userId} />
+              )}
+
+              {activeTab === 'moments' && (
+                <ContactMomentsFeed contactId={contactId as Id<"contacts">} userId={userId} />
               )}
             </div>
           </div>
