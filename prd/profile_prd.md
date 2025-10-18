@@ -1,58 +1,74 @@
-
 # Product Requirement Document: Scrollodex Profile Page
 
 ## 1. Overview
 
 - **Product:** Scrollodex
-- **Feature:** Profile Page / Friend Detail View
+- **Feature:** Profile Page / Contact Detail View
 - **Status:** Live
-- **Goal:** To present a comprehensive and visually rich profile for a selected friend, mimicking the detailed stats and information layout of a Pokémon's Pokédex entry.
+- **Goal:** To present a comprehensive and visually rich profile for a selected contact, functioning as a personal CRM entry. The page blends a fun, Pokédex-inspired aesthetic with practical contact management information.
 
 ## 2. User Stories
 
+<<<<<<< Updated upstream
 - **As a user,** after selecting a friend, I want to see their detailed profile page so I can learn more about them.
 - **As a user,** I want to see a large version of their picture, their full description, and their "Pokédex data" (e.g., name, birthday, category).
 - **As a user,** I want to view their base stats (HP, Attack, etc.) in a clear, graphical format like progress bars.
 - **As a user,** I want to easily identify their "types" and "weaknesses" through colored badges.
 - **As a user,** I want a clear and simple way to navigate back to the main list of friends.
+=======
+- **As a user,** after selecting a contact, I want to see their detailed profile page so I can get a full picture of our relationship.
+- **As a user,** I want to see an AI-generated summary of our relationship so I can get a quick, dynamic insight that updates over time.
+- **As a user,** I want to see relevant CRM information like their role, company, and when we last talked.
+- **As a user,** I want to see a clear "Relationship Score" and detailed stats to quickly gauge the health and nature of our connection.
+- **As a user,** I want to easily find their contact details, like email and social media links.
+- **As a user,** I want a clear and simple way to navigate back to the main list of contacts.
+>>>>>>> Stashed changes
 
 ## 3. Functional Requirements
 
 ### 3.1. Page Layout and Theming
-- The page must display the complete profile of a single friend.
+- The page must display the complete profile of a single contact.
 - The layout must be responsive:
   - **Desktop:** A two-column layout, with the image/stats on the left and info on the right.
   - **Mobile:** A single-column layout, with content sections stacked vertically.
-- The page header's background color should be themed based on the friend's primary type, creating a cohesive and immersive experience.
+- The page header's background color should be themed based on the contact's type ('Personal' or 'Professional').
 
 ### 3.2. Navigation
 - A "Back to List" button, accompanied by an arrow icon, must be prominently displayed at the top of the page.
-- Clicking this button must return the user to the Home Page (Friend List View).
+- Clicking this button must return the user to the Home Page (Contact List View).
 
 ### 3.3. Profile Content Sections
 
-- **Image & Stats Column:**
+- **Image & Stats Column (Left):**
   - **Profile Image:** A large, circular profile picture displayed within a styled container.
-  - **Base Stats:**
-    - A section titled "Base Stats".
-    - Each of the six stats (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed) must be displayed with its label, numerical value, and a horizontal `StatBar`.
-    - The `StatBar`'s fill percentage must be proportional to the stat's value (relative to a max value of 200).
-    - Each stat bar should have a distinct color for easy differentiation.
+  - **Relationship Score:**
+    - A prominently displayed overall score (0-100) that provides a quick-glance measure of the relationship's strength.
+    - The score is the average of the four core Relationship Stats.
+  - **Relationship Stats:**
+    - A section titled "Relationship Stats".
+    - Each of the four stats (Connection, Reliability, Communication, Energy) must be displayed with its label, numerical value, and a horizontal `StatBar`.
+    - The `StatBar`'s fill percentage must be proportional to the stat's value.
+    - Each stat bar should have a distinct, thematic color for easy differentiation.
 
-- **Information Column:**
-  - **Header:** The friend's name in a large font size and their ID number in a smaller, secondary style.
-  - **Description:** The friend's full description text, displayed within a styled, inset block to set it apart.
-  - **Profile Data Box:**
-    - A visually distinct, themed box containing key "Pokédex-style" data.
-    - Must include: Height, Weight, Category, and Gender.
-  - **Types Section:**
-    - Displays the friend's types as large, colored, and easy-to-read badges.
-  - **Weaknesses Section:**
-    - Displays the friend's weaknesses as large, colored, and easy-to-read badges.
+- **Information Column (Right):**
+  - **Header:** The contact's name in a large font size and their location in a smaller, secondary style.
+  - **Summary (AI-Generated):**
+    - An AI-generated, two-sentence summary of the relationship.
+    - This summary is dynamically created based on the contact's personality and the current relationship stats.
+    - A loading indicator must be displayed while the summary is being generated.
+    - If the API call fails, the view should fall back to displaying the contact's static description.
+  - **General Info Section:**
+    - A visually distinct, themed box containing key CRM data.
+    - Must include: Role, Company, Last Contacted, and Birthday.
+  - **Type Section:**
+    - Displays the contact's single type ('Personal' or 'Professional') as a large, colored, and easy-to-read badge.
+  - **Contact Info Section:**
+    - A section displaying the contact's detailed contact information.
+    - Must include: Email, Phone, Social Media (as a hyperlink), and Preferred Contact Method.
 
 ## 4. Non-Functional Requirements
 
-- **Performance:** The page should render instantly upon selection from the list view with no noticeable delay.
+- **Performance:** The page should render instantly. A loading indicator must be shown for the AI-generated summary, which may have a slight delay.
 - **Accessibility:**
   - The "Back" button must be keyboard-focusable and have a clear, descriptive label.
   - All text must have sufficient color contrast against its background.
@@ -66,11 +82,12 @@
 
 - **Framework:** React
 - **Styling:** Tailwind CSS
-- **Components:** `ScrolladexDetail.tsx`, `StatBar.tsx`.
-- **Data:** The `ScrolladexDetail` component receives a single `friend` object as a prop from the main `App` component.
+- **API:** Google Gemini API (`@google/genai`) for generating the dynamic summary.
+- **Components:** `ScrollodexDetail.tsx`, `StatBar.tsx`.
+- **Data:** The `ScrollodexDetail` component receives a single `contact` object as a prop from the main `App` component.
 
 ## 6. Out of Scope for this Feature
 
-- "Previous" and "Next" friend navigation buttons on the detail page.
-- Comparing stats between two or more friends.
-- Editing or updating friend information from the UI.
+- "Previous" and "Next" contact navigation buttons on the detail page.
+- Comparing stats between two or more contacts.
+- Editing or updating contact information from the UI.

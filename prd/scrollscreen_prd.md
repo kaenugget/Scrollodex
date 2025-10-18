@@ -1,4 +1,3 @@
-
 # Product Requirement Document: Scrollodex Home Page
 
 ## 1. Overview
@@ -10,10 +9,9 @@
 
 ## 2. User Stories
 
-MVP
 - **As a user,** I want to see all my contacts displayed in a visually appealing grid so that I can get a quick overview of everyone.
-- **As a user,** I want each contact's card to show key information (name, picture, and location) so I can quickly identify them.
-- **As a user,** I want to be able to click on a contact's card to view their detailed profile. (name, picture, birthday, preferences, location, social media links, relationships and family)
+- **As a user,** I want each contact's card to show key information (name, ID, picture, type) so I can quickly identify them.
+- **As a user,** I want to be able to click on a contact's card to view their detailed profile.
 - **As a user,** I want the interface to be responsive so I can browse my contacts on any device (desktop, tablet, or mobile).
 
 ## 3. Functional Requirements
@@ -29,12 +27,11 @@ MVP
 ### 3.2. Contact Card Component
 - Each contact in the grid will be represented by a `ContactCard`.
 - The card must display:
-  - **Profile Picture:** A circular, high-quality image in the style of an Apple Memoji of the contact.
-  - **Contact ID:** The contact's unique ID number, formatted to six digits with leading zeros (e.g.,#000001,#000014).
-  - **Contact Name:** The full name of the contact and a preferred name column.
-  - **Types:** The contact's assigned "types" (e.g., 'Tech', 'Logic') displayed as colored badges for quick recognition.
+  - **Profile Picture:** A circular, high-quality image of the contact.
+  - **Contact Name:** The full name of the contact.
+  - **Type:** The contact's assigned "type" ('Personal' or 'Professional') displayed as a colored badge.
 - The card should have a subtle hover effect (e.g., lift via shadow and transform) to provide visual feedback and indicate interactivity.
-- The bottom border color of the card should correspond to the contact's primary type color, adding a thematic touch.
+- The bottom border color of the card should correspond to the contact's type color, adding a thematic touch.
 
 ### 3.3. Navigation
 - Clicking anywhere on a `ContactCard` must transition the view to the "Contact Profile Page" for that specific contact.
@@ -55,9 +52,12 @@ MVP
 
 - **Framework:** React
 - **Styling:** Tailwind CSS
-- **Components:** `ContactList.tsx`, which contains the `ContactCard` component.
+- **Components:** `ScrollodexList.tsx`, which contains the `ContactCard` component.
 - **Data Source:** A static array of `Contact` objects located in `constants.ts`.
 
 ## 6. Out of Scope for this Feature
 
-- TBD
+- Searching or filtering the contact list.
+- Sorting contacts by ID, name, or type.
+- Adding, editing, or deleting contacts from the list.
+- User authentication or personalized contact lists.
