@@ -6,19 +6,20 @@
 - **Product:** Scrollodex
 - **Feature:** Home Page / Contact List View
 - **Status:** Live
-- **Goal:** To provide users with an engaging and intuitive way to browse their collection of friends, inspired by the classic Pokémon Pokédex interface. The page should display a grid of all friends, encouraging exploration and interaction.
+- **Goal:** To provide users with an engaging and intuitive way to browse their collection of contacts, inspired by the classic Pokémon Pokédex interface. The page should display a grid of all contacts, encouraging exploration and interaction.
 
 ## 2. User Stories
 
-- **As a user,** I want to see all my friends displayed in a visually appealing grid so that I can get a quick overview of everyone.
-- **As a user,** I want each contact's card to show key information (name, ID, picture, types) so I can quickly identify them.
-- **As a user,** I want to be able to click on a contact's card to view their detailed profile.
-- **As a user,** I want the interface to be responsive so I can browse my friends on any device (desktop, tablet, or mobile).
+MVP
+- **As a user,** I want to see all my contacts displayed in a visually appealing grid so that I can get a quick overview of everyone.
+- **As a user,** I want each contact's card to show key information (name, picture, and location) so I can quickly identify them.
+- **As a user,** I want to be able to click on a contact's card to view their detailed profile. (name, picture, birthday, preferences, location, social media links, relationships and family)
+- **As a user,** I want the interface to be responsive so I can browse my contacts on any device (desktop, tablet, or mobile).
 
 ## 3. Functional Requirements
 
 ### 3.1. Contact Grid Display
-- The page must display a grid of all available friends from the data source.
+- The page must display a grid of all available contacts from the data source.
 - The grid must be responsive, adjusting the number of columns based on the screen width to ensure optimal viewing on all devices.
   - **Large Screens (lg):** 4 columns
   - **Medium Screens (md):** 3 columns
@@ -28,9 +29,9 @@
 ### 3.2. Contact Card Component
 - Each contact in the grid will be represented by a `ContactCard`.
 - The card must display:
-  - **Profile Picture:** A circular, high-quality image of the contact.
-  - **Contact ID:** The contact's unique ID number, formatted to three digits with leading zeros (e.g., #001, #014).
-  - **Contact Name:** The full name of the contact.
+  - **Profile Picture:** A circular, high-quality image in the style of an Apple Memoji of the contact.
+  - **Contact ID:** The contact's unique ID number, formatted to six digits with leading zeros (e.g.,#000001,#000014).
+  - **Contact Name:** The full name of the contact and a preferred name column.
   - **Types:** The contact's assigned "types" (e.g., 'Tech', 'Logic') displayed as colored badges for quick recognition.
 - The card should have a subtle hover effect (e.g., lift via shadow and transform) to provide visual feedback and indicate interactivity.
 - The bottom border color of the card should correspond to the contact's primary type color, adding a thematic touch.
@@ -59,7 +60,4 @@
 
 ## 6. Out of Scope for this Feature
 
-- Searching or filtering the contact list.
-- Sorting friends by ID, name, or type.
-- Adding, editing, or deleting friends from the list.
-- User authentication or personalized contact lists.
+- TBD
