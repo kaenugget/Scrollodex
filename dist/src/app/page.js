@@ -27,9 +27,6 @@ export default function Home() {
     // Use Clerk authentication if available, otherwise fall back to custom auth
     const isUserAuthenticated = isSignedIn || isAuthenticated;
     const currentUser = convexUser || user;
-    // Mutations for creating peer pages and demo user
-    const createPeerPage = useMutation(api.social.createPeerPage);
-    const getOrCreateDemoUser = useMutation(api.users.getOrCreateDemoUser);
     // Only use hooks when we have a valid Convex user ID
     const hasValidConvexUserId = currentUser?._id && typeof currentUser._id === 'string' && currentUser._id !== 'demo';
     // Use a dummy ID when we don't have a valid user ID, but disable the queries
@@ -43,29 +40,6 @@ export default function Home() {
     };
     const handleAuthSuccess = () => {
         setShowAuth(null);
-    };
-    const createDemoPeerPage = async () => {
-        if (!currentUser?._id) {
-            alert('Please sign in first');
-            return;
-        }
-        try {
-            // Get or create a demo user
-            const demoUserId = await getOrCreateDemoUser();
-            // Create a peer page with the current user and demo user
-            const peerPageId = await createPeerPage({
-                aUserId: currentUser._id,
-                bUserId: demoUserId,
-                title: "Demo Peer Page",
-                visibility: "private",
-            });
-            // Navigate to the peer page
-            window.location.href = `/peer/${peerPageId}`;
-        }
-        catch (error) {
-            console.error('Error creating peer page:', error);
-            alert('Failed to create peer page. Please try again.');
-        }
     };
     // Show loading while checking authentication
     if (authLoading || clerkConvexLoading) {
@@ -105,11 +79,6 @@ export default function Home() {
                     <Wifi className="w-4 h-4 mr-2"/>
                     <span className="hidden sm:inline">Sync {needsSync} Contacts</span>
                     <span className="sm:hidden">Sync {needsSync}</span>
-                  </Button>)}
-                {currentUser && (<Button onClick={createDemoPeerPage} variant="outline" size="sm" className="border-blue-600 text-blue-600 hover:bg-blue-50">
-                    <Users className="w-4 h-4 mr-2"/>
-                    <span className="hidden sm:inline">Demo Peer Page</span>
-                    <span className="sm:hidden">Demo</span>
                   </Button>)}
                 {contacts.length === 0 && currentUser && (<SeedDataButton userId={currentUser._id}/>)}
               </div>
