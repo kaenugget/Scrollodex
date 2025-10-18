@@ -375,7 +375,9 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
         avatarUrl: safeAvatarUrl,
         avatarFileId,
         avatarUrlSize: avatarUrl ? avatarUrl.length : 0,
-        isBase64: avatarUrl ? avatarUrl.startsWith('data:image/') : false
+        isBase64: avatarUrl ? avatarUrl.startsWith('data:image/') : false,
+        originalAvatarUrl: avatarUrl,
+        safeAvatarUrl: safeAvatarUrl
       });
       
       await signUp(email, `${firstName} ${lastName}`.trim(), password, firstName, lastName, selfieFileId, safeAvatarUrl, avatarFileId || undefined);
