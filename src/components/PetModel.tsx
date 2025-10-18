@@ -191,7 +191,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
 
   // Get debug pet image (for testing different styles)
   const getDebugPetImage = () => {
-    const state = getDebugPetState();
+    const state = getPetState();
     const imageUrl = petModel?.[`${state}ImageUrl` as keyof typeof petModel] as string || petModel?.neutralImageUrl;
     return imageUrl || null;
   };
