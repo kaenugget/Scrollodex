@@ -64,6 +64,12 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
     return memojiImages[index];
   };
 
+  // Generate a consistent contact type (Personal/Professional) based on contact name
+  const getContactType = (name: string) => {
+    const index = name.charCodeAt(0) % 2;
+    return index === 0 ? 'Personal' : 'Professional';
+  };
+
   const formatLastInteraction = (timestamp: number) => {
     const now = Date.now();
     const diff = now - timestamp;
@@ -105,12 +111,16 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
           </div>
         </div>
 
-        {/* Contact Number and Dynamic Indicator */}
+        {/* Contact Type Tag and Dynamic Indicator */}
         <div className="text-center mb-2">
           <div className="flex items-center justify-center gap-2">
-            <span className="text-sm scrollodex-text-light-gray font-mono">
-              #{String(contact._id).slice(-3).padStart(3, '0')}
-            </span>
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              getContactType(contact.name) === 'Personal' 
+                ? 'bg-green-500 text-white' 
+                : 'bg-blue-500 text-white'
+            }`}>
+              {getContactType(contact.name)}
+            </div>
             {contact.isDynamicContact && (
               <div className="flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs">
                 <Wifi className="w-3 h-3" />
