@@ -1,14 +1,19 @@
 "use client";
 
 import { ContactCard } from "@/components/ContactCard";
+import { DexCard } from "@/components/DexCard";
 import { SeedDataButton } from "@/components/SeedDataButton";
+import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { AppHeader } from "@/components/AppHeader";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
-import AnimatedMemojiLanding from "@/components/AnimatedMemojiLanding";
+import { SignupLandingPage } from "@/components/SignupLandingPage";
 import { useContacts } from "@/hooks/useContacts";
+import { useDexEntries } from "@/hooks/useDex";
 import { useAuth } from "@/hooks/useAuth";
+// import { useClerkConvexUser } from "@/hooks/useClerkConvexUser";
 import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
+// import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
@@ -17,16 +22,20 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
 export default function Home() {
-  // Removed dex tab - focusing on core contact management
+  const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
+  // const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
   
-  // Use custom auth system
+  // Use custom auth only for now due to React 19 compatibility issues with Clerk
   const isUserAuthenticated = isAuthenticated;
   const currentUser = user;
 
+  // Mutations for creating peer pages and demo user
+  const createPeerPage = useMutation(api.social.createPeerPage);
+  const getOrCreateDemoUser = useMutation(api.users.getOrCreateDemoUser);
   
   // Only use hooks when we have a valid Convex user ID
   const hasValidConvexUserId = currentUser?._id && typeof currentUser._id === 'string' && currentUser._id !== 'demo';
@@ -35,6 +44,10 @@ export default function Home() {
   const dummyUserId = "demo" as Id<"users">;
   
   const { contacts, pinContact, isLoading: contactsLoading } = useContacts(
+    hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
+    !!(isUserAuthenticated && hasValidConvexUserId)
+  );
+  const { dexEntries, isLoading: dexLoading } = useDexEntries(
     hasValidConvexUserId ? (currentUser._id as Id<"users">) : dummyUserId, 
     !!(isUserAuthenticated && hasValidConvexUserId)
   );
@@ -52,6 +65,32 @@ export default function Home() {
     setShowAuth(null);
   };
 
+  const createDemoPeerPage = async () => {
+    if (!currentUser?._id) {
+      alert('Please sign in first');
+      return;
+    }
+
+    try {
+      // Get or create a demo user
+      const demoUserId = await getOrCreateDemoUser();
+      
+      // Create a peer page with the current user and demo user
+      const peerPageId = await createPeerPage({
+        aUserId: currentUser._id as Id<"users">,
+        bUserId: demoUserId as Id<"users">,
+        title: "Demo Peer Page",
+        visibility: "private",
+      });
+      
+      // Navigate to the peer page
+      window.location.href = `/peer/${peerPageId}`;
+    } catch (error) {
+      console.error('Error creating peer page:', error);
+      alert('Failed to create peer page. Please try again.');
+    }
+  };
+
   // Show loading while checking authentication
   if (authLoading) {
     return <LoadingSpinner fullScreen text="Loading Scrollodex..." />;
@@ -60,7 +99,7 @@ export default function Home() {
   // Show auth forms if not authenticated
   if (!isUserAuthenticated) {
     console.log('User not authenticated, showing landing page');
-    return <AnimatedMemojiLanding />;
+    return <SignupLandingPage />;
   }
 
   const handleSignOut = async () => {
@@ -71,15 +110,19 @@ export default function Home() {
     <main className="scrollodex-bg">
       <AnimatedBackground />
       <AppHeader 
-        currentPage="home" 
-        onNavigate={() => {}} // No navigation needed since Dex menu is removed
+        currentPage={activeTab === 'dex' ? 'dex' : 'home'} 
+        onNavigate={(page) => {
+          if (page === 'dex') {
+            setActiveTab('dex');
+          }
+        }}
         user={currentUser || undefined}
         onSignOut={handleSignOut}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
 
         {/* Content */}
-        {(
+        {activeTab === "contacts" && (
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
@@ -97,6 +140,18 @@ export default function Home() {
                     <Wifi className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Sync {needsSync} Contacts</span>
                     <span className="sm:hidden">Sync {needsSync}</span>
+                  </Button>
+                )}
+                {currentUser && (
+                  <Button
+                    onClick={createDemoPeerPage}
+                    variant="outline"
+                    size="sm"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Demo Peer Page</span>
+                    <span className="sm:hidden">Demo</span>
                   </Button>
                 )}
                 {contacts.length === 0 && currentUser && (
@@ -125,6 +180,45 @@ export default function Home() {
                     onView={handleContactView}
                   />
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "dex" && (
+          <div className="space-y-4 sm:space-y-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold scrollodex-text-white-bold">Your Dex</h2>
+              <p className="scrollodex-text-white mt-1">Track your relationship progress</p>
+            </div>
+            {dexLoading ? (
+              <LoadingSpinner text="Loading dex entries..." />
+            ) : dexEntries.length === 0 ? (
+              <div className="scrollodex-card text-center py-12">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-medium mb-2 scrollodex-text-dark">No dex entries yet</p>
+                <p className="scrollodex-text-gray">Interact with contacts to generate dex entries!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                {dexEntries.map((dexEntry: any) => {
+                  // Find the contact for this dex entry
+                  const contact = contacts.find((c: any) => c._id === dexEntry.contactId);
+                  if (!contact) return null;
+                  
+                  return (
+                    <DexCard
+                      key={dexEntry._id}
+                      dexEntry={dexEntry}
+                      contact={contact}
+                      onView={handleContactView}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

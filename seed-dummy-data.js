@@ -118,6 +118,31 @@ async function seedDummyData() {
     
     console.log(`✅ User created/found: ${userId}`);
     
+    // Available emoji assets for profile pictures
+    const emojiAssets = [
+      "08356205059d24549593d0b9a19cb1762abc8900.png",
+      "0f3142c26306857d8e70277ea1bb8f087bc38fd9.png",
+      "1273bdff1e02246ba2bc10e92c9ae54e27ecac5c.png",
+      "175b568fdd31fff9ebc4eb30d2fd4b1a988fffc3.png",
+      "18f3ede5ed062331e5fb62e6f9d5fbc8e4f5c6ac.png",
+      "1967330d9961adf49d90841a7a35d8b513034ef9.png",
+      "233a6fd519ce98178bfa9832ddd058403db1d3bb.png",
+      "2ae7077bc7abdb19b28ad47b8561f4b6154115ee.png",
+      "40eea2bdc979e8303cfe5ad670c718ab7cc6cd26.png",
+      "44faab3101d6e25090512693120c23866d347d02.png",
+      "637f9d8820279c93bb2cefb93af72472f431eb50.png",
+      "7d8e6fc528bf327988694404fca08058031b575e.png",
+      "895ae4cd93b3ed20d216afcda2414d80547ae205.png",
+      "8c98835dadb44f58c902e8b219525eadb42275c0.png",
+      "90d4316f95dfa58f20b98e74e9e8a295574e84a4.png",
+      "96ca4f3c99225394e50df5e7a78773cc97a178c7.png",
+      "c2fddacc152d57392b08ecccebbd50e1a6f2af8a.png",
+      "d6b40c57af7b91ce62fe3d8218a57c792f4e52b8.png",
+      "dfa1cae2fdb7e947b9b28b566d7285888111b66a.png",
+      "e6a83ff14ac76d1598087c994da84a379bd4b797.png",
+      "fdee818f54b8c3fba3690e004d2a4967c796d17d.png"
+    ];
+
     // Step 2: Create diverse contacts with different pet types
     console.log("👥 Creating contacts...");
     
@@ -134,6 +159,7 @@ async function seedDummyData() {
         notes: ["Met at tech conference", "Great at React"],
         lastInteractionAt: Date.now() - (2 * 24 * 60 * 60 * 1000), // 2 days ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[0]}`,
         petData: {
           petType: "cat",
           petName: "Whiskers",
@@ -161,6 +187,7 @@ async function seedDummyData() {
         notes: ["Amazing designer", "Loves coffee"],
         lastInteractionAt: Date.now() - (1 * 24 * 60 * 60 * 1000), // 1 day ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[1]}`,
         petData: {
           petType: "dog",
           petName: "Buddy",
@@ -188,6 +215,7 @@ async function seedDummyData() {
         notes: ["Great mentor", "Very inspiring"],
         lastInteractionAt: Date.now() - (7 * 24 * 60 * 60 * 1000), // 1 week ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[2]}`,
         petData: {
           petType: "dragon",
           petName: "Flame",
@@ -215,6 +243,7 @@ async function seedDummyData() {
         notes: ["Talented artist", "Very creative"],
         lastInteractionAt: Date.now() - (3 * 24 * 60 * 60 * 1000), // 3 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[3]}`,
         petData: {
           petType: "fox",
           petName: "Sage",
@@ -242,6 +271,7 @@ async function seedDummyData() {
         notes: ["Amazing musician", "Great collaborator"],
         lastInteractionAt: Date.now() - (5 * 24 * 60 * 60 * 1000), // 5 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[4]}`,
         petData: {
           petType: "bird",
           petName: "Melody",
@@ -269,6 +299,7 @@ async function seedDummyData() {
         notes: ["Great financial advice", "Very professional"],
         lastInteractionAt: Date.now() - (10 * 24 * 60 * 60 * 1000), // 10 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[5]}`,
         petData: {
           petType: "rabbit",
           petName: "Cotton",
@@ -296,6 +327,7 @@ async function seedDummyData() {
         notes: ["Great athlete", "Very motivated"],
         lastInteractionAt: Date.now() - (6 * 24 * 60 * 60 * 1000), // 6 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[6]}`,
         petData: {
           petType: "phoenix",
           petName: "Blaze",

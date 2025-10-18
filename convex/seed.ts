@@ -18,6 +18,31 @@ export const createDemoUser = mutation({
 export const seedDemoData = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    // Available emoji assets for profile pictures
+    const emojiAssets = [
+      "08356205059d24549593d0b9a19cb1762abc8900.png",
+      "0f3142c26306857d8e70277ea1bb8f087bc38fd9.png",
+      "1273bdff1e02246ba2bc10e92c9ae54e27ecac5c.png",
+      "175b568fdd31fff9ebc4eb30d2fd4b1a988fffc3.png",
+      "18f3ede5ed062331e5fb62e6f9d5fbc8e4f5c6ac.png",
+      "1967330d9961adf49d90841a7a35d8b513034ef9.png",
+      "233a6fd519ce98178bfa9832ddd058403db1d3bb.png",
+      "2ae7077bc7abdb19b28ad47b8561f4b6154115ee.png",
+      "40eea2bdc979e8303cfe5ad670c718ab7cc6cd26.png",
+      "44faab3101d6e25090512693120c23866d347d02.png",
+      "637f9d8820279c93bb2cefb93af72472f431eb50.png",
+      "7d8e6fc528bf327988694404fca08058031b575e.png",
+      "895ae4cd93b3ed20d216afcda2414d80547ae205.png",
+      "8c98835dadb44f58c902e8b219525eadb42275c0.png",
+      "90d4316f95dfa58f20b98e74e9e8a295574e84a4.png",
+      "96ca4f3c99225394e50df5e7a78773cc97a178c7.png",
+      "c2fddacc152d57392b08ecccebbd50e1a6f2af8a.png",
+      "d6b40c57af7b91ce62fe3d8218a57c792f4e52b8.png",
+      "dfa1cae2fdb7e947b9b28b566d7285888111b66a.png",
+      "e6a83ff14ac76d1598087c994da84a379bd4b797.png",
+      "fdee818f54b8c3fba3690e004d2a4967c796d17d.png"
+    ];
+
     // Create demo contacts with more comprehensive data
     const contacts = [
       {
@@ -31,6 +56,7 @@ export const seedDemoData = mutation({
         notes: ["Met at React conference", "Loves hiking", "Coffee enthusiast"],
         lastInteractionAt: Date.now() - 86400000, // 1 day ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[0]}`,
       },
       {
         name: "Bob Rodriguez",
@@ -43,6 +69,7 @@ export const seedDemoData = mutation({
         notes: ["Great eye for color", "Works with startups", "Skateboarding"],
         lastInteractionAt: Date.now() - 172800000, // 2 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[1]}`,
       },
       {
         name: "Carol Kim",
@@ -55,6 +82,7 @@ export const seedDemoData = mutation({
         notes: ["Amazing producer", "Into electronic music", "Night owl"],
         lastInteractionAt: Date.now() - 259200000, // 3 days ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[2]}`,
       },
       {
         name: "David Park",
@@ -67,6 +95,7 @@ export const seedDemoData = mutation({
         notes: ["Best Korean fusion", "Food truck entrepreneur", "Family man"],
         lastInteractionAt: Date.now() - 432000000, // 5 days ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[3]}`,
       },
       {
         name: "Emma Watson",
@@ -79,6 +108,7 @@ export const seedDemoData = mutation({
         notes: ["Great networker", "Helps with business strategy", "Yoga instructor"],
         lastInteractionAt: Date.now() - 604800000, // 1 week ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[4]}`,
       },
       {
         name: "Frank Liu",
@@ -91,6 +121,7 @@ export const seedDemoData = mutation({
         notes: ["Serial entrepreneur", "AI enthusiast", "Coffee addict"],
         lastInteractionAt: Date.now() - 1209600000, // 2 weeks ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[5]}`,
       },
       {
         name: "Grace Thompson",
@@ -103,6 +134,7 @@ export const seedDemoData = mutation({
         notes: ["Amazing photographer", "Loves nature", "Vegan"],
         lastInteractionAt: Date.now() - 1814400000, // 3 weeks ago
         pinned: true,
+        profilePictureUrl: `/assets-moji/${emojiAssets[6]}`,
       },
       {
         name: "Henry Davis",
@@ -115,6 +147,7 @@ export const seedDemoData = mutation({
         notes: ["Personal trainer", "Nutrition expert", "Early riser"],
         lastInteractionAt: Date.now() - 2419200000, // 4 weeks ago
         pinned: false,
+        profilePictureUrl: `/assets-moji/${emojiAssets[7]}`,
       },
     ];
 

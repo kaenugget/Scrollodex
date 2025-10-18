@@ -89,8 +89,14 @@ export default function ProfilePage() {
     return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
 
-  if (!isUserAuthenticated || !currentUser) {
+  // Only redirect if explicitly not authenticated, not if user is still loading
+  if (!isUserAuthenticated) {
     return <LoadingSpinner fullScreen text="Redirecting to login..." />;
+  }
+
+  // Show loading while user data is being fetched
+  if (!currentUser) {
+    return <LoadingSpinner fullScreen text="Loading profile..." />;
   }
 
   const tabs = [

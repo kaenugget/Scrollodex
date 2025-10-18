@@ -20,10 +20,10 @@ export function SeedDataButton({ userId }: SeedDataButtonProps) {
       // Seed data with the authenticated user ID
       await seedData({ userId });
       
-      alert("Demo data added successfully! Your contacts are now loaded.");
+      alert("Contacts imported successfully! Your contacts are now loaded.");
     } catch (error) {
       console.error("Error seeding data:", error);
-      alert("Error adding demo data. Check console for details.");
+      alert("Error importing contacts. Check console for details.");
     } finally {
       setIsSeeding(false);
     }
@@ -35,7 +35,7 @@ export function SeedDataButton({ userId }: SeedDataButtonProps) {
       disabled={isSeeding}
       className="pixel-border bg-green-600 hover:bg-green-700 text-white"
     >
-      {isSeeding ? "Adding Demo Data..." : "Add Demo Data"}
+      {isSeeding ? "Importing Contacts..." : "Import Contacts"}
     </Button>
   );
 }

@@ -16,13 +16,14 @@ import { Star, Phone, Mail, MapPin, Building, ArrowLeft, Calendar, User } from '
 interface ContactDetailViewProps {
   contactId: string;
   userId: Id<"users">;
+  contacts: any[];
+  dexEntries: any[];
   activeTab: "overview" | "notes" | "actions" | "preferences" | "moments";
   onTabChange: (tab: "overview" | "notes" | "actions" | "preferences" | "moments") => void;
 }
 
-export function ContactDetailView({ contactId, userId, activeTab, onTabChange }: ContactDetailViewProps) {
-  const { contacts, pinContact } = useContacts(userId, true);
-  const { dexEntries } = useDexEntries(userId, true);
+export function ContactDetailView({ contactId, userId, contacts, dexEntries, activeTab, onTabChange }: ContactDetailViewProps) {
+  const { pinContact } = useContacts(userId, false); // Disabled since we're passing data as props
   
   const contact = contacts.find(c => c._id === contactId);
   const dexEntry = dexEntries.find(d => d.contactId === contactId);
