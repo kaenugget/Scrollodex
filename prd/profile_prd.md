@@ -1,9 +1,9 @@
 
-# Product Requirement Document: Friendex Profile Page
+# Product Requirement Document: Scrollodex Profile Page
 
 ## 1. Overview
 
-- **Product:** Friendex
+- **Product:** Scrollodex
 - **Feature:** Profile Page / Friend Detail View
 - **Status:** Live
 - **Goal:** To present a comprehensive and visually rich profile for a selected friend, mimicking the detailed stats and information layout of a Pokémon's Pokédex entry.

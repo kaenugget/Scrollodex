@@ -1,9 +1,9 @@
 
-# Product Requirement Document: Friendex Home Page
+# Product Requirement Document: Scrollodex Home Page
 
 ## 1. Overview
 
-- **Product:** Friendex
+- **Product:** Scrollodex
 - **Feature:** Home Page / Friend List View
 - **Status:** Live
 - **Goal:** To provide users with an engaging and intuitive way to browse their collection of friends, inspired by the classic Pokémon Pokédex interface. The page should display a grid of all friends, encouraging exploration and interaction.
@@ -47,7 +47,7 @@
   - Color contrast for text and badges should meet WCAG AA standards.
 - **UI/UX:**
   - The design should be clean, modern, and fun, with a clear aesthetic reference to the Pokémon Pokédex.
-  - The page must include a main header with the application title ("Friendex") and a descriptive tagline.
+  - The page must include a main header with the application title ("Scrollodex") and a descriptive tagline.
   - A simple footer with attribution should be present at the bottom of the page.
 
 ## 5. Technical Specifications
