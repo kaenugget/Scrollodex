@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
 // import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -24,6 +25,7 @@ import { Users, Wifi } from "lucide-react";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
+  const router = useRouter();
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
@@ -55,7 +57,8 @@ export default function Home() {
   );
 
   const handleContactView = (contactId: string) => {
-    window.location.href = `/contacts/${contactId}`;
+    // Use Next.js router for client-side navigation
+    router.push(`/contacts/${contactId}`);
   };
 
   const handleAuthSuccess = () => {

@@ -23,9 +23,11 @@ export function middleware(request: NextRequest) {
     const authToken = request.cookies.get('authToken')?.value || 
                      request.headers.get('authorization')?.replace('Bearer ', '');
     
+    // For now, allow access to protected routes - authentication will be handled client-side
+    // This prevents the redirect loop issue
     if (!authToken) {
-      // Redirect to home page if not authenticated
-      return NextResponse.redirect(new URL('/', request.url));
+      // Don't redirect, let the client-side auth handle it
+      console.log('No auth token found in middleware, but allowing access for client-side auth check');
     }
   }
   

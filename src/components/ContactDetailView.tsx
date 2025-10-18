@@ -28,6 +28,37 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
   const contact = contacts.find(c => c._id === contactId);
   const dexEntry = dexEntries.find(d => d.contactId === contactId);
 
+  // List of available memoji images
+  const memojiImages = [
+    '08356205059d24549593d0b9a19cb1762abc8900.png',
+    '0f3142c26306857d8e70277ea1bb8f087bc38fd9.png',
+    '1273bdff1e02246ba2bc10e92c9ae54e27ecac5c.png',
+    '175b568fdd31fff9ebc4eb30d2fd4b1a988fffc3.png',
+    '18f3ede5ed062331e5fb62e6f9d5fbc8e4f5c6ac.png',
+    '1967330d9961adf49d90841a7a35d8b513034ef9.png',
+    '233a6fd519ce98178bfa9832ddd058403db1d3bb.png',
+    '2ae7077bc7abdb19b28ad47b8561f4b6154115ee.png',
+    '40eea2bdc979e8303cfe5ad670c718ab7cc6cd26.png',
+    '44faab3101d6e25090512693120c23866d347d02.png',
+    '637f9d8820279c93bb2cefb93af72472f431eb50.png',
+    '7d8e6fc528bf327988694404fca08058031b575e.png',
+    '895ae4cd93b3ed20d216afcda2414d80547ae205.png',
+    '8c98835dadb44f58c902e8b219525eadb42275c0.png',
+    '90d4316f95dfa58f20b98e74e9e8a295574e84a4.png',
+    '96ca4f3c99225394e50df5e7a78773cc97a178c7.png',
+    'c2fddacc152d57392b08ecccebbd50e1a6f2af8a.png',
+    'd6b40c57af7b91ce62fe3d8218a57c792f4e52b8.png',
+    'dfa1cae2fdb7e947b9b28b566d7285888111b66a.png',
+    'e6a83ff14ac76d1598087c994da84a379bd4b797.png',
+    'fdee818f54b8c3fba3690e004d2a4967c796d17d.png'
+  ];
+
+  // Generate a consistent memoji based on contact name
+  const getMemojiImage = (name: string) => {
+    const index = name.charCodeAt(0) % memojiImages.length;
+    return memojiImages[index];
+  };
+
   const handleBack = () => {
     window.history.back();
   };
@@ -164,10 +195,12 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
           {/* Profile Picture Card */}
           <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
             <div className="flex justify-center mb-4 sm:mb-6">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-white text-2xl sm:text-4xl font-bold">
-                  {contact.name.charAt(0).toUpperCase()}
-                </span>
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                <img 
+                  src={`/assets-moji/${getMemojiImage(contact.name)}`}
+                  alt={`${contact.name} memoji`}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
             
