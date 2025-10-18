@@ -394,10 +394,12 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
           <div className="space-y-4">
             {!selfiePreview ? (
               <div className="text-center">
-                <div className="mb-4">
-                  <Camera className="w-16 h-16 text-green-400 mx-auto mb-2" />
-                  <h3 className="text-lg font-medium text-gray-300 mb-2">Take a Selfie</h3>
-                  <p className="text-gray-400 text-sm">
+                <div className="mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera className="w-10 h-10 text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold scrollodex-text-dark mb-2">Take a Selfie</h3>
+                  <p className="scrollodex-text-gray text-sm">
                     We&apos;ll use this photo for your profile
                   </p>
                 </div>
@@ -406,7 +408,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                   <div>
                     <Button
                       onClick={startCamera}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <Camera className="w-4 h-4 mr-2" />
                       Start Camera
@@ -431,7 +433,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                       <Button
                         onClick={captureSelfie}
                         disabled={!isVideoReady}
-                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white disabled:opacity-50 px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         <Camera className="w-4 h-4 mr-2" />
                         {isVideoReady ? "Capture" : "Loading..."}
@@ -459,20 +461,23 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
               </div>
             ) : (
               <div className="text-center">
-                <div className="mb-4">
-                  <img
-                    src={selfiePreview}
-                    alt="Selfie preview"
-                    className="w-32 h-32 rounded-full mx-auto object-cover border-2 border-green-400"
-                  />
-                  <p className="text-gray-400 text-sm mt-2">
+                <div className="mb-6">
+                  <div className="relative w-32 h-32 mx-auto">
+                    <img
+                      src={selfiePreview}
+                      alt="Selfie preview"
+                      className="w-full h-full rounded-full object-cover border-4 border-gradient-to-r from-purple-500 to-pink-500"
+                    />
+                    <div className="absolute inset-0 rounded-full border-4 border-gradient-to-r from-purple-500 to-pink-500"></div>
+                  </div>
+                  <p className="scrollodex-text-gray text-sm mt-3">
                     Great! This will be your profile photo
                   </p>
                 </div>
                 <Button
                   onClick={retakeSelfie}
                   variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-2"
                 >
                   <Camera className="w-4 h-4 mr-2" />
                   Retake Photo
@@ -536,7 +541,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
             )}
             
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium mb-2 text-gray-300">
+              <label htmlFor="firstName" className="block text-sm font-medium mb-2 scrollodex-text-dark">
                 First Name
               </label>
               <input
@@ -545,12 +550,12 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
                 placeholder="Enter your first name"
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium mb-2 text-gray-300">
+              <label htmlFor="lastName" className="block text-sm font-medium mb-2 scrollodex-text-dark">
                 Last Name
               </label>
               <input
@@ -559,7 +564,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
                 placeholder="Enter your last name"
               />
             </div>
@@ -570,7 +575,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
         return (
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium mb-2 scrollodex-text-dark">
                 Email Address
               </label>
               <input
@@ -579,12 +584,12 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
                 placeholder="Enter your email address"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2 text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium mb-2 scrollodex-text-dark">
                 Password
               </label>
               <input
@@ -593,7 +598,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all shadow-sm"
                 placeholder="Create a password"
               />
             </div>
@@ -653,85 +658,89 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
   };
 
   return (
-    <Card className="bg-gray-900 border-gray-700">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex space-x-2">
-            {steps.map((step, index) => (
+    <div className="space-y-6">
+      {/* Progress Header */}
+      <div className="text-center">
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          {steps.map((step, index) => (
+            <div key={step} className="flex items-center">
               <div
-                key={step}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                   index <= currentStepIndex
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-700 text-gray-400"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                    : "bg-gray-200 text-gray-500"
                 }`}
               >
                 {index < currentStepIndex ? (
-                  <Check className="w-4 h-4" />
+                  <Check className="w-5 h-5" />
                 ) : (
                   index + 1
                 )}
               </div>
-            ))}
-          </div>
-          <div className="text-sm text-gray-400">
-            Step {currentStepIndex + 1} of {steps.length}
-          </div>
+              {index < steps.length - 1 && (
+                <div className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${
+                  index < currentStepIndex ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-200"
+                }`} />
+              )}
+            </div>
+          ))}
         </div>
         
-        <CardTitle className="text-green-400 text-xl">{getStepTitle()}</CardTitle>
-        <CardDescription className="text-gray-400">
-          {getStepDescription()}
-        </CardDescription>
-      </CardHeader>
+        <div className="mb-6">
+          <h3 className="text-xl font-bold scrollodex-text-dark mb-2">{getStepTitle()}</h3>
+          <p className="scrollodex-text-gray text-sm">
+            {getStepDescription()}
+          </p>
+        </div>
+      </div>
       
-      <CardContent>
-        <form onSubmit={(e) => e.preventDefault()}>
-          {renderStepContent()}
+      {/* Form Content */}
+      <form onSubmit={(e) => e.preventDefault()}>
+        {renderStepContent()}
 
-          {error && (
-            <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 rounded-lg p-3 mt-4">
-              {error}
-            </div>
+        {error && (
+          <div className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
+            {error}
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-8">
+          {currentStep !== "avatar" && (
+            <Button
+              type="button"
+              onClick={handlePrevious}
+              disabled={currentStepIndex === 0}
+              variant="outline"
+              className="border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 px-6 py-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Previous
+            </Button>
           )}
 
-          <div className="flex justify-between mt-6">
-            {currentStep !== "avatar" && (
-              <Button
-                type="button"
-                onClick={handlePrevious}
-                disabled={currentStepIndex === 0}
-                variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-gray-800 disabled:opacity-50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-            )}
-
-            {currentStepIndex === steps.length - 1 ? (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!canProceed() || isLoading}
-                className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
-              >
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
-            ) : currentStep !== "avatar" ? (
-              <Button
-                type="button"
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
-              >
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : null}
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          {currentStepIndex === steps.length - 1 ? (
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!canProceed() || isLoading}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white disabled:opacity-50 px-8 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+          ) : currentStep !== "avatar" ? (
+            <Button
+              type="button"
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white disabled:opacity-50 px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              Next
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          ) : null}
+        </div>
+      </form>
+    </div>
   );
 }

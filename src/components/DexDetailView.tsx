@@ -67,29 +67,29 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-4 sm:mb-6">
         <button
           onClick={handleBack}
           className="p-2 hover:bg-neutral-800 transition-colors pixel-border-outset"
         >
           <ArrowLeft className="w-4 h-4 text-neutral-400" />
         </button>
-        <h1 className="text-3xl font-pixel text-emerald-400">Dex Entry</h1>
+        <h1 className="text-2xl sm:text-3xl font-pixel text-emerald-400">Dex Entry</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left Column - Dex Card */}
         <div className="space-y-6">
           {/* Main Dex Card */}
           <PixelFrame padding="p-6">
             <div className="text-center">
               <div className="mb-4">
-                <div className="bg-neutral-700 pixel-border-outset p-4 mx-auto w-48 h-48">
-                  <div className="bg-neutral-900 aspect-square p-4">
+                <div className="bg-neutral-700 pixel-border-outset p-3 sm:p-4 mx-auto w-32 h-32 sm:w-48 sm:h-48">
+                  <div className="bg-neutral-900 aspect-square p-3 sm:p-4">
                     <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-                      <span className="font-pixel text-neutral-900 text-6xl">
+                      <span className="font-pixel text-neutral-900 text-3xl sm:text-6xl">
                         {contact.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -97,8 +97,8 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
                 </div>
               </div>
 
-              <h2 className="text-2xl font-pixel text-neutral-100 mb-2">{contact.name}</h2>
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <h2 className="text-xl sm:text-2xl font-pixel text-neutral-100 mb-2">{contact.name}</h2>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4">
                 <span className="font-pixel text-neutral-400">#{dexEntry.dexNumber.toString().padStart(3, '0')}</span>
                 <span className="font-pixel text-emerald-400">Lv. {dexEntry.level}</span>
                 <span className="font-pixel text-cyan-400">{dexEntry.xp} XP</span>
@@ -155,7 +155,7 @@ export function DexDetailView({ contactId, userId }: DexDetailViewProps) {
           {/* Type Effectiveness */}
           <PixelFrame padding="p-6">
             <h3 className="font-pixel text-xl text-emerald-400 mb-4">Type Effectiveness</h3>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
               {['FIRE', 'WATER', 'GRASS', 'ELEC', 'PSY', 'STEEL', 'DARK', 'ART', 'NORM'].map(type => {
                 const effectiveness = getTypeEffectiveness(dexEntry.types[0])[type] || 1;
                 const getEffectivenessColor = (eff: number) => {

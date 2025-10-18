@@ -27,7 +27,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
   const [newHobby, setNewHobby] = useState('');
 
   const { preferences, isLoading } = usePreferences(contactId);
-  const upsertPreferences = useMutation(api.preferences.upsertPreferences);
+  const upsertPreferences = useMutation(api.preferences.create);
 
   // Load existing preferences when they're available
   useEffect(() => {
@@ -131,11 +131,11 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-pixel text-xl text-emerald-400">Preferences</h3>
+        <h3 className="font-pixel text-xl text-purple-600">Preferences</h3>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 flex items-center gap-2"
+            className="px-4 py-2 bg-purple-600 text-white font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-purple-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Edit Preferences
@@ -148,7 +148,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
           <div className="space-y-6">
             {/* Food Preferences */}
             <div>
-              <label className="block text-sm font-pixel text-neutral-300 mb-3">
+              <label className="block text-sm font-pixel text-gray-700 mb-3">
                 Food Preferences
               </label>
               <div className="space-y-3">
@@ -159,22 +159,22 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
                     onChange={(e) => setNewFood(e.target.value)}
                     onKeyPress={(e) => handleKeyPress(e, 'food', newFood)}
                     placeholder="Add a food preference..."
-                    className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm focus:outline-none focus:border-purple-500"
                   />
                   <button
                     onClick={() => addItem('food', newFood)}
-                    className="px-3 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm pixel-border-outset hover:bg-emerald-400 transition-colors"
+                    className="px-3 py-2 bg-purple-600 text-white font-pixel text-sm pixel-border-outset hover:bg-purple-700 transition-colors"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {food.map((item, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       <span>{item}</span>
                       <button
                         onClick={() => removeItem('food', item)}
-                        className="text-neutral-500 hover:text-red-400 transition-colors"
+                        className="text-gray-500 hover:text-red-500 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -186,7 +186,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
 
             {/* Music Preferences */}
             <div>
-              <label className="block text-sm font-pixel text-neutral-300 mb-3">
+              <label className="block text-sm font-pixel text-gray-700 mb-3">
                 Music Preferences
               </label>
               <div className="space-y-3">
@@ -197,22 +197,22 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
                     onChange={(e) => setNewMusic(e.target.value)}
                     onKeyPress={(e) => handleKeyPress(e, 'music', newMusic)}
                     placeholder="Add a music preference..."
-                    className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm focus:outline-none focus:border-purple-500"
                   />
                   <button
                     onClick={() => addItem('music', newMusic)}
-                    className="px-3 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm pixel-border-outset hover:bg-emerald-400 transition-colors"
+                    className="px-3 py-2 bg-purple-600 text-white font-pixel text-sm pixel-border-outset hover:bg-purple-700 transition-colors"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {music.map((item, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       <span>{item}</span>
                       <button
                         onClick={() => removeItem('music', item)}
-                        className="text-neutral-500 hover:text-red-400 transition-colors"
+                        className="text-gray-500 hover:text-red-500 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -224,7 +224,7 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
 
             {/* Hobbies */}
             <div>
-              <label className="block text-sm font-pixel text-neutral-300 mb-3">
+              <label className="block text-sm font-pixel text-gray-700 mb-3">
                 Hobbies & Interests
               </label>
               <div className="space-y-3">
@@ -235,22 +235,22 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
                     onChange={(e) => setNewHobby(e.target.value)}
                     onKeyPress={(e) => handleKeyPress(e, 'hobbies', newHobby)}
                     placeholder="Add a hobby or interest..."
-                    className="flex-1 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm focus:outline-none focus:border-purple-500"
                   />
                   <button
                     onClick={() => addItem('hobbies', newHobby)}
-                    className="px-3 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm pixel-border-outset hover:bg-emerald-400 transition-colors"
+                    className="px-3 py-2 bg-purple-600 text-white font-pixel text-sm pixel-border-outset hover:bg-purple-700 transition-colors"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {hobbies.map((item, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       <span>{item}</span>
                       <button
                         onClick={() => removeItem('hobbies', item)}
-                        className="text-neutral-500 hover:text-red-400 transition-colors"
+                        className="text-gray-500 hover:text-red-500 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -262,14 +262,14 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-pixel text-neutral-300 mb-3">
+              <label className="block text-sm font-pixel text-gray-700 mb-3">
                 Additional Notes
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any other preferences or notes about this contact..."
-                className="w-full h-24 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm resize-none focus:outline-none focus:border-emerald-500"
+                className="w-full h-24 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm resize-none focus:outline-none focus:border-purple-500"
               />
             </div>
 
@@ -277,14 +277,14 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
             <div className="flex gap-2 justify-end">
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-neutral-400 hover:text-neutral-200 transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 flex items-center gap-2"
+                className="px-4 py-2 bg-purple-600 text-white font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-purple-700 flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 Save Preferences
@@ -297,64 +297,64 @@ export function PreferencesSection({ contactId, userId }: PreferencesSectionProp
           <div className="space-y-6">
             {/* Food Preferences */}
             <div>
-              <h4 className="font-pixel text-sm text-neutral-400 mb-3">Food Preferences</h4>
+              <h4 className="font-pixel text-sm text-gray-600 mb-3">Food Preferences</h4>
               {food.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {food.map((item, index) => (
-                    <span key={index} className="px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       {item}
                     </span>
                   ))}
                 </div>
               ) : (
-                <div className="text-neutral-500 text-sm">No food preferences set</div>
+                <div className="text-gray-500 text-sm">No food preferences set</div>
               )}
             </div>
 
             {/* Music Preferences */}
             <div>
-              <h4 className="font-pixel text-sm text-neutral-400 mb-3">Music Preferences</h4>
+              <h4 className="font-pixel text-sm text-gray-600 mb-3">Music Preferences</h4>
               {music.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {music.map((item, index) => (
-                    <span key={index} className="px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       {item}
                     </span>
                   ))}
                 </div>
               ) : (
-                <div className="text-neutral-500 text-sm">No music preferences set</div>
+                <div className="text-gray-500 text-sm">No music preferences set</div>
               )}
             </div>
 
             {/* Hobbies */}
             <div>
-              <h4 className="font-pixel text-sm text-neutral-400 mb-3">Hobbies & Interests</h4>
+              <h4 className="font-pixel text-sm text-gray-600 mb-3">Hobbies & Interests</h4>
               {hobbies.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {hobbies.map((item, index) => (
-                    <span key={index} className="px-3 py-1 bg-neutral-700 text-neutral-300 font-pixel text-sm">
+                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 font-pixel text-sm">
                       {item}
                     </span>
                   ))}
                 </div>
               ) : (
-                <div className="text-neutral-500 text-sm">No hobbies set</div>
+                <div className="text-gray-500 text-sm">No hobbies set</div>
               )}
             </div>
 
             {/* Notes */}
             {notes && (
               <div>
-                <h4 className="font-pixel text-sm text-neutral-400 mb-3">Additional Notes</h4>
-                <div className="text-neutral-200 font-pixel text-sm leading-relaxed">
+                <h4 className="font-pixel text-sm text-gray-600 mb-3">Additional Notes</h4>
+                <div className="text-gray-900 font-pixel text-sm leading-relaxed">
                   {notes}
                 </div>
               </div>
             )}
 
             {food.length === 0 && music.length === 0 && hobbies.length === 0 && !notes && (
-              <div className="text-neutral-400 text-center py-8">
+              <div className="text-gray-500 text-center py-8">
                 No preferences set yet. Click &quot;Edit Preferences&quot; to add food, music, hobbies, and other preferences.
               </div>
             )}

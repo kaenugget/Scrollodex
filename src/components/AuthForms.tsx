@@ -49,10 +49,10 @@ export function LoginForm({ onSuccess }: AuthFormProps) {
       </div>
 
       {/* Email/Password Form */}
-      <Card className="bg-gray-900 border-gray-700">
+      <Card className="scrollodex-card">
         <CardHeader className="pb-4">
-          <CardTitle className="text-green-400 text-xl">Sign In</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardTitle className="scrollodex-text-dark text-xl">Sign In</CardTitle>
+          <CardDescription className="scrollodex-text-gray">
             Enter your email and password to sign in
           </CardDescription>
         </CardHeader>
@@ -161,7 +161,7 @@ export function SignUpForm({ onSuccess }: AuthFormProps) {
       </div>
 
       {/* Email/Password Form */}
-      <Card className="bg-gray-900 border-gray-700">
+      <Card className="scrollodex-card">
         <CardHeader className="pb-4">
           <CardTitle className="text-green-400 text-xl">Create Account</CardTitle>
           <CardDescription className="text-gray-400">

@@ -21,18 +21,20 @@ export function LoadingSpinner({
   fullScreen = false 
 }: LoadingSpinnerProps) {
   const spinner = (
-    <div className={cn("animate-spin rounded-full border-2 border-gray-300 border-t-blue-600", sizeClasses[size], className)} />
+    <div className={cn("animate-spin rounded-full border-2 border-white border-t-transparent", sizeClasses[size], className)} />
   );
 
   if (fullScreen) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="fixed inset-0 scrollodex-bg flex items-center justify-center z-50">
         <div className="text-center">
-          {spinner}
+          <div className="mb-6">
+            <div className="animate-spin rounded-full border-4 border-white border-t-transparent h-16 w-16 mx-auto"></div>
+          </div>
           {text && (
             <>
-              <div className="text-xl font-semibold text-gray-900 mt-4 mb-2">{text}</div>
-              <div className="text-gray-600">Please wait...</div>
+              <div className="text-2xl font-bold scrollodex-text-white-bold mb-2">{text}</div>
+              <div className="text-lg scrollodex-text-white">Please wait...</div>
             </>
           )}
         </div>
@@ -44,7 +46,7 @@ export function LoadingSpinner({
     return (
       <div className="text-center">
         {spinner}
-        <div className="text-gray-600 mt-2">{text}</div>
+        <div className="text-neutral-400 mt-2">{text}</div>
       </div>
     );
   }

@@ -42,12 +42,16 @@ export default defineSchema({
     notes: v.array(v.string()),
     lastInteractionAt: v.number(),
     pinned: v.boolean(),
+    // Dynamic connection fields
+    connectedUserId: v.optional(v.id("users")), // If this contact is a connected user
+    isDynamicContact: v.optional(v.boolean()), // True if this is a live-connected contact
+    lastSyncedAt: v.optional(v.number()), // When the contact data was last synced
     petData: v.optional(v.object({
       // Core pet info
       petType: v.optional(v.string()), // "cat", "dog", "dragon", "fox", "bird", "rabbit", etc.
       petName: v.optional(v.string()), // Custom name
-      level: v.optional(v.number()),
-      happiness: v.optional(v.number()),
+      level: v.optional(v.float64()),
+      happiness: v.optional(v.float64()),
       
       // Visual customization
       color: v.optional(v.string()), // "blue", "purple", "gold", etc.
@@ -68,9 +72,21 @@ export default defineSchema({
       
       // Generation data
       templateId: v.optional(v.string()), // Reference to egg template
-      generatedAt: v.optional(v.number()),
-      lastUpdated: v.optional(v.number()),
-      hatchedAt: v.optional(v.number()),
+      generatedAt: v.optional(v.float64()),
+      lastUpdated: v.optional(v.float64()),
+      hatchedAt: v.optional(v.float64()),
+      regeneratedAt: v.optional(v.float64()),
+      
+      // Evolution system
+      evolutionTokens: v.optional(v.float64()), // Tokens earned for customization
+      totalEvolutions: v.optional(v.float64()), // Track how many times evolved
+      lastEvolutionAt: v.optional(v.float64()),
+      
+      // Video generation status
+      videoGenerationStatus: v.optional(v.string()), // "pending" | "generating" | "completed" | "failed"
+      videoGenerationStartedAt: v.optional(v.float64()),
+      videoGenerationCompletedAt: v.optional(v.float64()),
+      videoGenerationError: v.optional(v.string()),
     })),
   }).index("by_owner", ["ownerId"]),
 
@@ -93,7 +109,21 @@ export default defineSchema({
     lat: v.optional(v.number()),
     lng: v.optional(v.number()),
     createdAt: v.number(),
-  }),
+    updatedAt: v.optional(v.number()),
+    // Enhanced features
+    tags: v.array(v.string()), // Categories like "travel", "food", "adventure", etc.
+    mood: v.optional(v.string()), // "happy", "excited", "peaceful", "nostalgic", etc.
+    visibility: v.optional(v.string()), // "public", "private", "friends_only"
+    isArchived: v.optional(v.boolean()),
+    // Engagement metrics
+    likesCount: v.optional(v.number()),
+    commentsCount: v.optional(v.number()),
+    // Additional metadata
+    weather: v.optional(v.string()), // "sunny", "rainy", "cloudy", etc.
+    activity: v.optional(v.string()), // "hiking", "dining", "working", etc.
+  }).index("by_peer_page", ["peerPageId"])
+    .index("by_author", ["authorId"])
+    .index("by_created_at", ["createdAt"]),
 
   // Decks for cards
   decks: defineTable({
@@ -226,13 +256,23 @@ export default defineSchema({
   // Invites for sharing
   invites: defineTable({
     code: v.string(),
-    kind: v.string(), // "card"
+    kind: v.string(), // "card" | "user"
     cardId: v.optional(v.id("cards")),
+    userId: v.optional(v.id("users")), // For user profile sharing
     shareToken: v.optional(v.string()),
     shareType: v.optional(v.string()),
     createdAt: v.number(),
     expiresAt: v.number(),
   }),
+
+  // User connections - tracks who is connected to whom
+  userConnections: defineTable({
+    fromUserId: v.id("users"), // User who shared their profile
+    toUserId: v.id("users"), // User who connected
+    connectedAt: v.number(),
+    status: v.string(), // "active" | "blocked"
+  }).index("by_from_user", ["fromUserId"])
+    .index("by_to_user", ["toUserId"]),
 
   // Wallet links (optional)
   walletLinks: defineTable({
@@ -256,4 +296,38 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_template_id", ["templateId"])
     .index("by_rarity", ["rarity"]),
+
+  // Evolution quests and rewards
+  evolutionQuests: defineTable({
+    ownerId: v.id("users"),
+    contactId: v.id("contacts"),
+    questType: v.string(), // "level_up", "interaction", "time_based", "achievement"
+    title: v.string(),
+    description: v.string(),
+    rewardTokens: v.number(), // Evolution tokens earned
+    completedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  }).index("by_contact", ["contactId"])
+    .index("by_owner", ["ownerId"]),
+
+  // Moment likes
+  momentLikes: defineTable({
+    momentId: v.id("moments"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_moment", ["momentId"])
+    .index("by_user", ["userId"]),
+
+  // Moment comments
+  momentComments: defineTable({
+    momentId: v.id("moments"),
+    authorId: v.id("users"),
+    content: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+    parentCommentId: v.optional(v.id("momentComments")), // For replies
+  }).index("by_moment", ["momentId"])
+    .index("by_author", ["authorId"])
+    .index("by_parent", ["parentCommentId"]),
 });

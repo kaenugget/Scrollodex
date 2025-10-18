@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Phone, Mail, MapPin, Building } from "lucide-react";
+import { Star, Phone, Mail, MapPin, Building, Wifi } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
 
 interface Contact {
@@ -14,6 +14,8 @@ interface Contact {
   tags: string[];
   lastInteractionAt: number;
   pinned: boolean;
+  isDynamicContact?: boolean;
+  lastSyncedAt?: number;
 }
 
 interface ContactCardProps {
@@ -59,26 +61,34 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-      <div className="p-6">
+    <div className="scrollodex-card scrollodex-card-entrance hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+      <div className="p-4 sm:p-6">
         {/* Profile Image */}
-        <div className="flex justify-center mb-4">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-xl sm:text-2xl font-bold">
               {contact.name.charAt(0).toUpperCase()}
             </span>
           </div>
         </div>
 
-        {/* Contact Number */}
+        {/* Contact Number and Dynamic Indicator */}
         <div className="text-center mb-2">
-          <span className="text-sm text-gray-500 font-mono">
-            #{String(contact._id).slice(-3).padStart(3, '0')}
-          </span>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-sm scrollodex-text-light-gray font-mono">
+              #{String(contact._id).slice(-3).padStart(3, '0')}
+            </span>
+            {contact.isDynamicContact && (
+              <div className="flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs">
+                <Wifi className="w-3 h-3" />
+                <span>Live</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Name */}
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-3">{contact.name}</h3>
+        <h3 className="text-base sm:text-lg font-semibold scrollodex-text-dark text-center mb-2 sm:mb-3">{contact.name}</h3>
 
         {/* Tags */}
         {contact.tags.length > 0 && (
@@ -100,7 +110,7 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
         )}
 
         {/* Contact Info */}
-        <div className="space-y-2 mb-4 text-sm text-gray-600">
+        <div className="space-y-2 mb-4 text-sm scrollodex-text-gray">
           {contact.company && (
             <div className="flex items-center gap-2">
               <Building className="w-4 h-4" />
@@ -124,7 +134,7 @@ export function ContactCard({ contact, onPin, onView }: ContactCardProps) {
         </div>
 
         {/* Last Interaction */}
-        <div className="text-xs text-gray-500 text-center mb-4">
+        <div className="text-xs scrollodex-text-light-gray text-center mb-4">
           Last seen: {formatLastInteraction(contact.lastInteractionAt)}
         </div>
 

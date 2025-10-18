@@ -1,0 +1,43 @@
+# Copy this to .env.local and fill in your actual values
+
+# Clerk Authentication
+# Get these from https://dashboard.clerk.com/
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+CLERK_SECRET_KEY=sk_test_your_secret_key_here
+
+# Convex Backend
+# Get these from your Convex dashboard
+NEXT_PUBLIC_CONVEX_URL=https://your-convex-url.convex.cloud
+CONVEX_DEPLOY_KEY=your_convex_deploy_key_here
+
+# FAL AI for pet generation (optional)
+# Get this from https://fal.ai/
+FAL_KEY=your_fal_key_here
+
+# Clerk URLs (optional - these will use defaults if not set)
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+
+# MCP Integration via Composio.dev
+# Get these from https://composio.dev after creating profiles
+GMAIL_MCP_URL=https://mcp.composio.dev/gmail/[your-private-url]
+CONTACTS_MCP_URL=https://mcp.composio.dev/googlecontacts/[your-private-url]
+TELEGRAM_MCP_URL=https://mcp.composio.dev/telegram/[your-private-url]
+
+# Telegram Bot Configuration
+# Create bot with @BotFather and get your chat ID
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_DEFAULT_CHAT_ID=your_chat_id_here
+
+# Google OAuth (for Gmail/Contacts access via Mastra)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
+
+# OpenAI (for AI agents)
+OPENAI_API_KEY=your_openai_api_key
+
+# Database (for CRM functionality)
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/mastra_crm

@@ -6,7 +6,7 @@ import { Id } from "../../convex/_generated/dataModel";
 
 export function useNotes(contactId: Id<"contacts">, enabled: boolean = true) {
   const notes = useQuery(
-    api.notes.listNotes,
+    api.notes.getNotes,
     enabled ? { contactId } : "skip"
   );
 

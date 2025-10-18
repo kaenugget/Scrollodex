@@ -21,8 +21,8 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
   const [editingBody, setEditingBody] = useState('');
 
   const { notes, isLoading } = useNotes(contactId);
-  const addNote = useMutation(api.notes.addNote);
-  const updateNote = useMutation(api.notes.updateNote);
+  const addNote = useMutation(api.notes.create);
+  const updateNote = useMutation(api.notes.update);
   const deleteNote = useMutation(api.notes.deleteNote);
 
   const handleAddNote = async () => {
@@ -99,11 +99,11 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-pixel text-xl text-emerald-400">Notes</h3>
+        <h3 className="font-pixel text-xl text-purple-600">Notes</h3>
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 flex items-center gap-2"
+            className="px-4 py-2 bg-purple-600 text-white font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-purple-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Note
@@ -119,7 +119,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
               value={newNoteBody}
               onChange={(e) => setNewNoteBody(e.target.value)}
               placeholder="Write a note about this contact..."
-              className="w-full h-24 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm resize-none focus:outline-none focus:border-emerald-500"
+              className="w-full h-24 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm resize-none focus:outline-none focus:border-purple-500"
               autoFocus
             />
             <div className="flex gap-2 justify-end">
@@ -128,7 +128,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
                   setIsAdding(false);
                   setNewNoteBody('');
                 }}
-                className="px-4 py-2 text-neutral-400 hover:text-neutral-200 transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 Cancel
@@ -136,7 +136,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
               <button
                 onClick={handleAddNote}
                 disabled={!newNoteBody.trim()}
-                className="px-4 py-2 bg-emerald-500 text-neutral-900 font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 bg-purple-600 text-white font-pixel text-sm tracking-wider pixel-border-outset transition-colors hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Check className="w-4 h-4" />
                 Save Note
@@ -148,7 +148,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
 
       {/* Notes List */}
       {notes.length === 0 ? (
-        <div className="text-neutral-400 text-center py-8">
+        <div className="text-gray-500 text-center py-8">
           No notes yet. Click &quot;Add Note&quot; to get started.
         </div>
       ) : (
@@ -161,7 +161,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
                     <textarea
                       value={editingBody}
                       onChange={(e) => setEditingBody(e.target.value)}
-                      className="w-full h-20 px-3 py-2 bg-neutral-800 border border-neutral-600 text-neutral-200 font-pixel text-sm resize-none focus:outline-none focus:border-emerald-500"
+                      className="w-full h-20 px-3 py-2 bg-white border border-gray-300 text-gray-900 font-pixel text-sm resize-none focus:outline-none focus:border-purple-500"
                       autoFocus
                     />
                     <div className="flex gap-2 justify-end">
@@ -175,7 +175,7 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
                       <button
                         onClick={handleUpdateNote}
                         disabled={!editingBody.trim()}
-                        className="px-3 py-1 bg-emerald-500 text-neutral-900 font-pixel text-xs tracking-wider pixel-border-outset transition-colors hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        className="px-3 py-1 bg-purple-600 text-white font-pixel text-xs tracking-wider pixel-border-outset transition-colors hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                       >
                         <Check className="w-3 h-3" />
                         Save
@@ -184,24 +184,24 @@ export function NotesSection({ contactId, userId }: NotesSectionProps) {
                   </div>
                 ) : (
                   <>
-                    <div className="text-neutral-200 font-pixel text-sm leading-relaxed">
+                    <div className="text-gray-900 font-pixel text-sm leading-relaxed">
                       {note.body}
                     </div>
                     <div className="flex justify-between items-center">
-                      <div className="text-xs text-neutral-500">
+                      <div className="text-xs text-gray-500">
                         {formatDate(note.createdAt)}
                       </div>
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleStartEdit(note._id, note.body)}
-                          className="p-1 text-neutral-500 hover:text-neutral-300 transition-colors"
+                          className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
                           title="Edit note"
                         >
                           <Edit3 className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => handleDeleteNote(note._id)}
-                          className="p-1 text-neutral-500 hover:text-red-400 transition-colors"
+                          className="p-1 text-gray-500 hover:text-red-500 transition-colors"
                           title="Delete note"
                         >
                           <Trash2 className="w-3 h-3" />

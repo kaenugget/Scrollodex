@@ -7,18 +7,58 @@ import { Id } from "../../convex/_generated/dataModel";
 import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { X, Upload, MapPin, Calendar } from "lucide-react";
+import { X, Upload, MapPin, Calendar, Tag, Smile, Eye, Cloud, Activity } from "lucide-react";
 
 interface AddMomentSheetProps {
   peerPageId: Id<"peerPages">;
   onClose: () => void;
 }
 
+const MOOD_OPTIONS = [
+  { value: "happy", label: "Happy", emoji: "😊" },
+  { value: "excited", label: "Excited", emoji: "🤩" },
+  { value: "peaceful", label: "Peaceful", emoji: "😌" },
+  { value: "nostalgic", label: "Nostalgic", emoji: "😌" },
+  { value: "inspired", label: "Inspired", emoji: "✨" },
+  { value: "grateful", label: "Grateful", emoji: "🙏" },
+];
+
+const WEATHER_OPTIONS = [
+  { value: "sunny", label: "Sunny", emoji: "☀️" },
+  { value: "cloudy", label: "Cloudy", emoji: "☁️" },
+  { value: "rainy", label: "Rainy", emoji: "🌧️" },
+  { value: "clear", label: "Clear", emoji: "🌤️" },
+  { value: "foggy", label: "Foggy", emoji: "🌫️" },
+];
+
+const ACTIVITY_OPTIONS = [
+  { value: "hiking", label: "Hiking" },
+  { value: "dining", label: "Dining" },
+  { value: "working", label: "Working" },
+  { value: "relaxing", label: "Relaxing" },
+  { value: "exploring", label: "Exploring" },
+  { value: "photography", label: "Photography" },
+  { value: "coffee", label: "Coffee" },
+  { value: "travel", label: "Travel" },
+];
+
+const TAG_OPTIONS = [
+  "nature", "city", "food", "travel", "friends", "family", "work", "adventure",
+  "relaxation", "photography", "art", "music", "sports", "coffee", "sunset",
+  "morning", "night", "summer", "winter", "spring", "autumn"
+];
+
 export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
   const [caption, setCaption] = useState("");
   const [placeName, setPlaceName] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [mood, setMood] = useState("");
+  const [visibility, setVisibility] = useState("private");
+  const [weather, setWeather] = useState("");
+  const [activity, setActivity] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [newTag, setNewTag] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
@@ -42,6 +82,16 @@ export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
       }
       setSelectedFile(file);
     }
+  };
+
+  const handleTagAdd = (tag: string) => {
+    if (tag && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+    }
+  };
+
+  const handleTagRemove = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,12 +132,23 @@ export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
         photoFileId: storageId,
         caption: caption.trim() || undefined,
         placeName: placeName.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        mood: mood || undefined,
+        visibility: visibility,
+        weather: weather || undefined,
+        activity: activity || undefined,
       });
       
       // Reset form and close
       setCaption("");
       setPlaceName("");
+      setTags([]);
+      setMood("");
+      setVisibility("private");
+      setWeather("");
+      setActivity("");
       setSelectedFile(null);
+      setNewTag("");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -103,7 +164,7 @@ export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-      <Card className="w-full max-w-md bg-gray-800 border-gray-700 rounded-t-xl">
+      <Card className="w-full max-w-lg bg-gray-800 border-gray-700 rounded-t-xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -208,6 +269,165 @@ export function AddMomentSheet({ peerPageId, onClose }: AddMomentSheetProps) {
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 maxLength={100}
               />
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Tag className="w-4 h-4 inline mr-1" />
+                Tags
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 bg-emerald-600 text-white text-xs rounded-full flex items-center gap-1"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleTagRemove(tag)}
+                      className="hover:text-gray-300"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Add a tag"
+                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleTagAdd(newTag.trim());
+                      setNewTag("");
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    handleTagAdd(newTag.trim());
+                    setNewTag("");
+                  }}
+                  className="px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white"
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {TAG_OPTIONS.slice(0, 8).map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleTagAdd(tag)}
+                    className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 text-gray-300 rounded"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mood */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Smile className="w-4 h-4 inline mr-1" />
+                Mood
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {MOOD_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setMood(mood === option.value ? "" : option.value)}
+                    className={`px-3 py-2 text-sm rounded-md border transition-colors ${
+                      mood === option.value
+                        ? "bg-emerald-600 border-emerald-500 text-white"
+                        : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {option.emoji} {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Weather */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Cloud className="w-4 h-4 inline mr-1" />
+                Weather
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {WEATHER_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setWeather(weather === option.value ? "" : option.value)}
+                    className={`px-2 py-2 text-sm rounded-md border transition-colors ${
+                      weather === option.value
+                        ? "bg-emerald-600 border-emerald-500 text-white"
+                        : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {option.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Activity */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Activity className="w-4 h-4 inline mr-1" />
+                Activity
+              </label>
+              <select
+                value={activity}
+                onChange={(e) => setActivity(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">Select activity</option>
+                {ACTIVITY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Visibility */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Eye className="w-4 h-4 inline mr-1" />
+                Visibility
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: "private", label: "Private" },
+                  { value: "friends_only", label: "Friends" },
+                  { value: "public", label: "Public" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setVisibility(option.value)}
+                    className={`px-3 py-2 text-sm rounded-md border transition-colors ${
+                      visibility === option.value
+                        ? "bg-emerald-600 border-emerald-500 text-white"
+                        : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Submit Button */}

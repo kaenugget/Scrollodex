@@ -6,26 +6,41 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(request: NextRequest) {
   try {
-    const { contactId, relationshipHealth } = await request.json();
+    const { contactId, userId, relationshipHealth } = await request.json();
 
-    if (!contactId || relationshipHealth === undefined) {
+    if (!contactId || !userId || relationshipHealth === undefined) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: contactId, userId, and relationshipHealth are required' },
         { status: 400 }
       );
     }
 
-    // Call Convex function to hatch pet
-    const result = await convex.mutation(api.pets.hatchPet, {
+    console.log('🐣 API: Starting pet generation with:', { contactId, userId, relationshipHealth });
+
+    // Call Convex action to hatch pet (actions are called differently than mutations)
+    const result = await convex.action(api.pets.hatchPet, {
       contactId,
+      userId,
       relationshipHealth,
     });
 
+    console.log('🐣 API: Pet generation completed:', result);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Pet hatching API error:', error);
+    console.error('🐣 API: Pet hatching error:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to hatch pet';
+    if (error.message?.includes('Connection lost')) {
+      errorMessage = 'Pet generation timed out. Please try again.';
+    } else if (error.message?.includes('permission')) {
+      errorMessage = 'You do not have permission to generate a pet for this contact.';
+    } else if (error.message?.includes('not found')) {
+      errorMessage = 'Contact not found.';
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to hatch pet' },
+      { error: errorMessage, details: error.message },
       { status: 500 }
     );
   }

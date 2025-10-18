@@ -24,6 +24,9 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
   // Get current user
   const { convexUser: currentUser } = useClerkConvexUser();
   
+  // Get contact to check if it's a connected user
+  const contact = useQuery(api.contacts.get, { contactId });
+  
   // Find or create peer page between current user and contact
   const findOrCreatePeerPage = useMutation(api.social.findOrCreatePeerPage);
   const [peerPageId, setPeerPageId] = useState<Id<"peerPages"> | null>(null);
@@ -33,15 +36,45 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
 
   // Initialize peer page when component mounts
   React.useEffect(() => {
-    if (currentUser && !peerPageId) {
+    if (currentUser && contact && contact.connectedUserId && !peerPageId) {
       findOrCreatePeerPage({
         userId1: currentUser._id as Id<"users">,
-        userId2: userId,
+        userId2: contact.connectedUserId,
       }).then((id) => {
         setPeerPageId(id);
       }).catch(console.error);
     }
-  }, [currentUser, userId, peerPageId, findOrCreatePeerPage]);
+  }, [currentUser, contact, peerPageId, findOrCreatePeerPage]);
+
+  if (!contact) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-gray-600">Loading contact...</div>
+      </div>
+    );
+  }
+
+  if (!contact.connectedUserId) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-purple-600">Shared Moments</h2>
+            <p className="text-gray-600">This contact is not connected to share moments</p>
+          </div>
+        </div>
+        <Card className="bg-white border-gray-200 p-12 text-center">
+          <div className="text-gray-600 mb-4">
+            <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No moments available</h3>
+            <p className="text-gray-600">
+              This contact is not a connected user, so you cannot share moments with them.
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   if (!moments) {
     return (
@@ -56,7 +89,7 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
       {/* Header with Add Button */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Shared Moments</h2>
+          <h2 className="text-xl font-semibold text-purple-600">Shared Moments</h2>
           <p className="text-gray-600">
             {moments.length} {moments.length === 1 ? 'moment' : 'moments'} shared
           </p>
@@ -64,7 +97,7 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
         {peerPageId && (
           <Button
             onClick={() => setShowAddMoment(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Moment
@@ -84,7 +117,7 @@ export function ContactMomentsFeed({ contactId, userId }: ContactMomentsFeedProp
             {peerPageId && (
               <Button
                 onClick={() => setShowAddMoment(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add First Moment

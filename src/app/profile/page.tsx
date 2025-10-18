@@ -3,11 +3,16 @@
 import { useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { QRCodeDisplay } from '@/components/QRCodeDisplay';
+import { useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
+import { Id } from '../../../convex/_generated/dataModel';
 import { 
   User, 
   Bell, 
@@ -16,11 +21,18 @@ import {
   Database, 
   Download, 
   Trash2, 
-  Mail
+  Mail,
+  Share2,
+  QrCode,
+  Copy,
+  Check
 } from 'lucide-react';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'privacy' | 'appearance' | 'data'>('profile');
+  const [showQR, setShowQR] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { convexUser, isLoading: clerkConvexLoading } = useClerkConvexUser();
@@ -30,11 +42,46 @@ export default function ProfilePage() {
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
 
+  // Mutations
+  const createUserShare = useMutation(api.social.createUserShare);
+
   const handleSignOut = async () => {
     if (isSignedIn) {
       await clerkSignOut();
     } else {
       // Handle custom auth sign out
+    }
+  };
+
+  const generateProfileShareLink = async () => {
+    if (!currentUser?._id) {
+      alert('Please sign in first');
+      return;
+    }
+
+    try {
+      const share = await createUserShare({
+        userId: currentUser._id as Id<"users">,
+      });
+      
+      const url = `${window.location.origin}/connect/${share.shareToken}`;
+      setShareUrl(url);
+      setShowQR(true);
+    } catch (error) {
+      console.error('Error creating profile share link:', error);
+      alert('Failed to create share link. Please try again.');
+    }
+  };
+
+  const copyToClipboard = async () => {
+    if (shareUrl) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        console.log('Error copying to clipboard:', error);
+      }
     }
   };
 
@@ -55,7 +102,8 @@ export default function ProfilePage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="scrollodex-bg">
+      <AnimatedBackground />
       <AppHeader 
         currentPage="profile" 
         onNavigate={(page) => {
@@ -67,16 +115,16 @@ export default function ProfilePage() {
         onSignOut={handleSignOut}
       />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile & Settings</h1>
-          <p className="text-gray-600">Manage your account and app preferences</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold scrollodex-text-white-bold mb-2">Profile & Settings</h1>
+          <p className="scrollodex-text-white">Manage your account and app preferences</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <Card className="p-4">
+            <div className="scrollodex-card">
               <nav className="space-y-2">
                 {tabs.map(({ key, label, icon: Icon }) => (
                   <button
@@ -84,8 +132,8 @@ export default function ProfilePage() {
                     onClick={() => setActiveTab(key)}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
                       activeTab === key
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'bg-blue-50 scrollodex-text-dark border border-blue-200'
+                        : 'scrollodex-text-gray hover:scrollodex-text-dark hover:bg-gray-50'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -93,13 +141,13 @@ export default function ProfilePage() {
                   </button>
                 ))}
               </nav>
-            </Card>
+            </div>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3">
             {activeTab === 'profile' && (
-              <Card className="p-6">
+              <div className="scrollodex-card-large">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-2xl font-bold">
@@ -107,15 +155,15 @@ export default function ProfilePage() {
                     </span>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{currentUser.displayName || 'User'}</h2>
-                    <p className="text-gray-600">Manage your profile information</p>
+                    <h2 className="text-2xl font-bold scrollodex-text-dark">{currentUser.displayName || 'User'}</h2>
+                    <p className="scrollodex-text-gray">Manage your profile information</p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
+                      <label className="block text-sm font-medium scrollodex-text-dark mb-2">Display Name</label>
                       <input
                         type="text"
                         defaultValue={currentUser.displayName || ''}
@@ -124,18 +172,18 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <label className="block text-sm font-medium scrollodex-text-dark mb-2">Email</label>
                       <input
                         type="email"
                         value={(currentUser as { email?: string })?.email || 'No email provided'}
                         disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 scrollodex-text-light-gray"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <label className="block text-sm font-medium scrollodex-text-dark mb-2">Bio</label>
                     <textarea
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -147,19 +195,73 @@ export default function ProfilePage() {
                     <Button>Save Changes</Button>
                     <Button variant="outline">Cancel</Button>
                   </div>
+
+                  {/* Profile Sharing Section */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold scrollodex-text-dark mb-4">Share Your Profile</h3>
+                    <p className="text-sm scrollodex-text-gray mb-4">
+                      Let others connect with you by sharing your profile QR code or link
+                    </p>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={generateProfileShareLink}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        <QrCode className="w-4 h-4 mr-2" />
+                        Generate QR Code
+                      </Button>
+                    </div>
+
+                    {/* QR Code Modal */}
+                    {showQR && shareUrl && (
+                      <div className="scrollodex-card mt-6 text-center">
+                        <h4 className="text-lg font-semibold scrollodex-text-dark mb-4">
+                          Share Your Profile
+                        </h4>
+                        
+                        <div className="bg-white p-4 rounded-lg inline-block mb-4">
+                          <QRCodeDisplay url={shareUrl} size={128} />
+                        </div>
+                        
+                        <p className="scrollodex-text-gray text-sm mb-4">
+                          Others can scan this QR code to connect with you
+                        </p>
+                        
+                        <div className="flex gap-2 justify-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={copyToClipboard}
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                          >
+                            {copied ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copied ? "Copied!" : "Copy Link"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowQR(false)}
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                          >
+                            Close
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </Card>
+              </div>
             )}
 
             {activeTab === 'notifications' && (
-              <Card className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Notification Preferences</h2>
+              <div className="scrollodex-card-large">
+                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Notification Preferences</h2>
                 
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">Birthday Reminders</h3>
-                      <p className="text-sm text-gray-600">Get notified when your contacts have birthdays</p>
+                      <h3 className="font-medium scrollodex-text-dark">Birthday Reminders</h3>
+                      <p className="text-sm scrollodex-text-gray">Get notified when your contacts have birthdays</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -189,21 +291,21 @@ export default function ProfilePage() {
                     </label>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
 
             {activeTab === 'privacy' && (
-              <Card className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Privacy & Security</h2>
+              <div className="scrollodex-card-large">
+                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Privacy & Security</h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Data Visibility</h3>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Data Visibility</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-900">Profile Visibility</h4>
-                          <p className="text-sm text-gray-600">Who can see your profile information</p>
+                          <h4 className="font-medium scrollodex-text-dark">Profile Visibility</h4>
+                          <p className="text-sm scrollodex-text-gray">Who can see your profile information</p>
                         </div>
                         <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                           <option>Private</option>
@@ -214,8 +316,8 @@ export default function ProfilePage() {
                       
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-900">Activity Sharing</h4>
-                          <p className="text-sm text-gray-600">Allow contacts to see your activity</p>
+                          <h4 className="font-medium scrollodex-text-dark">Activity Sharing</h4>
+                          <p className="text-sm scrollodex-text-gray">Allow contacts to see your activity</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input type="checkbox" className="sr-only peer" />
@@ -226,7 +328,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Account Security</h3>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Account Security</h3>
                     <div className="space-y-4">
                       <Button variant="outline" className="w-full justify-start">
                         <Shield className="w-4 h-4 mr-2" />
@@ -239,34 +341,34 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
 
             {activeTab === 'appearance' && (
-              <Card className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Appearance</h2>
+              <div className="scrollodex-card-large">
+                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Appearance</h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Theme</h3>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Theme</h3>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="border-2 border-blue-500 rounded-lg p-4 cursor-pointer">
                         <div className="w-full h-20 bg-white border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center">Light</p>
+                        <p className="text-sm font-medium text-center scrollodex-text-dark">Light</p>
                       </div>
                       <div className="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400">
                         <div className="w-full h-20 bg-gray-900 border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center">Dark</p>
+                        <p className="text-sm font-medium text-center scrollodex-text-dark">Dark</p>
                       </div>
                       <div className="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400">
                         <div className="w-full h-20 bg-gradient-to-br from-blue-500 to-purple-600 border rounded mb-2"></div>
-                        <p className="text-sm font-medium text-center">Auto</p>
+                        <p className="text-sm font-medium text-center scrollodex-text-dark">Auto</p>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Accent Color</h3>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Accent Color</h3>
                     <div className="flex gap-3">
                       {['blue', 'green', 'purple', 'red', 'orange'].map(color => (
                         <div
@@ -279,17 +381,17 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
 
             {activeTab === 'data' && (
-              <Card className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Data Management</h2>
+              <div className="scrollodex-card-large">
+                <h2 className="text-2xl font-bold scrollodex-text-dark mb-6">Data Management</h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Export Data</h3>
-                    <p className="text-sm text-gray-600 mb-4">Download all your data in a portable format</p>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Export Data</h3>
+                    <p className="text-sm scrollodex-text-gray mb-4">Download all your data in a portable format</p>
                     <Button variant="outline" className="w-full justify-start">
                       <Download className="w-4 h-4 mr-2" />
                       Download My Data
@@ -297,33 +399,33 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-4">Storage Usage</h3>
+                    <h3 className="font-medium scrollodex-text-dark mb-4">Storage Usage</h3>
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Contacts</span>
-                        <span className="text-sm text-gray-600">12 contacts</span>
+                        <span className="text-sm font-medium scrollodex-text-dark">Contacts</span>
+                        <span className="text-sm scrollodex-text-gray">12 contacts</span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Photos</span>
-                        <span className="text-sm text-gray-600">45 photos (2.3 MB)</span>
+                        <span className="text-sm font-medium scrollodex-text-dark">Photos</span>
+                        <span className="text-sm scrollodex-text-gray">45 photos (2.3 MB)</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Total Storage</span>
-                        <span className="text-sm text-gray-600">2.8 MB</span>
+                        <span className="text-sm font-medium scrollodex-text-dark">Total Storage</span>
+                        <span className="text-sm scrollodex-text-gray">2.8 MB</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="border-t pt-6">
                     <h3 className="font-medium text-red-600 mb-4">Danger Zone</h3>
-                    <p className="text-sm text-gray-600 mb-4">Permanently delete your account and all associated data</p>
+                    <p className="text-sm scrollodex-text-gray mb-4">Permanently delete your account and all associated data</p>
                     <Button variant="destructive" className="w-full justify-start">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete Account
                     </Button>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
           </div>
         </div>

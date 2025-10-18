@@ -13,7 +13,7 @@ export const getPreferences = query({
 });
 
 // Create or update preferences
-export const upsertPreferences = mutation({
+export const create = mutation({
   args: {
     ownerId: v.id("users"),
     contactId: v.id("contacts"),
@@ -23,22 +23,50 @@ export const upsertPreferences = mutation({
     notes: v.string(),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
+    // Check if preferences already exist
+    const existingPrefs = await ctx.db
       .query("preferences")
       .withIndex("by_contact", (q) => q.eq("contactId", args.contactId))
       .first();
 
-    if (existing) {
-      await ctx.db.patch(existing._id, {
+    if (existingPrefs) {
+      // Update existing preferences
+      await ctx.db.patch(existingPrefs._id, {
         food: args.food,
         music: args.music,
         hobbies: args.hobbies,
         notes: args.notes,
       });
-      return existing._id;
+      return existingPrefs._id;
     } else {
+      // Create new preferences
       return await ctx.db.insert("preferences", args);
     }
+  },
+});
+
+// Update preferences
+export const update = mutation({
+  args: {
+    contactId: v.id("contacts"),
+    food: v.optional(v.array(v.string())),
+    music: v.optional(v.array(v.string())),
+    hobbies: v.optional(v.array(v.string())),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { contactId, ...updates } = args;
+    
+    const preferences = await ctx.db
+      .query("preferences")
+      .withIndex("by_contact", (q) => q.eq("contactId", contactId))
+      .first();
+
+    if (!preferences) {
+      throw new Error("Preferences not found");
+    }
+
+    await ctx.db.patch(preferences._id, updates);
   },
 });
 

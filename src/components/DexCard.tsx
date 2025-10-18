@@ -29,25 +29,25 @@ const formatDexNumber = (num: number) => `#${String(num).padStart(4, '0')}`;
 
 export function DexCard({ dexEntry, contact, onView }: DexCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-      <div className="p-6">
+    <div className="scrollodex-card scrollodex-card-entrance hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+      <div className="p-4 sm:p-6">
         {/* Dex Number */}
         <div className="flex justify-between items-start mb-3">
-          <span className="text-sm text-gray-500 font-mono">{formatDexNumber(dexEntry.dexNumber)}</span>
-          <span className="text-sm font-semibold text-gray-900">Lv. {dexEntry.level}</span>
+          <span className="text-sm scrollodex-text-light-gray font-mono">{formatDexNumber(dexEntry.dexNumber)}</span>
+          <span className="text-sm font-semibold scrollodex-text-dark">Lv. {dexEntry.level}</span>
         </div>
 
         {/* Profile Image */}
-        <div className="flex justify-center mb-4">
-          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-3xl font-bold">
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-2xl sm:text-3xl font-bold">
               {contact.name.charAt(0).toUpperCase()}
             </span>
           </div>
         </div>
 
         {/* Name */}
-        <h2 className="text-lg font-semibold text-gray-900 text-center mb-4">{contact.name}</h2>
+        <h2 className="text-base sm:text-lg font-semibold scrollodex-text-dark text-center mb-3 sm:mb-4">{contact.name}</h2>
 
         {/* Type Tags */}
         <div className="flex justify-center gap-2 mb-4">
@@ -78,7 +78,7 @@ export function DexCard({ dexEntry, contact, onView }: DexCardProps) {
 
 export const DexCardSkeleton: React.FC = () => {
   return (
-     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+     <div className="scrollodex-card overflow-hidden">
       <div className="p-6 animate-pulse">
         <div className="flex justify-between items-start mb-3">
             <div className="h-4 w-16 bg-gray-200 rounded"></div>

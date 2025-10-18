@@ -5,9 +5,12 @@ import { useParams } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { ContactDetailView } from '@/components/ContactDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
 import { useUser } from '@clerk/nextjs';
+import { useContacts } from '@/hooks/useContacts';
+import { useDexEntries } from '@/hooks/useDex';
 import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function ContactDetailPage() {
@@ -21,6 +24,16 @@ export default function ContactDetailPage() {
   
   const isUserAuthenticated = isSignedIn || isAuthenticated;
   const currentUser = convexUser || user;
+  
+  // Only load data if we have a user
+  const { contacts, isLoading: contactsLoading } = useContacts(
+    currentUser?._id as Id<"users">, 
+    !!currentUser
+  );
+  const { dexEntries, isLoading: dexLoading } = useDexEntries(
+    currentUser?._id as Id<"users">, 
+    !!currentUser
+  );
 
   const handleSignOut = () => {
     if (isSignedIn) {
@@ -30,7 +43,8 @@ export default function ContactDetailPage() {
     }
   };
 
-  if (authLoading || clerkConvexLoading) {
+  if (authLoading || clerkConvexLoading || contactsLoading || dexLoading) {
+    console.log('Loading states:', { authLoading, clerkConvexLoading, contactsLoading, dexLoading });
     return <LoadingSpinner fullScreen text="Loading contact details..." />;
   }
 
@@ -39,7 +53,8 @@ export default function ContactDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="scrollodex-bg">
+      <AnimatedBackground />
       <AppHeader 
         currentPage="home" 
         onNavigate={(page) => {
@@ -52,7 +67,7 @@ export default function ContactDetailPage() {
         user={currentUser}
         onSignOut={handleSignOut}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <ContactDetailView 
           contactId={contactId}
           userId={currentUser._id as Id<"users">}

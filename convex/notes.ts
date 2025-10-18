@@ -1,8 +1,8 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// List notes for a contact
-export const listNotes = query({
+// Get notes for a contact
+export const getNotes = query({
   args: { contactId: v.id("contacts") },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -13,83 +13,44 @@ export const listNotes = query({
   },
 });
 
-// Add a note
-export const addNote = mutation({
-  args: { 
+// Create a note
+export const create = mutation({
+  args: {
     ownerId: v.id("users"),
-    contactId: v.id("contacts"), 
-    body: v.string() 
+    contactId: v.id("contacts"),
+    body: v.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("notes", {
-      ownerId: args.ownerId,
-      contactId: args.contactId,
-      body: args.body,
+      ...args,
       createdAt: Date.now(),
     });
   },
 });
 
 // Update a note
-export const updateNote = mutation({
-  args: { 
+export const update = mutation({
+  args: {
     noteId: v.id("notes"),
-    body: v.string() 
+    body: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.noteId, {
-      body: args.body,
-    });
+    await ctx.db.patch(args.noteId, { body: args.body });
   },
 });
 
-// List open actions for a contact
-export const listOpenActions = query({
-  args: { contactId: v.id("contacts") },
+// Delete a note
+export const deleteNote = mutation({
+  args: { noteId: v.id("notes") },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("actions")
-      .withIndex("by_contact", (q) => q.eq("contactId", args.contactId))
-      .filter((q) => q.eq(q.field("doneAt"), undefined))
-      .order("asc")
-      .collect();
+    await ctx.db.delete(args.noteId);
   },
 });
 
-// Add an action
-export const addAction = mutation({
-  args: { 
-    ownerId: v.id("users"),
-    contactId: v.id("contacts"), 
-    title: v.string(),
-    dueAt: v.optional(v.number()),
-    kind: v.union(v.literal("followup"), v.literal("todo"))
-  },
+// Get a single note
+export const getNote = query({
+  args: { noteId: v.id("notes") },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("actions", {
-      ownerId: args.ownerId,
-      contactId: args.contactId,
-      title: args.title,
-      dueAt: args.dueAt,
-      kind: args.kind,
-    });
-  },
-});
-
-// Complete an action
-export const completeAction = mutation({
-  args: { actionId: v.id("actions") },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.actionId, { 
-      doneAt: Date.now() 
-    });
-  },
-});
-
-// Delete an action
-export const deleteAction = mutation({
-  args: { actionId: v.id("actions") },
-  handler: async (ctx, args) => {
-    await ctx.db.delete(args.actionId);
+    return await ctx.db.get(args.noteId);
   },
 });

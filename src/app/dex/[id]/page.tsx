@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { DexDetailView } from '@/components/DexDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { useClerkConvexUser } from '@/hooks/useClerkConvexUser';
 import { useUser } from '@clerk/nextjs';
@@ -38,7 +39,8 @@ export default function DexDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="scrollodex-bg">
+      <AnimatedBackground />
       <AppHeader 
         currentPage="dex" 
         onNavigate={(page) => {
@@ -51,7 +53,7 @@ export default function DexDetailPage() {
         user={currentUser}
         onSignOut={handleSignOut}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <DexDetailView 
           contactId={contactId}
           userId={currentUser._id as Id<"users">}

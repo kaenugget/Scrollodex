@@ -19,7 +19,7 @@ export const PixelFrame: React.FC<PixelFrameProps> = ({
   
   return (
     <div className={`${borderClasses} ${className}`}>
-      <div className={`w-full h-full ${padding} bg-neutral-800`}>
+      <div className={`w-full h-full ${padding} bg-white border border-gray-200`}>
         {children}
       </div>
     </div>

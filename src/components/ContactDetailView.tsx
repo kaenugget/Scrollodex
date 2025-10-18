@@ -21,8 +21,8 @@ interface ContactDetailViewProps {
 }
 
 export function ContactDetailView({ contactId, userId, activeTab, onTabChange }: ContactDetailViewProps) {
-  const { contacts, pinContact, isLoading: contactsLoading } = useContacts(userId, true);
-  const { dexEntries, isLoading: dexLoading } = useDexEntries(userId, true);
+  const { contacts, pinContact } = useContacts(userId, true);
+  const { dexEntries } = useDexEntries(userId, true);
   
   const contact = contacts.find(c => c._id === contactId);
   const dexEntry = dexEntries.find(d => d.contactId === contactId);
@@ -37,20 +37,10 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
     }
   };
 
-  if (contactsLoading || dexLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <div className="text-xl font-semibold text-gray-900 mb-2">Loading...</div>
-        <div className="text-gray-600">Loading contact details</div>
-      </div>
-    );
-  }
-
   if (!contact) {
     return (
       <div className="text-center py-12">
-        <div className="text-xl font-semibold text-gray-900 mb-2">Contact Not Found</div>
+        <div className="text-xl font-semibold scrollodex-text-dark mb-2">Contact Not Found</div>
         <div className="text-gray-600">This contact doesn&apos;t exist or you don&apos;t have access to it</div>
       </div>
     );
@@ -67,25 +57,86 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
     return `${Math.floor(days / 7)} weeks ago`;
   };
 
-  // Calculate relationship stats based on dex entry and contact data
+  // Calculate relationship stats based on actual contact data
   const getRelationshipStats = () => {
-    if (!dexEntry) {
+    if (!contact) {
       return {
-        connection: 75,
-        reliability: 80,
-        communication: 70,
-        energy: 65
+        connection: 50,
+        reliability: 50,
+        communication: 50,
+        energy: 50
       };
     }
-    
-    // Base stats from level and XP
-    const baseScore = Math.min(95, 50 + (dexEntry.level * 5) + Math.floor(dexEntry.xp / 100));
-    
+
+    // Get additional data for calculations
+    const notesCount = contact.notes?.length || 0;
+    const isPinned = contact.pinned || false;
+    const lastInteractionDays = Math.floor((Date.now() - contact.lastInteractionAt) / (1000 * 60 * 60 * 24));
+    const hasCompany = !!contact.company;
+    const hasLocation = !!contact.location;
+    const hasEmails = contact.emails?.length > 0;
+    const hasPhones = contact.phones?.length > 0;
+    const hasTags = contact.tags?.length > 0;
+
+    // Base score from dex entry if available
+    let baseScore = 50;
+    if (dexEntry) {
+      baseScore = Math.min(95, 50 + (dexEntry.level * 5) + Math.floor(dexEntry.xp / 100));
+    }
+
+    // Connection: Based on interaction frequency, notes, and contact completeness
+    const connectionScore = Math.min(100, Math.max(20, 
+      baseScore + 
+      (notesCount * 3) + // More notes = stronger connection
+      (isPinned ? 10 : 0) + // Pinned contacts have stronger connection
+      (lastInteractionDays < 7 ? 15 : lastInteractionDays < 30 ? 10 : lastInteractionDays < 90 ? 5 : -10) + // Recent interaction bonus
+      (hasCompany ? 5 : 0) + // Complete profile
+      (hasLocation ? 5 : 0) +
+      (hasEmails ? 5 : 0) +
+      (hasPhones ? 5 : 0) +
+      (hasTags ? 5 : 0)
+    ));
+
+    // Reliability: Based on consistency of interaction and profile completeness
+    const reliabilityScore = Math.min(100, Math.max(20,
+      baseScore +
+      (lastInteractionDays < 30 ? 15 : lastInteractionDays < 90 ? 10 : lastInteractionDays < 180 ? 5 : -15) + // Consistent interaction
+      (notesCount > 3 ? 10 : notesCount > 1 ? 5 : 0) + // Multiple notes show reliability
+      (hasCompany ? 8 : 0) + // Professional reliability
+      (hasLocation ? 5 : 0) +
+      (hasEmails ? 8 : 0) + // Contact info shows reliability
+      (hasPhones ? 8 : 0) +
+      (isPinned ? 5 : 0) // Pinned = reliable contact
+    ));
+
+    // Communication: Based on notes, contact methods, and interaction recency
+    const communicationScore = Math.min(100, Math.max(20,
+      baseScore +
+      (notesCount * 4) + // Notes indicate communication
+      (lastInteractionDays < 14 ? 20 : lastInteractionDays < 30 ? 15 : lastInteractionDays < 60 ? 10 : lastInteractionDays < 180 ? 5 : -10) + // Recent communication
+      (hasEmails ? 10 : 0) + // Email = communication channel
+      (hasPhones ? 10 : 0) + // Phone = communication channel
+      (hasTags ? 5 : 0) + // Tags show understanding
+      (isPinned ? 8 : 0) // Pinned = important communication
+    ));
+
+    // Energy: Based on interaction frequency, profile activity, and engagement
+    const energyScore = Math.min(100, Math.max(20,
+      baseScore +
+      (lastInteractionDays < 7 ? 25 : lastInteractionDays < 14 ? 20 : lastInteractionDays < 30 ? 15 : lastInteractionDays < 60 ? 10 : lastInteractionDays < 180 ? 5 : -15) + // Recent activity
+      (notesCount > 2 ? 15 : notesCount > 0 ? 8 : 0) + // Active note-taking
+      (hasCompany ? 5 : 0) + // Professional energy
+      (hasLocation ? 5 : 0) +
+      (hasTags ? 8 : 0) + // Tagging shows engagement
+      (isPinned ? 10 : 0) + // Pinned = high energy relationship
+      (dexEntry ? Math.min(10, dexEntry.level) : 0) // Dex level shows engagement
+    ));
+
     return {
-      connection: Math.min(95, baseScore + Math.floor(Math.random() * 10)),
-      reliability: Math.min(95, baseScore + Math.floor(Math.random() * 10)),
-      communication: Math.min(95, baseScore + Math.floor(Math.random() * 10)),
-      energy: Math.min(95, baseScore + Math.floor(Math.random() * 10))
+      connection: Math.round(connectionScore),
+      reliability: Math.round(reliabilityScore),
+      communication: Math.round(communicationScore),
+      energy: Math.round(energyScore)
     };
   };
 
@@ -93,27 +144,27 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
   const overallScore = Math.round((relationshipStats.connection + relationshipStats.reliability + relationshipStats.communication + relationshipStats.energy) / 4);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-4 sm:mb-6">
         <button
           onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+          <ArrowLeft className="w-5 h-5 text-white" />
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">Contact Profile</h1>
+        <h1 className="text-xl sm:text-2xl font-bold scrollodex-text-white">Contact Profile</h1>
       </div>
 
       {/* Two Panel Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
         {/* Left Panel - Profile Picture and Stats */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
           {/* Profile Picture Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex justify-center mb-6">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-white text-4xl font-bold">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl sm:text-4xl font-bold">
                   {contact.name.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -122,13 +173,14 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
             {/* Relationship Score */}
             <div className="text-center">
               <div className="text-sm text-gray-500 mb-2">Relationship Score</div>
-              <div className="text-4xl font-bold text-gray-900">{overallScore}</div>
+              <div className="text-4xl font-bold scrollodex-text-dark">{overallScore}</div>
             </div>
           </div>
 
           {/* Pet Model */}
           <PetModel 
             contactId={contactId as Id<"contacts">} 
+            userId={userId}
             relationshipStats={relationshipStats}
             petData={contact.petData}
           />
@@ -216,14 +268,14 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
         </div>
 
         {/* Right Panel - Contact Information */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Name and Location */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-start justify-between mb-6">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-1">{contact.name}</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{contact.name}</h2>
                 {contact.location && (
-                  <div className="text-lg text-gray-500">{contact.location}</div>
+                  <div className="text-base sm:text-lg text-gray-500">{contact.location}</div>
                 )}
               </div>
               <button
@@ -324,7 +376,7 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
             {[
               { key: 'overview', label: 'Overview' },
               { key: 'notes', label: 'Notes' },
@@ -335,7 +387,7 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
               <button
                 key={key}
                 onClick={() => onTabChange(key as "overview" | "notes" | "actions" | "preferences" | "moments")}
-                className={`px-6 py-3 font-medium text-sm transition-colors rounded-md ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 font-medium text-xs sm:text-sm transition-colors rounded-md flex-1 sm:flex-none ${
                   activeTab === key
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
@@ -350,9 +402,9 @@ export function ContactDetailView({ contactId, userId, activeTab, onTabChange }:
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-6">
               {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-900">Quick Actions</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-4 sm:space-y-6">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Quick Actions</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     <button className="px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
                       Add Moment
                     </button>

@@ -8,7 +8,7 @@ import { useClerkConvexUser } from "../hooks/useClerkConvexUser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Calendar, User } from "lucide-react";
+import { Plus, MapPin, Calendar, User, Heart, MessageCircle, Tag, Smile, Cloud, Activity, Eye } from "lucide-react";
 import { AddMomentSheet } from "./AddMomentSheet";
 import { PhotoViewer } from "./PhotoViewer";
 
@@ -112,6 +112,13 @@ interface MomentCardProps {
     lng?: number;
     createdAt: number;
     authorId: Id<"users">;
+    tags?: string[];
+    mood?: string;
+    visibility?: string;
+    weather?: string;
+    activity?: string;
+    likesCount?: number;
+    commentsCount?: number;
   };
   onPhotoClick: (photoUrl: string) => void;
 }
@@ -119,6 +126,23 @@ interface MomentCardProps {
 function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
   const photoUrl = useQuery(api.files.getFileUrl, { fileId: moment.photoFileId });
   const author = useQuery(api.users.getUser, { userId: moment.authorId });
+  const { convexUser: currentUser } = useClerkConvexUser();
+  
+  const likeMoment = useMutation(api.social.likeMoment);
+  const unlikeMoment = useMutation(api.social.unlikeMoment);
+  const isLiked = useQuery(api.social.isMomentLiked, 
+    currentUser ? { momentId: moment._id, userId: currentUser._id } : "skip"
+  );
+
+  const handleLike = async () => {
+    if (!currentUser) return;
+    
+    if (isLiked) {
+      await unlikeMoment({ momentId: moment._id, userId: currentUser._id });
+    } else {
+      await likeMoment({ momentId: moment._id, userId: currentUser._id });
+    }
+  };
 
   if (!photoUrl) {
     return (
@@ -127,6 +151,23 @@ function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
       </Card>
     );
   }
+
+  const moodEmojis: { [key: string]: string } = {
+    happy: "😊",
+    excited: "🤩",
+    peaceful: "😌",
+    nostalgic: "😌",
+    inspired: "✨",
+    grateful: "🙏",
+  };
+
+  const weatherEmojis: { [key: string]: string } = {
+    sunny: "☀️",
+    cloudy: "☁️",
+    rainy: "🌧️",
+    clear: "🌤️",
+    foggy: "🌫️",
+  };
 
   return (
     <Card className="bg-gray-800 border-gray-700 overflow-hidden">
@@ -147,6 +188,15 @@ function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
             </div>
           </div>
         </div>
+        
+        {/* Visibility indicator */}
+        {moment.visibility && moment.visibility !== "private" && (
+          <div className="absolute top-2 right-2">
+            <div className="bg-black bg-opacity-50 rounded-full p-1">
+              <Eye className="w-3 h-3 text-white" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -165,6 +215,45 @@ function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
           <p className="text-white text-sm leading-relaxed">{moment.caption}</p>
         )}
 
+        {/* Tags */}
+        {moment.tags && moment.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {moment.tags.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs bg-emerald-600 text-white">
+                <Tag className="w-3 h-3 mr-1" />
+                {tag}
+              </Badge>
+            ))}
+            {moment.tags.length > 3 && (
+              <Badge variant="secondary" className="text-xs bg-gray-600 text-gray-300">
+                +{moment.tags.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Mood, Weather, Activity */}
+        <div className="flex items-center gap-3 text-sm text-gray-400">
+          {moment.mood && (
+            <div className="flex items-center gap-1">
+              <Smile className="w-4 h-4" />
+              <span>{moodEmojis[moment.mood] || "😊"} {moment.mood}</span>
+            </div>
+          )}
+          {moment.weather && (
+            <div className="flex items-center gap-1">
+              <Cloud className="w-4 h-4" />
+              <span>{weatherEmojis[moment.weather] || "☀️"} {moment.weather}</span>
+            </div>
+          )}
+          {moment.activity && (
+            <div className="flex items-center gap-1">
+              <Activity className="w-4 h-4" />
+              <span>{moment.activity}</span>
+            </div>
+          )}
+        </div>
+
         {/* Location */}
         {moment.placeName && (
           <div className="flex items-center gap-2 text-gray-400 text-sm">
@@ -172,6 +261,24 @@ function MomentCard({ moment, onPhotoClick }: MomentCardProps) {
             <span>{moment.placeName}</span>
           </div>
         )}
+
+        {/* Engagement */}
+        <div className="flex items-center gap-4 pt-2 border-t border-gray-700">
+          <button
+            onClick={handleLike}
+            className={`flex items-center gap-1 text-sm transition-colors ${
+              isLiked ? "text-red-400" : "text-gray-400 hover:text-red-400"
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+            <span>{moment.likesCount || 0}</span>
+          </button>
+          
+          <div className="flex items-center gap-1 text-sm text-gray-400">
+            <MessageCircle className="w-4 h-4" />
+            <span>{moment.commentsCount || 0}</span>
+          </div>
+        </div>
       </div>
     </Card>
   );

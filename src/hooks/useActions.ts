@@ -6,7 +6,7 @@ import { Id } from "../../convex/_generated/dataModel";
 
 export function useActions(contactId: Id<"contacts">, enabled: boolean = true) {
   const actions = useQuery(
-    api.notes.listOpenActions,
+    api.actions.getActions,
     enabled ? { contactId } : "skip"
   );
 

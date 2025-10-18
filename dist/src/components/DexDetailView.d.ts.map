@@ -1,0 +1,1 @@
+{"version":3,"file":"DexDetailView.d.ts","sourceRoot":"","sources":["../../../src/components/DexDetailView.tsx"],"names":[],"mappings":"AAEA,OAAO,KAAK,MAAM,OAAO,CAAC;AAC1B,OAAO,EAAE,EAAE,EAAE,MAAM,mCAAmC,CAAC;AAQvD,UAAU,kBAAkB;IAC1B,SAAS,EAAE,MAAM,CAAC;IAClB,MAAM,EAAE,EAAE,CAAC,OAAO,CAAC,CAAC;CACrB;AAED,wBAAgB,aAAa,CAAC,EAAE,SAAS,EAAE,MAAM,EAAE,EAAE,kBAAkB,qBA+NtE"}

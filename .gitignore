@@ -7,3 +7,7 @@
 
 # clerk configuration (can include secrets)
 /.clerk/
+.env.example
+.env
+.env
+.env

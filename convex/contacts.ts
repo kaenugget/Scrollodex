@@ -127,3 +127,53 @@ export const bump = mutation({
     });
   },
 });
+
+// Sync all dynamic contacts for a user
+export const syncAllDynamicContacts = mutation({
+  args: { ownerId: v.id("users") },
+  handler: async (ctx, args) => {
+    const dynamicContacts = await ctx.db
+      .query("contacts")
+      .withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
+      .filter((q) => q.eq(q.field("isDynamicContact"), true))
+      .collect();
+
+    const syncPromises = dynamicContacts.map(async (contact) => {
+      if (contact.connectedUserId) {
+        const connectedUser = await ctx.db.get(contact.connectedUserId);
+        if (connectedUser) {
+          await ctx.db.patch(contact._id, {
+            name: connectedUser.displayName,
+            emails: connectedUser.email ? [connectedUser.email] : [],
+            lastSyncedAt: Date.now(),
+          });
+        }
+      }
+    });
+
+    await Promise.all(syncPromises);
+    return { synced: dynamicContacts.length };
+  },
+});
+
+// Get dynamic contacts that need syncing
+export const getDynamicContactsNeedingSync = query({
+  args: { ownerId: v.id("users") },
+  handler: async (ctx, args) => {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    
+    return await ctx.db
+      .query("contacts")
+      .withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
+      .filter((q) => 
+        q.and(
+          q.eq(q.field("isDynamicContact"), true),
+          q.or(
+            q.eq(q.field("lastSyncedAt"), undefined),
+            q.lt(q.field("lastSyncedAt"), oneHourAgo)
+          )
+        )
+      )
+      .collect();
+  },
+});

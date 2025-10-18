@@ -21,6 +21,26 @@ export const getUserById = query({
   },
 });
 
+// Get user by ID (alias for getUserById)
+export const getUser = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) return null;
+
+    // Return user without password hash
+    return {
+      _id: user._id,
+      email: user.email,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
+    };
+  },
+});
+
 // Get or create demo user
 export const getOrCreateDemoUser = mutation({
   args: {},
@@ -44,6 +64,75 @@ export const getOrCreateDemoUser = mutation({
     });
 
     return demoUserId;
+  },
+});
+
+// Get user by email
+export const getUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+  },
+});
+
+// Create a new user
+export const createUser = mutation({
+  args: {
+    email: v.string(),
+    displayName: v.string(),
+    passwordHash: v.optional(v.string()),
+    clerkUserId: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    bio: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+
+    if (existingUser) {
+      return existingUser._id;
+    }
+
+    // Create new user
+    return await ctx.db.insert("users", {
+      ...args,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Get or create user by email
+export const getOrCreateUserByEmail = mutation({
+  args: {
+    email: v.string(),
+    displayName: v.string(),
+    passwordHash: v.optional(v.string()),
+    clerkUserId: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    bio: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+
+    if (existingUser) {
+      return existingUser._id;
+    }
+
+    // Create new user
+    return await ctx.db.insert("users", {
+      ...args,
+      createdAt: Date.now(),
+    });
   },
 });
 
