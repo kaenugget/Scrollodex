@@ -26,7 +26,6 @@ export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
   const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
-  const router = useRouter();
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
