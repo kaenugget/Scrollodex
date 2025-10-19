@@ -1,5 +1,5 @@
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 
 export function useAvatar(avatarFileId: string | null | undefined) {
   const avatarUrl = useQuery(

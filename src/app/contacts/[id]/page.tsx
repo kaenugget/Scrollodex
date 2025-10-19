@@ -9,7 +9,7 @@ import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { useContacts } from '@/hooks/useContacts';
 import { useDexEntries } from '@/hooks/useDex';
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function ContactDetailPage() {
   const params = useParams();
@@ -75,12 +75,12 @@ export default function ContactDetailPage() {
             router.push('/settings');
           }
         }}
-        user={currentUser}
+        user={currentUser || undefined}
         onSignOut={handleSignOut}
       />
       <ContactDetailView 
         contactId={contactId}
-        userId={currentUser._id as Id<"users">}
+        userId={currentUser?._id as Id<"users">}
         contacts={contacts}
         dexEntries={dexEntries}
         activeTab={activeTab}

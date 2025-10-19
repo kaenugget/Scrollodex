@@ -18,7 +18,10 @@ function Memoji({
   bgColor: string; 
   left: string; 
   top: string; 
-  animation: any;
+  animation: {
+    animate: any;
+    transition: any;
+  };
   className?: string;
 }) {
   return (

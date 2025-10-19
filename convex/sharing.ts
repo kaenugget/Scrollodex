@@ -12,12 +12,14 @@ export const createInvite = mutation({
   },
   handler: async (ctx, args) => {
     const code = generateInviteCode();
+    const shareToken = generateShareToken();
     const expiresAt = Date.now() + ((args.expiresInHours || 24) * 60 * 60 * 1000);
     
     return await ctx.db.insert("invites", {
       code,
       kind: args.kind,
       cardId: args.cardId,
+      shareToken,
       createdAt: Date.now(),
       expiresAt,
     });
@@ -177,6 +179,16 @@ function generateInviteCode(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let result = "";
   for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Helper function to generate share tokens
+function generateShareToken(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 32; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;

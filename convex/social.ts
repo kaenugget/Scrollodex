@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 // Peer Pages Functions
 
@@ -660,7 +661,7 @@ export const createUserShare = mutation({
     // Generate a unique share token
     const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
-    return await ctx.db.insert("invites", {
+    const inviteId = await ctx.db.insert("invites", {
       userId: args.userId,
       shareToken,
       shareType: "connect",
@@ -669,6 +670,9 @@ export const createUserShare = mutation({
       expiresAt: args.expiresAt || Date.now() + (30 * 24 * 60 * 60 * 1000), // 30 days default
       createdAt: Date.now(),
     });
+
+    // Return the full invite object
+    return await ctx.db.get(inviteId);
   },
 });
 

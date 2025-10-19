@@ -7,17 +7,6 @@ import { planner } from "./src/agents/planner";
 import { writer } from "./src/agents/writer";
 
 export const mastra = new Mastra({
-  name: "scrollodex-crm",
-  version: "1.0.0",
-  description: "Agentic CRM system for Scrollodex - AI agents for contact management",
-  
-  // Configure model providers
-  modelProviders: {
-    openai: openai({
-      apiKey: process.env.OPENAI_API_KEY,
-    }),
-  },
-  
   // Register your agents (these will be deployed to Mastra Cloud)
   agents: {
     curator,

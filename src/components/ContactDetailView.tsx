@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 import { useContacts } from '@/hooks/useContacts';
 import { useDexEntries } from '@/hooks/useDex';
 import { TypeChip } from './TypeChip';
@@ -16,8 +16,8 @@ import { Star, Phone, Mail, MapPin, Building, ArrowLeft, Calendar, User } from '
 interface ContactDetailViewProps {
   contactId: string;
   userId: Id<"users">;
-  contacts: any[];
-  dexEntries: any[];
+  contacts: Doc<"contacts">[];
+  dexEntries: Doc<"dexEntries">[];
   activeTab: "overview" | "notes" | "actions" | "preferences" | "moments";
   onTabChange: (tab: "overview" | "notes" | "actions" | "preferences" | "moments") => void;
 }
@@ -139,10 +139,10 @@ export function ContactDetailView({ contactId, userId, contacts, dexEntries, act
     const energySeed = (nameHash + 4) % 100;
 
     // Base scores with more variation (30-70 range)
-    let baseConnection = 30 + (connectionSeed * 0.4);
-    let baseReliability = 30 + (reliabilitySeed * 0.4);
-    let baseCommunication = 30 + (communicationSeed * 0.4);
-    let baseEnergy = 30 + (energySeed * 0.4);
+    const baseConnection = 30 + (connectionSeed * 0.4);
+    const baseReliability = 30 + (reliabilitySeed * 0.4);
+    const baseCommunication = 30 + (communicationSeed * 0.4);
+    const baseEnergy = 30 + (energySeed * 0.4);
 
     // Apply modifiers but keep them more conservative
     const connectionScore = Math.min(100, Math.max(15, 

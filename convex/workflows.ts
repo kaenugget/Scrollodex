@@ -2,7 +2,7 @@
 
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { fetchContacts, createGmailDraft, sendTelegramMessage } from "./integrations";
+import { internal } from "./_generated/api";
 
 // Daily digest workflow (replacing Mastra workflow)
 export const runDailyDigest = action({
@@ -12,7 +12,7 @@ export const runDailyDigest = action({
     
     try {
       // Step 1: Fetch contacts
-      const contactsResult = await fetchContacts(ctx, { 
+      const contactsResult = await ctx.runAction(internal.integrations.fetchContacts, { 
         userId: args.userId || 'demo@example.com' 
       });
       console.log('📋 Fetched contacts:', contactsResult.contacts.length);
@@ -40,11 +40,11 @@ export const runDailyDigest = action({
       console.log('✍️ Created drafts:', drafts.length);
       
       // Step 4: Create Gmail drafts
-      const gmailResult = await createGmailDraft(ctx, { payload: drafts });
+      const gmailResult = await ctx.runAction(internal.integrations.createGmailDraft, { payload: drafts });
       console.log('📧 Gmail drafts created:', gmailResult.success);
       
       // Step 5: Send Telegram notification
-      const telegramResult = await sendTelegramMessage(ctx, {
+      const telegramResult = await ctx.runAction(internal.integrations.sendTelegramMessage, {
         chatId: 'your_chat_id', // You'd get this from user settings
         text: `Daily digest ready! Created ${drafts.length} drafts. Approve to send?`,
         replyMarkup: {
@@ -98,7 +98,7 @@ export const handleApproval = action({
         console.log('📤 Approving all drafts');
         
         // Send confirmation back to Telegram
-        await sendTelegramMessage(ctx, {
+        await ctx.runAction(internal.integrations.sendTelegramMessage, {
           chatId: args.chatId || 'your_chat_id',
           text: '✅ All drafts approved and sent!'
         });
@@ -110,7 +110,7 @@ export const handleApproval = action({
       } else if (args.callbackData === 'skip') {
         console.log('⏭️ Skipping drafts');
         
-        await sendTelegramMessage(ctx, {
+        await ctx.runAction(internal.integrations.sendTelegramMessage, {
           chatId: args.chatId || 'your_chat_id',
           text: '⏭️ Drafts skipped'
         });

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { usePreferences } from '@/hooks/usePreferences';
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { PixelFrame } from './PixelFrame';

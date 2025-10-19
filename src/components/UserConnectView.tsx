@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { Id } from "../../../convex/_generated/dataModel";
-import { useAuth } from "../../hooks/useAuth";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,7 +134,7 @@ export function UserConnectView({ shareToken }: UserConnectViewProps) {
             <Card className="bg-gray-800 border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5" />
-                What you'll get:
+                What you&apos;ll get:
               </h3>
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start gap-2">

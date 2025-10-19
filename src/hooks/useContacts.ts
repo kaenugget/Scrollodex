@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 export function useContacts(ownerId: Id<"users">, enabled: boolean = true) {
   // Skip the query if disabled or if ownerId is invalid

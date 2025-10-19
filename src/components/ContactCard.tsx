@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Building, Wifi } from "lucide-react";
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface Contact {
   _id: Id<"contacts">;

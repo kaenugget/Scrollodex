@@ -42,7 +42,7 @@ function Memoji({
   bgColor: string; 
   left: string; 
   top: string; 
-  animation: any;
+  animation: string;
   className?: string;
 }) {
   return (

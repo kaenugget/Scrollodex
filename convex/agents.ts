@@ -104,40 +104,31 @@ export const runAgentWorkflow = action({
       console.log('🚀 Running agent workflow');
       
       // Step 1: Use curator to process contacts
-      const curatorResult = await callCuratorAgent(ctx, {
-        prompt: `Process these contacts: ${args.contacts}`,
-        context: { userId: args.userId }
-      });
+      const curatorResult = await curator.generate(`Process these contacts: ${args.contacts}`);
       
-      if (!curatorResult.success) {
-        throw new Error(`Curator failed: ${curatorResult.error}`);
+      if (!curatorResult) {
+        throw new Error('Curator failed to generate response');
       }
       
       // Step 2: Use planner to create strategy
-      const plannerResult = await callPlannerAgent(ctx, {
-        prompt: `Create outreach strategy based on: ${curatorResult.result}`,
-        context: { userId: args.userId }
-      });
+      const plannerResult = await planner.generate(`Create outreach strategy based on: ${curatorResult.text}`);
       
-      if (!plannerResult.success) {
-        throw new Error(`Planner failed: ${plannerResult.error}`);
+      if (!plannerResult) {
+        throw new Error('Planner failed to generate response');
       }
       
       // Step 3: Use writer to create drafts
-      const writerResult = await callWriterAgent(ctx, {
-        prompt: `Create outreach drafts based on: ${plannerResult.result}`,
-        context: { userId: args.userId }
-      });
+      const writerResult = await writer.generate(`Create outreach drafts based on: ${plannerResult.text}`);
       
-      if (!writerResult.success) {
-        throw new Error(`Writer failed: ${writerResult.error}`);
+      if (!writerResult) {
+        throw new Error('Writer failed to generate response');
       }
       
       return {
         success: true,
-        curator: curatorResult.result,
-        planner: plannerResult.result,
-        writer: writerResult.result
+        curator: curatorResult.text,
+        planner: plannerResult.text,
+        writer: writerResult.text
       };
       
     } catch (error) {

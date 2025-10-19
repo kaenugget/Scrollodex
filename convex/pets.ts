@@ -25,7 +25,7 @@ export const hatchPet = action({
     userId: v.id("users"),
     relationshipHealth: v.number(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; petId?: string; error?: string }> => {
     const { contactId, userId, relationshipHealth } = args;
     
     console.log('🐣 Convex: hatchPet action called with:', {
@@ -280,9 +280,9 @@ export const hatchPet = action({
     } catch (error) {
       console.error("🐣 Convex: Failed to hatch pet:", error);
       console.error("🐣 Convex: Error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown',
       });
       throw new Error("Failed to hatch pet");
     }
@@ -603,7 +603,7 @@ export const evolvePet = action({
     customizationType: v.string(), // "color", "pattern", "accessory", "name"
     newValue: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; petId?: string; error?: string; newTokens?: number; totalEvolutions?: number; customizationType?: string; newValue?: string }> => {
     const { contactId, userId, customizationType, newValue } = args;
     
     console.log('🔄 Convex: evolvePet called with:', {
@@ -760,18 +760,18 @@ export const evolvePet = action({
     } catch (error) {
       console.error("🔄 Convex: Failed to evolve pet:", error);
       console.error("🔄 Convex: Error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown',
       });
-      throw new Error(`Failed to evolve pet: ${error.message}`);
+      throw new Error(`Failed to evolve pet: ${error instanceof Error ? error.message : String(error)}`);
     }
   },
 });
 
 // Helper function to get customization costs
 function getCustomizationCost(type: string): number {
-  const costs = {
+  const costs: Record<string, number> = {
     "name": 0, // Free to rename
     "color": 1,
     "pattern": 1,
@@ -900,7 +900,7 @@ export const startVideoGeneration = action({
       };
     } catch (error) {
       console.error("🎬 Convex: Failed to start video generation:", error);
-      throw new Error(`Failed to start video generation: ${error.message}`);
+      throw new Error(`Failed to start video generation: ${error instanceof Error ? error.message : String(error)}`);
     }
   },
 });
@@ -975,7 +975,7 @@ async function generatePetVideosBackground(ctx: any, contactId: any, petData: an
         });
         
         // Race between video generation and timeout
-        const videoResponse = await Promise.race([videoGenerationPromise, timeoutPromise]);
+        const videoResponse = await Promise.race([videoGenerationPromise, timeoutPromise]) as Response;
         
         if (videoResponse.ok) {
           const videoData = await videoResponse.json();
@@ -1026,7 +1026,7 @@ async function generatePetVideosBackground(ctx: any, contactId: any, petData: an
         }
         
         // If it's a timeout error, don't retry immediately
-        if (error.message?.includes('timeout')) {
+        if (error instanceof Error && error.message?.includes('timeout')) {
           console.log(`🎬 Convex: ${state} video timed out, skipping retry`);
           videoUrls[`${state}VideoUrl`] = "";
           break;
@@ -1211,7 +1211,7 @@ export const generatePetVideos = action({
       };
     } catch (error) {
       console.error("🎬 Convex: Failed to generate pet videos:", error);
-      throw new Error(`Failed to generate pet videos: ${error.message}`);
+      throw new Error(`Failed to generate pet videos: ${error instanceof Error ? error.message : String(error)}`);
     }
   },
 });

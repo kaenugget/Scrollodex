@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface SeedDataButtonProps {
   userId: Id<"users">;

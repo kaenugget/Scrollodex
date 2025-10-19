@@ -626,7 +626,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
           
           <div className="mb-3 p-2 bg-purple-100 rounded text-xs text-purple-800">
             <strong>Evolution Mode:</strong> All customizations are free for testing!<br/>
-            <strong>Note:</strong> Evolution generates images quickly. Use "Generate Videos" button for animations.
+            <strong>Note:</strong> Evolution generates images quickly. Use &quot;Generate Videos&quot; button for animations.
           </div>
           
           {getCustomizationOptions && (

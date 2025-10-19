@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Camera, ArrowLeft, ArrowRight, Check } from "lucide-react";
@@ -214,7 +214,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
       formData.append('size', '1024x1024');
       
       console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
+      for (const [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
       

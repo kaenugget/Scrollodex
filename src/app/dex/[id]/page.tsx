@@ -7,7 +7,7 @@ import { DexDetailView } from '@/components/DexDetailView';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function DexDetailPage() {
   const params = useParams();

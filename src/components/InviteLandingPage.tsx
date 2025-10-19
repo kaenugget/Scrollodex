@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 
 interface InviteLandingPageProps {
   shareId: string;

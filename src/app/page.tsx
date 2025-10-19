@@ -16,9 +16,10 @@ import { useDynamicContactSync } from "@/hooks/useDynamicContactSync";
 // import { useUser, useClerk } from '@clerk/nextjs';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
+import type { Doc } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
@@ -137,7 +138,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {contacts.map((contact: any) => (
+                {contacts.map((contact: Doc<"contacts">) => (
                   <ContactCard
                     key={contact._id}
                     contact={contact}
@@ -170,9 +171,9 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {dexEntries.map((dexEntry: any) => {
+                {dexEntries.map((dexEntry: Doc<"dexEntries">) => {
                   // Find the contact for this dex entry
-                  const contact = contacts.find((c: any) => c._id === dexEntry.contactId);
+                  const contact = contacts.find((c: Doc<"contacts">) => c._id === dexEntry.contactId);
                   if (!contact) return null;
                   
                   return (

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { PixelFrame } from './PixelFrame';
 import { Plus, Trash2, Check, Clock, Calendar, X } from 'lucide-react';

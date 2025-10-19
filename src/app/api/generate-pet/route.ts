@@ -31,16 +31,17 @@ export async function POST(request: NextRequest) {
     
     // Provide more specific error messages
     let errorMessage = 'Failed to hatch pet';
-    if (error.message?.includes('Connection lost')) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('Connection lost')) {
       errorMessage = 'Pet generation timed out. Please try again.';
-    } else if (error.message?.includes('permission')) {
+    } else if (errorMsg.includes('permission')) {
       errorMessage = 'You do not have permission to generate a pet for this contact.';
-    } else if (error.message?.includes('not found')) {
+    } else if (errorMsg.includes('not found')) {
       errorMessage = 'Contact not found.';
     }
     
     return NextResponse.json(
-      { error: errorMessage, details: error.message },
+      { error: errorMessage, details: errorMsg },
       { status: 500 }
     );
   }

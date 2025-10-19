@@ -13,6 +13,7 @@
     "lint": "echo 'add linter if needed'"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.52",
     "@auth/core": "^0.37.4",
     "@convex-dev/auth": "^0.0.90",
     "@google-cloud/local-auth": "^3.0.1",

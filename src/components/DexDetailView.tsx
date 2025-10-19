@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 import { useContacts } from '@/hooks/useContacts';
 import { useDexEntries } from '@/hooks/useDex';
 import { PixelFrame } from './PixelFrame';
