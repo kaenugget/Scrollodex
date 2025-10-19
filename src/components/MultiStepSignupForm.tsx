@@ -382,6 +382,13 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
       });
       
       await signUp(email, `${firstName} ${lastName}`.trim(), password, firstName, lastName, selfieFileId, safeAvatarUrl, avatarFileId || undefined);
+      
+      // Store avatar URL in session storage for immediate access
+      if (avatarUrl) {
+        sessionStorage.setItem('userAvatarUrl', avatarUrl);
+        console.log('Avatar URL stored in session storage:', avatarUrl);
+      }
+      
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign up failed");

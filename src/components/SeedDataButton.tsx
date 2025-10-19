@@ -12,7 +12,9 @@ interface SeedDataButtonProps {
 
 export function SeedDataButton({ userId }: SeedDataButtonProps) {
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isGeneratingPets, setIsGeneratingPets] = useState(false);
   const seedData = useMutation(api.seed.seedDemoData);
+  const generatePets = useMutation(api.pets.generatePetsForContactsWithoutPets);
 
   const handleSeed = async () => {
     setIsSeeding(true);
@@ -29,13 +31,40 @@ export function SeedDataButton({ userId }: SeedDataButtonProps) {
     }
   };
 
+  const handleGeneratePets = async () => {
+    setIsGeneratingPets(true);
+    try {
+      const result = await generatePets({ userId });
+      
+      if (result.scheduled > 0) {
+        alert(`Pet generation started for ${result.scheduled} contacts! Check back in a few minutes to see your pets.`);
+      } else {
+        alert("No contacts found that need pets generated.");
+      }
+    } catch (error) {
+      console.error("Error generating pets:", error);
+      alert("Error generating pets. Check console for details.");
+    } finally {
+      setIsGeneratingPets(false);
+    }
+  };
+
   return (
-    <Button
-      onClick={handleSeed}
-      disabled={isSeeding}
-      className="pixel-border bg-green-600 hover:bg-green-700 text-white"
-    >
-      {isSeeding ? "Importing Contacts..." : "Import Contacts"}
-    </Button>
+    <div className="flex gap-2">
+      <Button
+        onClick={handleSeed}
+        disabled={isSeeding}
+        className="pixel-border bg-green-600 hover:bg-green-700 text-white"
+      >
+        {isSeeding ? "Importing Contacts..." : "Import Contacts"}
+      </Button>
+      <Button
+        onClick={handleGeneratePets}
+        disabled={isGeneratingPets}
+        className="pixel-border bg-purple-600 hover:bg-purple-700 text-white"
+      >
+        {isGeneratingPets ? "Generating Pets..." : "Generate Pets"}
+      </Button>
+    </div>
   );
 }

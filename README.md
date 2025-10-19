@@ -2,6 +2,8 @@
 
 A pixel-art social contact manager built with Next.js, Convex, and Tailwind CSS.
 
+🌐 **Live Demo**: [https://scrollodex.vercel.app/](https://scrollodex.vercel.app/)
+
 ## Features
 
 - **Pixel-art UI** with dark theme and emerald accents
@@ -204,7 +206,7 @@ This is a personal project, but feel free to:
 1. [Brent Deverman](https://deverman.org) brent@deverman.org
 2. [Chen Chen]() cecichencc@gmail.com
 3. [Tatsuya Kohrogi](https://www.linkedin.com/in/tatsuya-kohrogi/) tkohrogi@ripple.com
-4. [Wan Sheng Fung, Kaelan]() kaelan.wan.2022@scis.smu.edu.sg
+4. [Wan Sheng Fung, Kaelan](https://www.linkedin.com/in/kaelan) kaelanwanshengfung@gmail.com
 
 ## License
 

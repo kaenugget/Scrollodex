@@ -23,6 +23,12 @@ export function useAuth() {
   // Debug logging
   useEffect(() => {
     console.log('useAuth: currentUser changed:', currentUser ? 'User found' : 'No user', currentUser?._id);
+    
+    // Store avatar URL in session storage if user has one and it's not already stored
+    if (currentUser?.avatarUrl && !sessionStorage.getItem('userAvatarUrl')) {
+      sessionStorage.setItem('userAvatarUrl', currentUser.avatarUrl);
+      console.log('Avatar URL stored in session storage from user data:', currentUser.avatarUrl);
+    }
   }, [currentUser]);
 
   // Mutations

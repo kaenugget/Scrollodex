@@ -79,6 +79,35 @@ export const upsert = mutation({
     notes: v.array(v.string()),
     lastInteractionAt: v.number(),
     pinned: v.boolean(),
+    petData: v.optional(v.object({
+      petType: v.optional(v.string()),
+      petName: v.optional(v.string()),
+      level: v.optional(v.float64()),
+      happiness: v.optional(v.float64()),
+      color: v.optional(v.string()),
+      pattern: v.optional(v.string()),
+      accessory: v.optional(v.string()),
+      happyImageUrl: v.optional(v.string()),
+      neutralImageUrl: v.optional(v.string()),
+      sadImageUrl: v.optional(v.string()),
+      excitedImageUrl: v.optional(v.string()),
+      happyVideoUrl: v.optional(v.string()),
+      neutralVideoUrl: v.optional(v.string()),
+      sadVideoUrl: v.optional(v.string()),
+      excitedVideoUrl: v.optional(v.string()),
+      templateId: v.optional(v.string()),
+      generatedAt: v.optional(v.float64()),
+      lastUpdated: v.optional(v.float64()),
+      hatchedAt: v.optional(v.float64()),
+      regeneratedAt: v.optional(v.float64()),
+      evolutionTokens: v.optional(v.float64()),
+      totalEvolutions: v.optional(v.float64()),
+      lastEvolutionAt: v.optional(v.float64()),
+      videoGenerationStatus: v.optional(v.string()),
+      videoGenerationStartedAt: v.optional(v.float64()),
+      videoGenerationCompletedAt: v.optional(v.float64()),
+      videoGenerationError: v.optional(v.string()),
+    })),
   },
   handler: async (ctx, args) => {
     const { id, ...contactData } = args;
@@ -93,6 +122,38 @@ export const upsert = mutation({
       
       // Automatically create a dex entry for new contacts
       await ctx.runMutation(api.dex.computeEntry, { contactId });
+      
+      // Auto-generate pet if no petData provided and FAL_KEY is available
+      if (!contactData.petData && process.env.FAL_KEY) {
+        try {
+          // Calculate relationship health based on contact data
+          // Start with base health of 40% for new contacts
+          let relationshipHealth = 40;
+          
+          // Boost health based on contact completeness
+          if (contactData.emails.length > 0) relationshipHealth += 10;
+          if (contactData.phones.length > 0) relationshipHealth += 10;
+          if (contactData.company) relationshipHealth += 10;
+          if (contactData.notes.length > 0) relationshipHealth += 10;
+          if (contactData.tags.length > 0) relationshipHealth += 10;
+          if (contactData.pinned) relationshipHealth += 10;
+          
+          // Cap at 90% for auto-generation
+          relationshipHealth = Math.min(90, relationshipHealth);
+          
+          console.log(`🐣 Auto-generating pet for new contact ${contactData.name} with ${relationshipHealth}% health`);
+          
+          // Schedule pet generation asynchronously
+          await ctx.scheduler.runAfter(0, api.pets.hatchPet, {
+            contactId,
+            userId: args.ownerId,
+            relationshipHealth,
+          });
+        } catch (error) {
+          console.error('🐣 Failed to schedule pet generation for new contact:', error);
+          // Don't fail the contact creation if pet generation fails
+        }
+      }
       
       return contactId;
     }

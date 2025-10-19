@@ -1249,6 +1249,84 @@ export const debugPetData = query({
   },
 });
 
+// Generate pets for contacts that don't have them
+export const generatePetsForContactsWithoutPets = action({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = args;
+    
+    console.log('🐣 Generating pets for contacts without pets for user:', userId);
+    
+    // Get all contacts for the user that don't have pet data
+    const contacts = await ctx.runQuery(api.contacts.list, { ownerId: userId });
+    const contactsWithoutPets = contacts.filter(contact => !contact.petData || !contact.petData.petType);
+    
+    console.log(`🐣 Found ${contactsWithoutPets.length} contacts without pets`);
+    
+    const results = [];
+    
+    for (const contact of contactsWithoutPets) {
+      try {
+        // Calculate relationship health based on contact data
+        let relationshipHealth = 40; // Base health for existing contacts
+        
+        // Boost health based on contact completeness and engagement
+        if (contact.emails.length > 0) relationshipHealth += 10;
+        if (contact.phones.length > 0) relationshipHealth += 10;
+        if (contact.company) relationshipHealth += 10;
+        if (contact.notes.length > 0) relationshipHealth += 10;
+        if (contact.tags.length > 0) relationshipHealth += 10;
+        if (contact.pinned) relationshipHealth += 10;
+        
+        // Boost based on recent interaction (more recent = higher health)
+        const daysSinceInteraction = (Date.now() - contact.lastInteractionAt) / (1000 * 60 * 60 * 24);
+        if (daysSinceInteraction < 7) relationshipHealth += 15;
+        else if (daysSinceInteraction < 30) relationshipHealth += 10;
+        else if (daysSinceInteraction < 90) relationshipHealth += 5;
+        
+        // Cap at 90% for auto-generation
+        relationshipHealth = Math.min(90, relationshipHealth);
+        
+        console.log(`🐣 Generating pet for ${contact.name} with ${relationshipHealth}% health`);
+        
+        // Schedule pet generation
+        await ctx.scheduler.runAfter(0, api.pets.hatchPet, {
+          contactId: contact._id,
+          userId,
+          relationshipHealth,
+        });
+        
+        results.push({
+          contactId: contact._id,
+          contactName: contact.name,
+          relationshipHealth,
+          scheduled: true,
+        });
+      } catch (error) {
+        console.error(`🐣 Failed to schedule pet generation for ${contact.name}:`, error);
+        results.push({
+          contactId: contact._id,
+          contactName: contact.name,
+          relationshipHealth: 0,
+          scheduled: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+    
+    console.log(`🐣 Pet generation scheduled for ${results.filter(r => r.scheduled).length} contacts`);
+    
+    return {
+      totalContacts: contactsWithoutPets.length,
+      scheduled: results.filter(r => r.scheduled).length,
+      failed: results.filter(r => !r.scheduled).length,
+      results,
+    };
+  },
+});
+
 // Create pet template
 export const createPetTemplate = mutation({
   args: {

@@ -28,6 +28,7 @@ export default function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionAvatarUrl, setSessionAvatarUrl] = useState<string | null>(null);
   
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   
@@ -41,6 +42,15 @@ export default function ProfilePage() {
     currentUser?.avatarFileId ? { avatarFileId: currentUser.avatarFileId } : "skip"
   );
 
+  // Load avatar from session storage
+  useEffect(() => {
+    const storedAvatarUrl = sessionStorage.getItem('userAvatarUrl');
+    if (storedAvatarUrl) {
+      setSessionAvatarUrl(storedAvatarUrl);
+      console.log('Avatar loaded from session storage:', storedAvatarUrl);
+    }
+  }, []);
+
   // Debug logging for avatar data
   useEffect(() => {
     if (currentUser) {
@@ -48,10 +58,11 @@ export default function ProfilePage() {
         displayName: currentUser.displayName,
         avatarUrl: currentUser.avatarUrl,
         avatarFileId: currentUser.avatarFileId,
-        avatarUrlFromStorage: avatarUrlFromStorage
+        avatarUrlFromStorage: avatarUrlFromStorage,
+        sessionAvatarUrl: sessionAvatarUrl
       });
     }
-  }, [currentUser, avatarUrlFromStorage]);
+  }, [currentUser, avatarUrlFromStorage, sessionAvatarUrl]);
 
   // Debug the query parameters
   useEffect(() => {
@@ -215,19 +226,19 @@ export default function ProfilePage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        {(currentUser.avatarUrl || avatarUrlFromStorage) ? (
+        {(sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage) ? (
           <Image 
-            src={currentUser.avatarUrl || avatarUrlFromStorage || ''} 
+            src={sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage || ''} 
             alt={`${currentUser.displayName}'s avatar`}
             width={192}
             height={192}
             className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl"
             onError={(e) => {
               console.error('Avatar image failed to load:', e);
-              console.log('Failed to load avatar URL:', currentUser.avatarUrl || avatarUrlFromStorage);
+              console.log('Failed to load avatar URL:', sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage);
             }}
             onLoad={() => {
-              console.log('Avatar loaded successfully:', currentUser.avatarUrl || avatarUrlFromStorage);
+              console.log('Avatar loaded successfully:', sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage);
             }}
           />
         ) : (
