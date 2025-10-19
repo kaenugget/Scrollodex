@@ -204,7 +204,7 @@ This is a personal project, but feel free to:
 
 ## Project Team Members
 1. [Brent Deverman](https://deverman.org) brent@deverman.org
-2. [Chen Chen]() cecichencc@gmail.com
+2. [Chen Chen](https://www.linkedin.com/in/chen-chen-12288439) cecichencc@gmail.com
 3. [Tatsuya Kohrogi](https://www.linkedin.com/in/tatsuya-kohrogi/) tkohrogi@ripple.com
 4. [Wan Sheng Fung, Kaelan](https://www.linkedin.com/in/kaelan-wan) kaelanwanshengfung@gmail.com
 
