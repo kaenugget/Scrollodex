@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Camera, ArrowLeft, ArrowRight, Check } from "lucide-react";
 
 interface MultiStepSignupFormProps {

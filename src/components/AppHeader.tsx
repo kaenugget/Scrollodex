@@ -4,24 +4,24 @@ import React, { useState } from 'react';
 import { UserDropdown } from './UserDropdown';
 import { Menu, X } from 'lucide-react';
 
-interface NavButtonProps {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}
+// interface NavButtonProps {
+//   label: string;
+//   isActive: boolean;
+//   onClick: () => void;
+// }
 
-const NavButton: React.FC<NavButtonProps> = ({ label, isActive, onClick }) => (
-    <button 
-        onClick={onClick}
-        className={`font-medium text-sm px-4 py-2 transition-colors duration-200 ${
-            isActive 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-600 hover:text-gray-900'
-        }`}
-    >
-        {label}
-    </button>
-)
+// const NavButton: React.FC<NavButtonProps> = ({ label, isActive, onClick }) => (
+//     <button 
+//         onClick={onClick}
+//         className={`font-medium text-sm px-4 py-2 transition-colors duration-200 ${
+//             isActive 
+//                 ? 'text-blue-600 border-b-2 border-blue-600' 
+//                 : 'text-gray-600 hover:text-gray-900'
+//         }`}
+//     >
+//         {label}
+//     </button>
+// )
 
 interface AppHeaderProps {
     currentPage: string;
@@ -30,7 +30,7 @@ interface AppHeaderProps {
     onSignOut?: () => void;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ currentPage, onNavigate, user, onSignOut }) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({ user, onSignOut }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (

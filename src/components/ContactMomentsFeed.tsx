@@ -7,7 +7,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Plus, MapPin, Calendar, User } from "lucide-react";
 import { AddMomentSheet } from "./AddMomentSheet";
 import { PhotoViewer } from "./PhotoViewer";

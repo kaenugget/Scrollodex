@@ -1,5 +1,5 @@
 export function next8amInSGT() {
-  const tz = process.env.TIMEZONE || 'Asia/Singapore';
+  // const tz = process.env.TIMEZONE || 'Asia/Singapore';
   const now = new Date();
   const next = new Date(now);
   next.setHours(8, 0, 0, 0);

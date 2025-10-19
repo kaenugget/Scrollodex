@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
+import Image from 'next/image';
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+// import { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -189,9 +190,11 @@ export function SharedCardView({ shareToken }: SharedCardViewProps) {
             <Card className="bg-gray-800 border-gray-700 overflow-hidden">
               <div className="aspect-[3/4] bg-gray-700 relative">
                 {(showFront ? frontImageUrl : backImageUrl) ? (
-                  <img
+                  <Image
                     src={showFront ? frontImageUrl : backImageUrl}
                     alt={`${card.title} - ${showFront ? 'Front' : 'Back'}`}
+                    width={400}
+                    height={533}
                     className="w-full h-full object-cover"
                   />
                 ) : (

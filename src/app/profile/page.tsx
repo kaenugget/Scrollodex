@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,7 +29,7 @@ export default function ProfilePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   
   const isUserAuthenticated = isAuthenticated;
   const currentUser = user;
@@ -60,7 +61,7 @@ export default function ProfilePage() {
       queryCalled: !!currentUser?.avatarFileId,
       avatarUrlFromStorage: avatarUrlFromStorage
     });
-  }, [currentUser?.avatarFileId, avatarUrlFromStorage]);
+  }, [currentUser, currentUser?.avatarFileId, avatarUrlFromStorage]);
 
   // Mock relationship health data based on PRD requirements
   const relationshipHealth = {
@@ -75,9 +76,9 @@ export default function ProfilePage() {
      relationshipHealth.communication + relationshipHealth.energy) / 4
   );
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
+  // const handleSignOut = async () => {
+  //   await signOut();
+  // };
 
   const generateInviteLink = async () => {
     if (!currentUser?._id) {
@@ -215,9 +216,11 @@ export default function ProfilePage() {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         {(currentUser.avatarUrl || avatarUrlFromStorage) ? (
-          <img 
+          <Image 
             src={currentUser.avatarUrl || avatarUrlFromStorage || ''} 
             alt={`${currentUser.displayName}'s avatar`}
+            width={192}
+            height={192}
             className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl"
             onError={(e) => {
               console.error('Avatar image failed to load:', e);

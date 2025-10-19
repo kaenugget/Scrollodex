@@ -3,15 +3,15 @@
 import React from 'react';
 import { Id } from "@/convex/_generated/dataModel";
 import { useContacts } from '@/hooks/useContacts';
-import { useDexEntries } from '@/hooks/useDex';
-import { TypeChip } from './TypeChip';
-import { XpProgress } from './XpProgress';
+// import { useDexEntries } from '@/hooks/useDex';
+// import { TypeChip } from './TypeChip';
+// import { XpProgress } from './XpProgress';
 import { NotesSection } from './NotesSection';
 import { ActionsSection } from './ActionsSection';
 import { PreferencesSection } from './PreferencesSection';
 import { ContactMomentsFeed } from './ContactMomentsFeed';
 import { PetModel } from './PetModel';
-import { Star, Phone, Mail, MapPin, Building, ArrowLeft, Calendar, User } from 'lucide-react';
+import { Star, ArrowLeft } from 'lucide-react';
 
 interface ContactDetailViewProps {
   contactId: string;

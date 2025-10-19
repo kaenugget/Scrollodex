@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+// import { Id } from "@/convex/_generated/dataModel";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, User, Mail, Calendar, Check, Users, Star } from "lucide-react";
+// import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Mail, Calendar, Check, Users, Star } from "lucide-react";
 
 interface UserConnectViewProps {
   shareToken: string;

@@ -3,7 +3,7 @@
 import { ContactCard } from "@/components/ContactCard";
 import { DexCard } from "@/components/DexCard";
 import { SeedDataButton } from "@/components/SeedDataButton";
-import { LoginForm, SignUpForm } from "@/components/AuthForms";
+// import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { AppHeader } from "@/components/AppHeader";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
@@ -18,15 +18,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import type { Doc } from "@/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+// import { useMutation } from "convex/react";
+// import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Users, Wifi } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"contacts" | "dex">("contacts");
-  const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
+  // const [showAuth, setShowAuth] = useState<"login" | "signup" | null>(null);
   // const { isSignedIn } = useUser();
   // const { signOut: clerkSignOut } = useClerk();
   const { user, isLoading: authLoading, isAuthenticated, signOut } = useAuth();
@@ -63,9 +63,9 @@ export default function Home() {
     router.push(`/contacts/${contactId}`);
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuth(null);
-  };
+  // const handleAuthSuccess = () => {
+  //   setShowAuth(null);
+  // };
 
   
 

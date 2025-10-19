@@ -5,7 +5,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
 // Daily digest workflow (replacing Mastra workflow)
-export const runDailyDigest = action({
+export const runDailyDigest: any = action({
   args: { userId: v.optional(v.string()) },
   handler: async (ctx, args) => {
     console.log('🚀 Starting daily digest workflow');

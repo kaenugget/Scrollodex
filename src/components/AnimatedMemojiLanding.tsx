@@ -19,8 +19,8 @@ function Memoji({
   left: string; 
   top: string; 
   animation: {
-    animate: any;
-    transition: any;
+    animate: Record<string, unknown>;
+    transition: Record<string, unknown>;
   };
   className?: string;
 }) {

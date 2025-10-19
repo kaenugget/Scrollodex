@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Heart, Star, Video, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useAction, useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -87,7 +88,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
   );
 
   // Hatch a new pet
-  const handleHatchPet = async () => {
+  const handleHatchPet = useCallback(async () => {
     console.log('🐣 PetModel: handleHatchPet called');
     console.log('🐣 PetModel: Current state:', { hasExistingPet, isGenerating, overallHealth });
     
@@ -145,7 +146,7 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [hasExistingPet, isGenerating, overallHealth, hatchPet, contactId, userId]);
 
   // Auto-generate pet when user has no pet and meets requirements
   useEffect(() => {
@@ -424,9 +425,11 @@ export function PetModel({ contactId, userId, relationshipStats, petData }: PetM
                     onCanPlay={() => {}}
                   />
                 ) : imageUrl && imageUrl.trim() !== "" ? (
-                  <img 
+                  <Image 
                     src={imageUrl} 
                     alt={`${petModel.petName} the ${petModel.petType}`}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover"
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       // Fallback to placeholder if image fails to load

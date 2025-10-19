@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { MultiStepSignupForm } from "@/components/MultiStepSignupForm";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 
@@ -26,8 +27,8 @@ const imgMemoji3 = "/assets-moji/fdee818f54b8c3fba3690e004d2a4967c796d17d.png";
 const imgMemoji4 = "/assets-moji/96ca4f3c99225394e50df5e7a78773cc97a178c7.png";
 const img6 = "/assets-moji/90d4316f95dfa58f20b98e74e9e8a295574e84a4.png";
 const img7 = "/assets-moji/e6a83ff14ac76d1598087c994da84a379bd4b797.png";
-const imgRectangle1 = "/assets-moji/1967330d9961adf49d90841a7a35d8b513034ef9.png";
-const imgBackground = "/assets-moji/895ae4cd93b3ed20d216afcda2414d80547ae205.png";
+// const imgRectangle1 = "/assets-moji/1967330d9961adf49d90841a7a35d8b513034ef9.png";
+// const imgBackground = "/assets-moji/895ae4cd93b3ed20d216afcda2414d80547ae205.png";
 
 // Memoji components with actual images and different animations
 function Memoji({ 
@@ -51,10 +52,13 @@ function Memoji({
       animate={animation.animate}
       transition={animation.transition}
     >
-      <img 
+      <Image 
         alt="" 
         className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" 
-        src={src} 
+        src={src}
+        width={110}
+        height={110}
+        unoptimized
       />
     </motion.div>
   );
@@ -138,7 +142,7 @@ function MobileGridSection() {
 }
 
 export function SignupLandingPage() {
-  const router = useRouter();
+  // const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignupSuccess = () => {
