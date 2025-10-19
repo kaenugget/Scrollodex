@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useState, useEffect } from "react";
 
 export function useAuth() {
@@ -33,7 +34,7 @@ export function useAuth() {
   const deleteAccount = useMutation(api.auth.deleteAccount);
 
   // Auth actions
-  const signUp = async (email: string, displayName: string, password: string, firstName?: string, lastName?: string, selfieFileId?: string, avatarUrl?: string, avatarFileId?: string) => {
+  const signUp = async (email: string, displayName: string, password: string, firstName?: string, lastName?: string, selfieFileId?: Id<"_storage">, avatarUrl?: string, avatarFileId?: Id<"_storage">) => {
     try {
       const result = await register({ email, displayName, password, firstName, lastName, selfieFileId, avatarUrl, avatarFileId });
       setToken(result.token);

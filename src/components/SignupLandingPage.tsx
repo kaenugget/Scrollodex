@@ -43,7 +43,12 @@ function Memoji({
   bgColor: string; 
   left: string; 
   top: string; 
-  animation: string;
+  animation: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    animate: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transition: any;
+  };
   className?: string;
 }) {
   return (

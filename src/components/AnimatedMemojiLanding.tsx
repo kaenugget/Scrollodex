@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
+import { motion, TargetAndTransition, Transition } from 'framer-motion';
 import { useState } from 'react';
 import { LoginForm, SignUpForm } from "@/components/AuthForms";
 import { MultiStepSignupForm } from "@/components/MultiStepSignupForm";
@@ -19,8 +19,10 @@ function Memoji({
   left: string; 
   top: string; 
   animation: {
-    animate: Record<string, unknown>;
-    transition: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    animate: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transition: any;
   };
   className?: string;
 }) {

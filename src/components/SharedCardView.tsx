@@ -191,7 +191,7 @@ export function SharedCardView({ shareToken }: SharedCardViewProps) {
               <div className="aspect-[3/4] bg-gray-700 relative">
                 {(showFront ? frontImageUrl : backImageUrl) ? (
                   <Image
-                    src={showFront ? frontImageUrl : backImageUrl}
+                    src={(showFront ? frontImageUrl : backImageUrl) || ''}
                     alt={`${card.title} - ${showFront ? 'Front' : 'Back'}`}
                     width={400}
                     height={533}

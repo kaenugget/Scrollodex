@@ -60,7 +60,7 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
   ];
 
   const handleSignOut = () => {
-    if (isSignedIn) {
+    if (currentUser) {
       window.location.href = '/';
     } else {
       // Handle custom auth sign out
@@ -115,7 +115,7 @@ export function PeerPageView({ peerPageId }: PeerPageViewProps) {
                 <Button
                   key={tab.id}
                   variant={activeTab === tab.id ? "default" : "ghost"}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => setActiveTab(tab.id as "moments" | "deck" | "settings")}
                   className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-colors rounded-md ${
                     activeTab === tab.id
                       ? "bg-white text-blue-600 shadow-sm"

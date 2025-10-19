@@ -1,7 +1,7 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-// Gmail operations (replacing MCP Gmail server)
+// Gmail operations (simplified - mock implementations)
 export const createGmailDraft = action({
   args: {
     payload: v.array(v.object({
@@ -11,13 +11,11 @@ export const createGmailDraft = action({
     }))
   },
   handler: async (ctx, args) => {
-    console.log('📧 Creating Gmail drafts:', args.payload);
+    console.log('📧 Creating Gmail drafts (simplified):', args.payload);
     
-    // In production, you'd integrate with real Gmail API here
-    // For now, just log and return success
     return {
       success: true,
-      message: `Created ${args.payload.length} Gmail drafts successfully`,
+      message: `Created ${args.payload.length} Gmail drafts successfully (simplified)`,
       drafts: args.payload.map((draft, index) => ({
         id: `draft_${index}`,
         ...draft
@@ -29,12 +27,11 @@ export const createGmailDraft = action({
 export const sendGmailDraft = action({
   args: { draftId: v.string() },
   handler: async (ctx, args) => {
-    console.log('📤 Sending Gmail draft:', args.draftId);
+    console.log('📤 Sending Gmail draft (simplified):', args.draftId);
     
-    // In production, you'd integrate with real Gmail API here
     return {
       success: true,
-      message: `Sent draft ${args.draftId} successfully`
+      message: `Sent draft ${args.draftId} successfully (simplified)`
     };
   }
 });
@@ -45,9 +42,8 @@ export const listGmailThreads = action({
     maxResults: v.optional(v.number())
   },
   handler: async (ctx, args) => {
-    console.log('📋 Listing Gmail threads:', args.query);
+    console.log('📋 Listing Gmail threads (simplified):', args.query);
     
-    // In production, you'd integrate with real Gmail API here
     return {
       threads: [
         {
@@ -61,13 +57,12 @@ export const listGmailThreads = action({
   }
 });
 
-// Contacts operations (replacing MCP Contacts server)
+// Contacts operations (simplified - mock data)
 export const fetchContacts = action({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
-    console.log('👥 Fetching contacts for user:', args.userId);
+    console.log('👥 Fetching contacts for user (simplified):', args.userId);
     
-    // In production, you'd integrate with real Google Contacts API here
     return {
       contacts: [
         {
@@ -77,13 +72,21 @@ export const fetchContacts = action({
           birthday: '1990-01-01',
           last_contacted_at: '2024-01-01T00:00:00Z',
           notes: 'Met at conference'
+        },
+        {
+          id: 'contact2',
+          name: 'Jane Smith',
+          primary_email: 'jane@example.com',
+          birthday: '1985-05-15',
+          last_contacted_at: '2024-02-01T00:00:00Z',
+          notes: 'Colleague from previous job'
         }
       ]
     };
   }
 });
 
-// Telegram operations (replacing MCP Telegram server)
+// Telegram operations (simplified - mock implementation)
 export const sendTelegramMessage = action({
   args: {
     chatId: v.string(),
@@ -91,12 +94,11 @@ export const sendTelegramMessage = action({
     replyMarkup: v.optional(v.any())
   },
   handler: async (ctx, args) => {
-    console.log('📱 Sending Telegram message:', args.text);
+    console.log('📱 Sending Telegram message (simplified):', args.text);
     
-    // In production, you'd integrate with real Telegram Bot API here
     return {
       success: true,
-      message: 'Message sent successfully',
+      message: 'Message sent successfully (simplified)',
       messageId: `msg_${Date.now()}`
     };
   }

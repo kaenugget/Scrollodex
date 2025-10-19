@@ -19,7 +19,7 @@ export function useVideoGeneration(contactId: Id<"contacts">, userId: Id<"users"
   
   // Extract video generation status from pet data
   const videoStatus: VideoGenerationStatus = {
-    status: petData?.videoGenerationStatus || 'pending',
+    status: (petData?.videoGenerationStatus as 'pending' | 'generating' | 'completed' | 'failed') || 'pending',
     startedAt: petData?.videoGenerationStartedAt,
     completedAt: petData?.videoGenerationCompletedAt,
     error: petData?.videoGenerationError,

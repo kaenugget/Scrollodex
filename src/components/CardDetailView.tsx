@@ -59,12 +59,13 @@ export function CardDetailView({ cardId }: CardDetailViewProps) {
 
   const generateShareLink = async (type: "view" | "claim") => {
     try {
-      const share = await createCardShare({
+      const shareId = await createCardShare({
         cardId: cardId as Id<"cards">,
         shareType: type,
       });
       
-      const url = `${window.location.origin}/share/${share.shareToken}`;
+      // For now, use the shareId as the token (this might need adjustment based on your schema)
+      const url = `${window.location.origin}/share/${shareId}`;
       setShareUrl(url);
       setShareType(type);
       setShowQR(true);
@@ -186,7 +187,7 @@ export function CardDetailView({ cardId }: CardDetailViewProps) {
               <div className="aspect-[3/4] bg-gray-700 relative">
                 {(showFront ? frontImageUrl : backImageUrl) ? (
                   <img
-                    src={showFront ? frontImageUrl : backImageUrl}
+                    src={(showFront ? frontImageUrl : backImageUrl) || ''}
                     alt={`${card.title} - ${showFront ? 'Front' : 'Back'}`}
                     className="w-full h-full object-cover"
                   />

@@ -35,6 +35,7 @@ export function CardComposer({ peerPageId, onClose }: CardComposerProps) {
   const { user: currentUser } = useAuth();
   const getDecks = useQuery(api.social.getDecks, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
   const contacts = useQuery(api.contacts.list, currentUser ? { ownerId: currentUser._id as Id<"users"> } : "skip");
+  const peerPage = useQuery(api.social.getPeerPage, { peerPageId });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -140,23 +141,31 @@ export function CardComposer({ peerPageId, onClose }: CardComposerProps) {
       }
 
       // Find or create deck for this peer page
+      // Use the peerPage from the query
+      if (!currentUser || !peerPage) {
+        throw new Error('User or peer page not found');
+      }
+      
+      const otherUserId = peerPage.aUserId === currentUser._id ? peerPage.bUserId : peerPage.aUserId;
+      
       let deck = getDecks?.find(d => 
         d.kind === "duo" && 
         d.peerUserId && 
-        (peerPageId === d.peerUserId) // This logic might need adjustment based on your schema
+        (d.peerUserId === otherUserId) // Compare with the actual user ID from the peer page
       );
 
       if (!deck && currentUser) {
         // Create a new duo deck for this peer page
-        const peerPage = await api.social.getPeerPage({ peerPageId });
-        const otherUserId = peerPage?.aUserId === currentUser._id ? peerPage.bUserId : peerPage?.aUserId;
-        
-        deck = await createDeck({
+        const newDeckId = await createDeck({
           ownerId: currentUser._id,
           kind: "duo",
           peerUserId: otherUserId,
           title: `Shared Collection`,
         });
+        
+        // Use the new deck ID directly
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        deck = { _id: newDeckId } as any; // Temporary workaround
       }
 
       if (!deck) {

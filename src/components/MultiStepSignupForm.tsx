@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "./ui/button";
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Camera, ArrowLeft, ArrowRight, Check } from "lucide-react";
@@ -26,7 +27,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarFileId, setAvatarFileId] = useState<string | null>(null);
+  const [avatarFileId, setAvatarFileId] = useState<Id<"_storage"> | null>(null);
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const [error, setError] = useState("");
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -344,7 +345,7 @@ export function MultiStepSignupForm({ onSuccess, isLoading, setIsLoading }: Mult
     }
 
     try {
-      let selfieFileId: string | undefined;
+      let selfieFileId: Id<"_storage"> | undefined;
 
       // Upload selfie if provided
       if (selfieFile) {
