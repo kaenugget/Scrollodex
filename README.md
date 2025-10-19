@@ -206,7 +206,7 @@ This is a personal project, but feel free to:
 1. [Brent Deverman](https://deverman.org) brent@deverman.org
 2. [Chen Chen]() cecichencc@gmail.com
 3. [Tatsuya Kohrogi](https://www.linkedin.com/in/tatsuya-kohrogi/) tkohrogi@ripple.com
-4. [Wan Sheng Fung, Kaelan](https://www.linkedin.com/in/kaelan) kaelanwanshengfung@gmail.com
+4. [Wan Sheng Fung, Kaelan](https://www.linkedin.com/in/kaelan-wan) kaelanwanshengfung@gmail.com
 
 ## License
 
