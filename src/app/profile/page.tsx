@@ -232,7 +232,7 @@ export default function ProfilePage() {
             alt={`${currentUser.displayName}'s avatar`}
             width={192}
             height={192}
-            className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl"
+            className="w-48 h-48 rounded-full object-cover object-center border-4 border-white shadow-2xl"
             onError={(e) => {
               console.error('Avatar image failed to load:', e);
               console.log('Failed to load avatar URL:', sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage);
