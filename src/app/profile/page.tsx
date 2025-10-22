@@ -45,9 +45,17 @@ export default function ProfilePage() {
   // Load avatar from session storage
   useEffect(() => {
     const storedAvatarUrl = sessionStorage.getItem('userAvatarUrl');
+    console.log('Session storage check:', {
+      hasStoredAvatar: !!storedAvatarUrl,
+      storedAvatarUrl: storedAvatarUrl,
+      sessionStorageKeys: Object.keys(sessionStorage)
+    });
+    
     if (storedAvatarUrl) {
       setSessionAvatarUrl(storedAvatarUrl);
       console.log('Avatar loaded from session storage:', storedAvatarUrl);
+    } else {
+      console.log('No avatar found in session storage');
     }
   }, []);
 
@@ -59,7 +67,9 @@ export default function ProfilePage() {
         avatarUrl: currentUser.avatarUrl,
         avatarFileId: currentUser.avatarFileId,
         avatarUrlFromStorage: avatarUrlFromStorage,
-        sessionAvatarUrl: sessionAvatarUrl
+        sessionAvatarUrl: sessionAvatarUrl,
+        hasSessionStorage: !!sessionStorage.getItem('userAvatarUrl'),
+        sessionStorageValue: sessionStorage.getItem('userAvatarUrl')
       });
     }
   }, [currentUser, avatarUrlFromStorage, sessionAvatarUrl]);
@@ -226,28 +236,51 @@ export default function ProfilePage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        {(sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage) ? (
-          <Image 
-            src={sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage || ''} 
-            alt={`${currentUser.displayName}'s avatar`}
-            width={192}
-            height={192}
-            className="w-48 h-48 rounded-full object-cover object-center border-4 border-white shadow-2xl"
-            onError={(e) => {
-              console.error('Avatar image failed to load:', e);
-              console.log('Failed to load avatar URL:', sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage);
-            }}
-            onLoad={() => {
-              console.log('Avatar loaded successfully:', sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage);
-            }}
-          />
-        ) : (
-          <div className="w-48 h-48 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center border-4 border-white shadow-2xl">
-            <span className="text-white text-6xl font-bold">
-              {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
-            </span>
-          </div>
-        )}
+        {(() => {
+          // Determine the best avatar source
+          const avatarSource = sessionAvatarUrl || currentUser.avatarUrl || avatarUrlFromStorage;
+          const hasAvatar = !!avatarSource;
+          
+          console.log('Avatar display logic:', {
+            sessionAvatarUrl,
+            currentUserAvatarUrl: currentUser.avatarUrl,
+            avatarUrlFromStorage,
+            finalAvatarSource: avatarSource,
+            hasAvatar
+          });
+          
+          if (hasAvatar) {
+            return (
+              <Image 
+                src={avatarSource} 
+                alt={`${currentUser.displayName}'s avatar`}
+                width={192}
+                height={192}
+                className="w-48 h-48 rounded-full object-cover object-center border-4 border-white shadow-2xl"
+                onError={(e) => {
+                  console.error('Avatar image failed to load:', e);
+                  console.log('Failed to load avatar URL:', avatarSource);
+                  // Force fallback by clearing the avatar source
+                  if (sessionAvatarUrl) {
+                    sessionStorage.removeItem('userAvatarUrl');
+                    setSessionAvatarUrl(null);
+                  }
+                }}
+                onLoad={() => {
+                  console.log('Avatar loaded successfully:', avatarSource);
+                }}
+              />
+            );
+          } else {
+            return (
+              <div className="w-48 h-48 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center border-4 border-white shadow-2xl">
+                <span className="text-white text-6xl font-bold">
+                  {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+            );
+          }
+        })()}
       </motion.div>
 
       {/* Profile Info Card */}

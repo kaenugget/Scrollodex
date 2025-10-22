@@ -24,10 +24,13 @@ export function useAuth() {
   useEffect(() => {
     console.log('useAuth: currentUser changed:', currentUser ? 'User found' : 'No user', currentUser?._id);
     
-    // Store avatar URL in session storage if user has one and it's not already stored
-    if (currentUser?.avatarUrl && !sessionStorage.getItem('userAvatarUrl')) {
-      sessionStorage.setItem('userAvatarUrl', currentUser.avatarUrl);
-      console.log('Avatar URL stored in session storage from user data:', currentUser.avatarUrl);
+    // Store avatar URL in session storage if user has one
+    if (currentUser?.avatarUrl) {
+      const existingAvatar = sessionStorage.getItem('userAvatarUrl');
+      if (!existingAvatar || existingAvatar !== currentUser.avatarUrl) {
+        sessionStorage.setItem('userAvatarUrl', currentUser.avatarUrl);
+        console.log('Avatar URL stored/updated in session storage from user data:', currentUser.avatarUrl);
+      }
     }
   }, [currentUser]);
 
